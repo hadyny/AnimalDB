@@ -1,0 +1,42 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.CulledPups>
+
+<h3>@Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })</h3>
+
+<h2>Culled Pups</h2>
+
+<p>
+    @Html.ActionLink("Add Details for Culled Pups", "Create", null, new { @class = "btn  btn-outline-dark" })
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.AnimalId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AmountCulled)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateCulled)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AmountCulled) @if (item.NumFemale != null) { <text>(@item.NumFemale Female, @item.NumMale Male)</text> }
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DateCulled)
+        </td>
+        <td>
+            @Html.ActionLink("View/Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+        </td>
+    </tr>
+}
+
+</table>

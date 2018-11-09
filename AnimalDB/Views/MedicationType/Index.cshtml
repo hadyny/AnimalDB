@@ -1,0 +1,35 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.MedicationType>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h3>@Html.ActionLink("Back to Admin", "Index", "Admin", null, new { @class = "btn btn-primary" })</h3>
+
+<h2>Medication</h2>
+
+<p>
+    @Html.ActionLink("Create New Medication Type", "Create", null, new { @class = "btn  btn-outline-dark" })
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.ActionLink("Animals", "Animals", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            @Html.ActionLink("View / Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+        </td>
+    </tr>
+}
+
+</table>

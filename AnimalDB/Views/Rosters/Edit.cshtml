@@ -1,0 +1,75 @@
+﻿@model AnimalDB.Repo.Entities.Roster
+
+<h3>@Html.ActionLink("Cancel", "Index", new { id = Model.Room_Id }, new { @class = "btn btn-primary" })</h3>
+
+<h2>Create new roster</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(m => m.Id)
+        @Html.HiddenFor(m => m.Room_Id)
+        <div class="form-group">
+            @Html.LabelFor(model => model.Student_Id, "Student", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("Student_Id", null, "", htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Student_Id, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
+
+            </div>
+
+        </div>
+
+        <div class="offset-md-2 col-md-10 explain-weekend"></div>
+
+        <div class="form-group">
+            <div class="offset-md-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-outline-dark " />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        var explainDate = function () {
+            var dates = $('#Date').val().split("/");
+            var saturday = new Date(dates[2], dates[1] - 1, dates[0]);
+            var sunday = new Date(dates[2], dates[1] - 1, dates[0]);
+            if (saturday.getDay() == 0) {
+                saturday.setDate(saturday.getDate() - 1);
+            } else {
+                sunday.setDate(sunday.getDate() + 1);
+            }
+            $('.explain-weekend').html('Weekend of ' + saturday.toDateString() + ' - ' + sunday.toDateString());
+        };
+
+        $(".date").datetimepicker({
+            format: 'DMY',
+            daysOfWeekDisabled: [1, 2, 3, 4, 5],
+            useCurrent: false
+        });
+
+        $('.date').on('dp.change', function (e) {
+            explainDate();
+        });
+
+        $(document).ready(function () {
+            explainDate();
+        });
+    </script>
+}

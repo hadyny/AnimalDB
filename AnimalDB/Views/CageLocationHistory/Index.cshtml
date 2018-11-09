@@ -1,0 +1,89 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.CageLocationHistory>
+
+@{
+    bool first = true;
+}
+
+<h2>Cage Location History for @ViewBag.AnimalName</h2>
+
+@Html.Partial("_AnimalHeaderPartial")
+
+<h3>
+    Current Location:
+    @if (Model.Count() != 0)
+    {
+        if (Model.First().CageLocation_Id != null)
+        {
+            @Model.First().CageLocation.Description;
+        }
+        else
+        {
+            <text>@Model.First().RackEntry.Rack.Reference_Id, @Model.First().RackEntry.Reference </text>
+    }
+}
+</h3>
+
+
+<p>
+    @Html.ActionLink("Move Animal", "Create", new { id = ViewBag.AnimalId }, new { @class = "btn  btn-outline-dark" })
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Timestamp)
+            </th>
+            <th>
+                Location
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+@foreach (var item in Model) {
+    if (first) {
+        first = false;
+        <tr class="success">
+            <td>
+                @Html.DisplayFor(modelItem => item.Timestamp)
+            </td>
+            <td>
+                @if (item.CageLocation_Id != null)
+                {
+                    @Html.DisplayFor(modelItem => item.CageLocation.Description)
+                }
+                else
+                {
+                    <text>@Html.DisplayFor(modelItem => item.RackEntry.Rack.Reference_Id), @Html.DisplayFor(modelItem => item.RackEntry.Reference)</text>
+}
+            </td>
+            <td>
+                @if (!User.IsInRole("Student") && !User.IsInRole("Veterinarian"))
+                {
+                    @Html.ActionLink("Change", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                }
+            </td>
+        </tr>
+    } else {
+        first = false;
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Timestamp)
+            </td>
+            <td>
+                @if (item.CageLocation_Id != null)
+                {
+                    @Html.DisplayFor(modelItem => item.CageLocation.Description)
+                }
+                else
+                {
+                    <text>@Html.DisplayFor(modelItem => item.RackEntry.Rack.Reference_Id), @Html.DisplayFor(modelItem => item.RackEntry.Reference)</text>
+}
+            </td>
+            <td>
+                
+            </td>
+        </tr>   
+    }
+}
+
+</table>

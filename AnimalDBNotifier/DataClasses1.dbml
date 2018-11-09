@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="aspnet-AnimalDB-20150205100020" Class="DataClasses1DataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=psychweb-v2;Initial Catalog=AnimalDB2;Persist Security Info=True;User ID=AnimalDB" SettingsObjectName="AnimalDBNotifier.Properties.Settings" SettingsPropertyName="AnimalDB2ConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Animals" Member="Animals">
+    <Type Name="Animal">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="UniqueAnimalId" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="ChargeCode_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ArrivalDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="BornHere" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="BirthDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="DeathDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="CauseOfDeath" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Tag" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Investigator_Id" Type="System.String" DbType="NVarChar(128)" CanBeNull="true" />
+      <Column Name="Colour_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="BaseWeight" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FeedingGroup_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Strain_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Source_Id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ArrivalStatus_Id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Sex" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="AliveStatus" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Manipulation" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Grading" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Room_Id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Group_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="HasPicture" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ApprovalNumber_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="Animal_Medication" Member="Medications" ThisKey="Id" OtherKey="Animal_Id" Type="Medication" />
+      <Association Name="Animal_Notification" Member="Notifications" ThisKey="Id" OtherKey="Animal_Id" Type="Notification" />
+      <Association Name="AspNetUser_Animal" Member="AspNetUser" ThisKey="Investigator_Id" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" />
+      <Association Name="Room_Animal" Member="Room" ThisKey="Room_Id" OtherKey="Id" Type="Room" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.AspNetUsers" Member="AspNetUsers">
+    <Type Name="AspNetUser">
+      <Column Name="Id" Type="System.String" DbType="NVarChar(128) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="FirstName" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="LastName" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Email" Type="System.String" DbType="NVarChar(256)" CanBeNull="true" />
+      <Column Name="EmailConfirmed" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="PasswordHash" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="SecurityStamp" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="PhoneNumber" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="PhoneNumberConfirmed" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TwoFactorEnabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="LockoutEndDateUtc" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="LockoutEnabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="AccessFailedCount" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UserName" Type="System.String" DbType="NVarChar(256) NOT NULL" CanBeNull="false" />
+      <Column Name="Investigator_Id" Type="System.String" DbType="NVarChar(128)" CanBeNull="true" />
+      <Column Name="Discriminator" Type="System.String" DbType="NVarChar(128) NOT NULL" CanBeNull="false" />
+      <Association Name="AspNetUser_Animal" Member="Animals" ThisKey="Id" OtherKey="Investigator_Id" Type="Animal" />
+      <Association Name="AspNetUser_AspNetUser" Member="AspNetUsers" ThisKey="Id" OtherKey="Investigator_Id" Type="AspNetUser" />
+      <Association Name="AspNetUser_Medication" Member="Medications" ThisKey="Id" OtherKey="WhoToNotify_Id" Type="Medication" />
+      <Association Name="AspNetUser_Room" Member="Rooms" ThisKey="Id" OtherKey="Technician_Id" Type="Room" />
+      <Association Name="AspNetUser_AspNetUser" Member="AspNetUser1" ThisKey="Investigator_Id" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Medications" Member="Medications">
+    <Type Name="Medication">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Timestamp" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Animal_Id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Dosage" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Rate" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Frequency" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FrequencyValue" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Duration" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="DurationValue" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Comments" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="MedicationType_Id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="IncidentReport_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="WhoToNotify_Id" Type="System.String" DbType="NVarChar(128)" CanBeNull="true" />
+      <Association Name="Medication_Notification" Member="Notifications" ThisKey="Id" OtherKey="Medication_Id" Type="Notification" />
+      <Association Name="Animal_Medication" Member="Animal" ThisKey="Animal_Id" OtherKey="Id" Type="Animal" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+      <Association Name="AspNetUser_Medication" Member="AspNetUser" ThisKey="WhoToNotify_Id" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" />
+      <Association Name="MedicationType_Medication" Member="MedicationType" ThisKey="MedicationType_Id" OtherKey="Id" Type="MedicationType" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Notifications" Member="Notifications">
+    <Type Name="Notification">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="NotificationDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Type" Type="global::AnimalDBNotifier.NotificationType" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Medication_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Animal_Id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Animal_Notification" Member="Animal" ThisKey="Animal_Id" OtherKey="Id" Type="Animal" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+      <Association Name="Medication_Notification" Member="Medication" ThisKey="Medication_Id" OtherKey="Id" Type="Medication" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Rooms" Member="Rooms">
+    <Type Name="Room">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="Technician_Id" Type="System.String" DbType="NVarChar(128) NOT NULL" CanBeNull="false" />
+      <Association Name="Room_Animal" Member="Animals" ThisKey="Id" OtherKey="Room_Id" Type="Animal" />
+      <Association Name="AspNetUser_Room" Member="AspNetUser" ThisKey="Technician_Id" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MedicationTypes" Member="MedicationTypes">
+    <Type Name="MedicationType">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Association Name="MedicationType_Medication" Member="Medications" ThisKey="Id" OtherKey="MedicationType_Id" Type="Medication" />
+    </Type>
+  </Table>
+</Database>

@@ -1,0 +1,74 @@
+﻿@model AnimalDB.Repo.Entities.Animal
+
+<h3>
+    @Html.ActionLink("Back", "Details", "Relationships", new { id = Model.Id }, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Relationships for @Model.UniqueAnimalId</h2>
+
+<p>
+    @Html.ActionLink("Create New Relationship", "Create", new { id = Model.Id }, new { @class = "btn  btn-outline-dark" })
+</p>
+
+<h3>Parents</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueAnimalId)
+            </th>
+            <th>
+                Culled
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+@foreach (var item in Model.Parents) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.UniqueAnimalId)
+        </td>
+        <td>
+            @(item.CauseOfDeath == AnimalDB.Repo.Enums.CauseOfDeathEnum.Culled)
+        </td>
+        <td>
+            @Html.ActionLink("X", "DeleteParent", new { id = item.Id, subject = Model.Id }, new { @class = "btn  btn-danger" })
+        </td>
+    </tr>
+}
+
+</table>
+
+<hr />
+
+<h3>Offspring</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueAnimalId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CauseOfDeath)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    @foreach (var item in Model.Offspring)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UniqueAnimalId)
+            </td>
+            <td>
+                @(item.CauseOfDeath == AnimalDB.Models.CauseOfDeathEnum.Culled)
+            </td>
+            <td>
+                @Html.ActionLink("X", "DeleteChild", new { id = item.Id, subject = Model.Id }, new { @class = "btn  btn-danger" })
+            </td>
+        </tr>
+    }
+
+</table>

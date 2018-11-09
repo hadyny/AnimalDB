@@ -1,0 +1,113 @@
+﻿@model AnimalDB.Repo.Entities.Animal
+
+<h2>Relationships for @Model.UniqueAnimalId</h2>
+
+@Html.Partial("_AnimalHeaderPartial")
+
+@if (!User.IsInRole("Student") && !User.IsInRole("Veterinarian"))
+{
+    @Html.ActionLink("Create New Relationship", "Create", "Relationships", new { id = Model.Id }, new { @class = "btn  btn-outline-dark" })
+}
+<h3>Parents</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueAnimalId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sex)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CauseOfDeath)
+            </th>
+            <th class="col-md-2"></th>
+        </tr>
+    </thead>
+    @foreach (var item in Model.Parents)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UniqueAnimalId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sex)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CauseOfDeath)
+            </td>
+            <td>
+                @if (!User.IsInRole("Student") && !User.IsInRole("Veterinarian"))
+                {
+                    @Html.ActionLink("View", "Details", "Animals", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                    @Html.ActionLink("X", "DeleteParent", new { id = item.Id, subject = Model.Id }, new { @class = "btn  btn-danger" })
+                }
+            </td>
+        </tr>
+    }
+</table>
+
+<hr />
+<h3>Offspring</h3>
+<dl class="dl-horizontal offspring-details">
+    <dt>
+        Total
+    </dt>
+
+    <dd>
+        @(Model.Offspring.Count() + ViewBag.AmountCulled as int?)
+    </dd>
+
+    <dt>
+        Kept / Culled
+    </dt>
+
+    <dd>
+        @Model.Offspring.Count(m => m.CauseOfDeath == null) / @(Model.Offspring.Count(m => m.CauseOfDeath == AnimalDB.Repo.Enums.CauseOfDeathEnum.Culled) + ViewBag.AmountCulled as int?)
+    </dd>
+
+    <dt>
+        Male / Female
+    </dt>
+
+    <dd>
+        @(Model.Offspring.Count(m => m.Sex == AnimalDB.Repo.Enums.Sex.Male) + ViewBag.NumMale as int?) / @(Model.Offspring.Count(m => m.Sex == AnimalDB.Repo.Enums.Sex.Female) + ViewBag.NumFemale as int?)
+    </dd>
+</dl>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueAnimalId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sex)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CauseOfDeath)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    @foreach (var item in Model.Offspring)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UniqueAnimalId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sex)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CauseOfDeath)
+            </td>
+            <td>
+                @if (!User.IsInRole("Student") && !User.IsInRole("Veterinarian"))
+                {
+                    @Html.ActionLink("View", "Details", "Animals", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                    @Html.ActionLink("X", "DeleteChild", new { id = item.Id, subject = Model.Id }, new { @class = "btn  btn-danger" })
+                }
+            </td>
+        </tr>
+    }
+</table>

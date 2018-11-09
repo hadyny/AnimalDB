@@ -1,0 +1,43 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.EthicsDocument>
+
+<h3>
+    @Html.ActionLink("Back", "Investigators", null, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Ethics Documents for @ViewBag.Investigator</h2>
+
+<p>
+    @Html.ActionLink("Upload New Document", "Upload", new { id = ViewBag.Investigator_Id }, new { @class = "btn  btn-outline-dark" })
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="col-md-6">
+
+            </th>
+            <th class="col-md-3">
+                @Html.DisplayNameFor(model => model.DateUploaded)
+            </th>
+            <th class="col-md-3"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                    <div class="small text-muted">@Html.DisplayFor(m => item.FileName)</div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateUploaded)
+                </td>
+                <td>
+                    @Html.ActionLink("View", "View", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

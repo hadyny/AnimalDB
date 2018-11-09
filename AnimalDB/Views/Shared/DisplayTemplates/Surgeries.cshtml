@@ -1,0 +1,10 @@
+﻿@model ICollection<AnimalDB.Models.SurgeryType>
+
+@for (int i = 0; i < Model.Count(); i++)
+{
+    if (i != 0)
+    {
+        <text>,</text>
+    }
+    @Model.ElementAt(i).Description
+}

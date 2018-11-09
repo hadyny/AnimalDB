@@ -1,0 +1,2 @@
+﻿@model System.Boolean?
+@Html.DropDownList("", new SelectList(new List<SelectListItem>() { new SelectListItem { Value = "false", Text = "No" }, new SelectListItem { Value = "true", Text = "Yes" } }, "Value", "Text", Model), new { @class = "form-control" })

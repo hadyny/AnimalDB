@@ -1,0 +1,36 @@
+﻿@model AnimalDB.Repo.Entities.Roster
+
+<h3>@Html.ActionLink("Back", "Index", new { id = Model.Room_Id }, new { @class = "btn btn-primary" })</h3>
+
+
+<h3>Are you sure you want to delete this roster?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Student)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Student.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-danger" />
+            @Html.ActionLink("Cancel", "Index", new { id = Model.Room_Id }, new { @class = "btn btn-outline-dark " })
+        </div>
+    }
+</div>

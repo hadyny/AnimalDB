@@ -1,0 +1,35 @@
+﻿@model AnimalDB.Repo.Entities.VetSchedule
+
+<h3>
+    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Upload New Vet Schedule</h2>
+
+
+@using (Html.BeginForm("Upload", "VetSchedules", null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <input type="hidden" name="Id" id="Id" value="0" />
+
+        <div class="form-group">
+            @Html.Label("PDF File", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="file" id="pdffile" name="upload" />
+                @Html.ValidationMessage("file", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="offset-md-2 col-md-10">
+                <input type="submit" value="Upload" class="btn btn-outline-dark " />
+            </div>
+        </div>
+    </div>
+}
+
+

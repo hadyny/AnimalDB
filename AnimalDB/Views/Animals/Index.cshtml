@@ -1,0 +1,64 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Animal>
+
+
+<h2>Animals</h2>
+
+<p>
+    @Html.ActionLink("Add New Animal", "Create", null, new { @class = "btn  btn-outline-dark" })
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr class="row">
+            <th>
+                @Html.DisplayNameFor(model => model.ArrivalDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueAnimalId)
+            </th>
+            @*
+            <th>
+                @Html.DisplayNameFor(model => model.ChargeCode)
+            </th>
+            *@
+            <th>
+                @Html.DisplayNameFor(model => model.Investigator)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Source.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Strain.Description)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ArrivalDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UniqueAnimalId)
+        </td>
+        @*
+        <td>
+            @Html.DisplayFor(modelItem => item.ChargeCode)
+        </td>
+            *@
+        <td>
+            @Html.DisplayFor(modelItem => item.Investigator.FullName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Source.Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Strain.Description)
+        </td>
+        <td>
+            @Html.ActionLink("View / Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+        </td>
+    </tr>
+}
+
+</table>

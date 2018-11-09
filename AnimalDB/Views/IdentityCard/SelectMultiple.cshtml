@@ -1,0 +1,124 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Animal>
+
+<h3>
+    @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Select animals to print identity cards</h2>
+<div class="alert alert-info col-sm-5">
+    Select the "Include offspring of selected" checkbox to also include
+    all offspring (marked with a -[number] at the end of their name. E.g. Animal, Animal-1, Animal-2 etc).
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <!--<h3>Animals (<span data-bind="text: animals().length"></span>)</h3>-->
+        @using (Html.BeginForm("Multiple", "IdentityCard", FormMethod.Post, new { target = "_blank" }))
+        {
+            /*
+            <table class="selectanimalsforprint">
+                <thead>
+                    <tr>
+                        <th>Unique Animal Id</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: animals">
+                    <tr>
+                        <td>
+                            <input type="hidden" name="animals.Index" data-bind="value: $index" />
+                            <select class="form-control" data-bind="value: name, attr: { name:'animals[' + $index() + '].Id' }">
+                                <option></option>
+                                @foreach (var animal in Model)
+                                {
+                                    <option value="@animal.Id">@animal.UniqueAnimalId</option>
+                                }
+                            </select>
+                        </td>
+                        <td><a href="#" class="btn  btn-danger" data-bind="click: $root.removeAnimal">X</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>
+                <button class="btn  btn-primary" data-bind="click: addAnimal">Add another animal</button>
+                <button type="submit" class="btn  btn-outline-dark">Print Cards</button>
+            </h3>
+            */
+            <select class="form-control" name="animals" id="animals" multiple style="height: 400px; font-size: 26px;">
+                @foreach (var animal in Model)
+                {
+                    <option value="@animal.Id">@animal.UniqueAnimalId</option>
+                }
+            </select>
+
+            <div style="margin-top: 20px;">
+                <div>
+                    <label><input type="checkbox" name="offspring" value="1" /> Include offspring of selected</label>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-outline-dark">Print Cards</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/Scripts/multi.min.js"></script>
+
+    <script>
+        multi(document.getElementById('animals'), {
+            'non_selected_header': ' ',
+            'selected_header': 'Animals currently selected:'
+        });
+        /*
+        function Animal(name) {
+            var self = this;
+            self.name = name;
+        }
+        function AnimalsViewModel() {
+            var self = this;
+            self.animals = ko.observableArray([
+                new Animal("")
+            ]);
+            self.addAnimal = function () {
+                self.animals.push(new Animal(""));
+                $('select').select2({
+                    allowClear: true,
+                    matcher: matchCustom
+                });
+            }
+            self.removeAnimal = function (animal) { self.animals.remove(animal) }
+        }
+
+        ko.applyBindings(new AnimalsViewModel());
+
+        $(document).ready(function () {
+            $('select').select2({
+                allowClear: true
+            });
+        });*/
+        $("#filter").keyup(function () {
+            if ($("#filter").val() == "") {
+                $('#animals > option').hidden = false;
+            }
+            for (let i = 0; i < $('#animals > option').length; i++) {
+                if ($('#animals > option')[i].innerText.toLowerCase().indexOf($("#filter").val().toLowerCase()) == -1) {
+                    $('#animals > option')[i].hidden = true;
+                } else {
+                    $('#animals > option')[i].hidden = false;
+                }
+            }
+        });
+
+        $('#animals').change(function () {
+            let selectedItems = $("#animals").val();
+            let selectedItemText = '', itemText = '';
+            $('#selectedlist')[0].innerHTML = '';
+            selectedItems.forEach(function (item) {
+                itemText = $(`#animals option[value=${item}]`)[0].innerText;
+                $('#selectedlist')[0].innerHTML += `<li>${itemText}</li>`;
+            });
+        });
+    </script>
+
+}

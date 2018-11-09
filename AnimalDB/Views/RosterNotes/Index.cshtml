@@ -1,0 +1,28 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.RosterNote>
+
+<h3>
+    @Html.ActionLink("Back", "Index", "Rosters", new { id = ViewBag.Room_Id }, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Weekend Roster Notes <small>@ViewBag.Weekend</small></h2>
+
+<p>
+    @Html.ActionLink("Create New Note", "Create", new { id = ViewBag.Id }, new { @class = "btn btn-outline-dark " })
+</p>
+
+<table class="table table-striped">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Content)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-danger " })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

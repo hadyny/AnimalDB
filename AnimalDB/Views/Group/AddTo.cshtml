@@ -1,0 +1,53 @@
+﻿@model AnimalDB.Models.AddToGroupViewModel
+
+<h3>
+    @Html.ActionLink("Back", "Index", new { id = ViewBag.FeedingGroupId }, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Add Animals to Group</h2>
+
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal clearfix">
+        <div class="col-md-6">
+            <h4>@ViewBag.GroupName</h4>
+            <hr />
+            @Html.ValidationSummary(true)
+            @Html.HiddenFor(m => m.GroupId)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AnimalId, "Animal Id", new { @class = "control-label col-md-2" })
+                <div>
+                    @Html.DropDownList("AnimalId", null, "-- Scan or Select -- ", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.AnimalId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div>
+                    <input type="submit" value="Add" class="btn  btn-outline-dark" />
+                </div>
+            </div>
+        </div>
+
+
+        <div class="groupanimalslist">
+            <h4>Animals in Group</h4>
+            <ul>
+                @foreach (AnimalDB.Repo.Entities.Animal animal in ViewBag.AnimalList)
+                {
+                    <li>@Html.ActionLink("X", "RemoveFrom", new { Id = animal.Id, groupid = Model.GroupId }, new { @class = "btn  btn-danger" }) @animal.UniqueAnimalId </li>
+                }
+            </ul>
+        </div>
+    </div>
+}
+@Html.ActionLink("Finish", "Index", "Group", new { id = ViewBag.FeedingGroupId }, new { @class = "btn  btn-primary" })
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

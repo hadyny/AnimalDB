@@ -1,0 +1,42 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.MedicationFollowUp>
+
+<h3>
+    @Html.ActionLink("Back", "Index", new { id = ViewBag.Animal_Id }, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Medication for @ViewBag.AnimalName</h2>
+
+<p>
+    @Html.ActionLink("Administer Medicine", "FollowUp", new { id = ViewBag.Animal_Id }, new { @class = "btn btn-outline-dark " })
+</p>
+<table class="table">
+    <tr>
+        <th class="col-md-2">
+            @Html.DisplayNameFor(model => model.Timestamp)
+        </th>
+        <th class="col-md-5">
+            @Html.DisplayNameFor(model => model.Medication)
+        </th>
+        <th class="col-md-4">
+            @Html.DisplayNameFor(model => model.Comments)
+        </th>
+        <th class="col-md-1"></th>
+    </tr>
+
+    @foreach (var item in Model.OrderByDescending(m => m.Timestamp)) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Timestamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Medication.Timestamp): @Html.DisplayFor(modelItem => item.Medication.MedicationType.Description) (@Html.DisplayFor(modelItem => item.Medication.Dosage))
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Comments)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "EditFollowUp", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            </td>
+        </tr>
+}
+</table>

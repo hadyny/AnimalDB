@@ -1,0 +1,61 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Animal>
+
+<h2>Animals under Charge Code: @ViewBag.ChargeCode</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueAnimalId)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Investigator)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Source.Description)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Strain.Description)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.CauseOfDeath)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UniqueAnimalId)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Investigator.FullName)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Source.Description)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Strain.Description)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.CauseOfDeath)
+                </td>
+
+                <td>
+                    @Html.ActionLink("View", "Details", "Animals", new { id = item.Id }, new { @class = "btn  btn-primary" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

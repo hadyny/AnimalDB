@@ -1,0 +1,339 @@
+﻿@model AnimalDB.Repo.Entities.Animal
+
+<h2>Details for @Model.UniqueAnimalId</h2>
+
+@Html.Partial("_AnimalHeaderPartial")
+<div class="row">
+    <div class="col-md-4">
+        <dl class="row leftanimaldetails">
+            <dt class="col-md-5">
+                @Html.DisplayNameFor(model => model.Room_Id)
+            </dt>
+
+            <dd class="col-md-7">
+                @Html.DisplayFor(model => model.Room.Description)
+            </dd>
+
+            <dt class="col-md-5">
+                Animal Id
+            </dt>
+
+            <dd class="col-md-7">
+                @Html.DisplayFor(model => model.UniqueAnimalId)
+            </dd>
+
+            <dt class="col-md-5">
+                @Html.DisplayNameFor(model => model.Sex)
+            </dt>
+
+            <dd class="col-md-7">
+                @Html.DisplayFor(model => model.Sex)
+            </dd>
+
+            <dt class="col-md-5">
+                @Html.DisplayNameFor(model => model.ArrivalDate)
+            </dt>
+
+            <dd class="col-md-7">
+                @Html.DisplayFor(model => model.ArrivalDate)
+            </dd>
+
+            <dt class="col-md-5">
+                @Html.DisplayNameFor(model => model.BornHere)
+            </dt>
+
+            <dd class="col-md-7">
+                @Html.DisplayFor(model => model.BornHere)
+            </dd>
+            @if (Model.BirthDate != null)
+            {
+                <dt class="col-md-5">
+                    @Html.DisplayNameFor(model => model.BirthDate)
+                </dt>
+
+                <dd class="col-md-7">
+                    @Html.DisplayFor(model => model.BirthDate)
+                </dd>
+            }
+            @if (Model.Sex == AnimalDB.Repo.Enums.Sex.Female && !string.IsNullOrEmpty(ViewBag.PlugDate))
+            {
+                <dt class="col-md-5">
+                    Plug Date
+                </dt>
+
+                <dd class="col-md-7">
+                    @ViewBag.PlugDate.Remove(ViewBag.PlugDate.IndexOf(' '))
+                </dd>
+
+                if (!string.IsNullOrEmpty(ViewBag.GDDate))
+                {
+                    <dt class="col-md-5">
+                        @ViewBag.GDDescription Date
+                    </dt>
+                    <dd class="col-md-7">
+                        @ViewBag.GDDate.Remove(ViewBag.GDDate.IndexOf(' '))
+                    </dd>
+                }
+
+                <dt class="col-md-5">
+                    Injection Date
+                </dt>
+
+                <dd class="col-md-7">
+                    @if (!string.IsNullOrEmpty(ViewBag.InjectionDate))
+                    {@ViewBag.InjectionDate.Remove(ViewBag.InjectionDate.IndexOf(' '));
+                }
+                </dd>
+                <dt class="col-md-5">
+                    Injection By
+                </dt>
+                <dd class="col-md-7">
+                    @ViewBag.InjectionBy
+                </dd>
+            }
+            @if (Model.DeathDate != null)
+            {
+                <dt class="col-md-5">
+                    @Html.DisplayNameFor(model => model.DeathDate)
+                </dt>
+
+                <dd class="col-md-7">
+                    @Html.DisplayFor(model => model.DeathDate)
+                </dd>
+
+                <dt class="col-md-5">
+                    @Html.DisplayNameFor(model => model.CauseOfDeath)
+                </dt>
+
+                <dd class="col-md-7">
+                    @Html.DisplayFor(model => model.CauseOfDeath)
+                </dd>
+            }
+        </dl>
+    </div>
+
+    <div class="col-md-4">
+        <dl class="row rightanimaldetails">
+            <dt class="col-md-5">
+                @Html.DisplayNameFor(model => model.ArrivalStatus_Id)
+            </dt>
+
+            <dd class="col-md-7">
+                @Html.DisplayFor(model => model.ArrivalStatus.Description)
+            </dd>
+
+            @if (Model.Colour_Id != null)
+            {
+                <dt class="col-md-5">
+                    @Html.DisplayNameFor(model => model.Colour_Id)
+                </dt>
+
+                <dd class="col-md-7">
+                    @Html.DisplayFor(model => model.Colour.Description)
+                </dd>
+            }
+            @if (Model.Tag != null)
+            {
+                <dt class="col-md-5">
+                    @Html.DisplayNameFor(model => model.Tag)
+                </dt>
+
+                <dd class="col-md-7">
+                    @Html.DisplayFor(model => model.Tag)
+                </dd>
+            }
+            <dt class="col-md-5">
+                @Html.DisplayNameFor(model => model.Investigator_Id)
+            </dt>
+
+            <dd class="col-md-7">
+                @Html.DisplayFor(model => model.Investigator.FullName)
+            </dd>
+            @if (Model.Researcher_Id != null)
+            {
+                <dt class="col-md-5">
+                    @Html.DisplayNameFor(model => model.Researcher_Id)
+                </dt>
+
+                <dd class="col-md-7">
+                    @Html.DisplayFor(model => model.Researcher.FullName)
+                </dd>
+            }
+            @if (Model.ApprovalNumber_Id != null)
+            {
+                <dt class="col-md-5">
+                    HSNO Act App#
+                </dt>
+
+                <dd class="col-md-7">
+                    @Html.DisplayFor(model => model.ApprovalNumber.Description)
+                </dd>
+            }
+            <dt class="col-md-5">
+                @Html.DisplayNameFor(model => model.Source_Id)
+            </dt>
+
+            <dd class="col-md-7">
+                @Html.DisplayFor(model => model.Source.Description)
+            </dd>
+            @if (Model.Strain_Id != null)
+            {
+            <dt class="col-md-5">
+                @Html.DisplayNameFor(model => model.Strain_Id)
+            </dt>
+
+            <dd class="col-md-7">
+                @Html.DisplayFor(model => model.Strain.Description)
+            </dd>
+            }
+            @if (Model.Transgene_Id != null)
+            {
+                <dt class="col-md-5">
+                    @Html.DisplayNameFor(model => model.Transgene_Id)
+                </dt>
+
+                <dd class="col-md-7">
+                    @Html.DisplayFor(model => model.Transgene.Description)
+                </dd>
+            }
+
+            @if (!string.IsNullOrEmpty(ViewBag.SurgeryDate))
+            {
+                <dt class="col-md-5">
+                    Surgery Date
+                </dt>
+
+                <dd class="col-md-7">
+                    @ViewBag.SurgeryDate.Remove(ViewBag.SurgeryDate.IndexOf(' '))
+                </dd>
+            }
+            @if (!string.IsNullOrEmpty(ViewBag.Surgeon)) 
+            {
+                <dt class="col-md-5">
+                    Surgeon
+                </dt>
+
+                <dd class="col-md-7">
+                    @ViewBag.Surgeon
+                </dd>
+            }
+            @if (!string.IsNullOrEmpty(ViewBag.SurgeryType))
+            {
+                <dt class="col-md-5">
+                    Surgery Type
+                </dt>
+
+                <dd class="col-md-7">
+                    @ViewBag.SurgeryType
+                </dd>
+            }
+            @if (!string.IsNullOrEmpty(ViewBag.Surgeon))
+            {
+                <dt class="col-md-5">
+                    Cage Location
+                </dt>
+
+                <dd class="col-md-7">
+                    @ViewBag.CageLocation
+                </dd>
+            }
+            @if (!string.IsNullOrEmpty(ViewBag.EthicsNumber))
+            {
+            <dt class="col-md-5">
+                AUP Number
+            </dt>
+            <dd class="col-md-7">
+                @ViewBag.EthicsNumber
+            </dd>
+            }
+            @if (Model.Sex == AnimalDB.Repo.Enums.Sex.Female)
+            {
+                <dt class="col-md-5">
+                    Offspring Kept
+                </dt>
+
+                <dd class="col-md-7">
+                    @ViewBag.OffspringKept
+                </dd>
+            }
+            @if (Model.FeedingGroup_Id != null)
+            {
+                <dt class="col-md-5">
+                    @Html.DisplayNameFor(model => model.FeedingGroup_Id)
+                </dt>
+
+                <dd class="col-md-7">
+                    @Html.DisplayFor(model => model.FeedingGroup.Description)
+                </dd>
+            }
+        </dl>
+    </div>
+
+    <div class="col-md-4">
+        <div style="float:left">
+            @if (Model.HasPicture)
+            {
+                <img class="animalImg" src="~/Content/AnimalImages/@(Model.Id).jpg?@DateTime.Now.Ticks" />
+            }
+            else
+            {
+                <img class="animalImg" style="display:none" src="" />
+            }
+            @if (Model.ApprovalNumber_Id != null)
+            {
+                <img src="~/Content/bh.jpg" width="70" height="70" alt="Approval Number" />
+            }
+        </div>
+        <div id="fileuploaderdiv" @if (Model.HasPicture) { <text> style="display:none" </text> }>
+            <div id="fileuploader">Upload Photo</div>
+        </div>
+
+        <div>
+            &nbsp;&nbsp;<button type="button" id="RemovePhoto" style="margin-left:40px;@if (!Model.HasPicture) { <text> display:none; </text> }" class="btn btn-outline-dark btn-sm">Remove Photo</button>
+        </div>
+    </div>
+</div>
+
+<div class="clearfix"></div>
+
+@if (!User.IsInRole("Veterinarian"))
+{
+<p>
+    @Html.ActionLink("Edit Animal", "Edit", "Animals", new { id = Model.Id }, new { @class = "btn btn-outline-dark" })
+    <a href="@Url.Action("Single", "IdentityCard", new { id = Model.Id })" class="btn btn-outline-dark" target="_blank">Print Identity Card</a>
+</p>
+}
+
+@section scripts {
+    @Scripts.Render("~/Scripts/jquery.uploadfile.js")
+<script>
+    $(document).ready(function()
+    {
+        $("#fileuploader").uploadFile({
+            url:"@Url.Action("UploadPhoto", new { id = Model.Id })",
+            fileName: "file",
+            allowedTypes: "jpg",
+            dragdropWidth: "170px",
+            onSuccess: function (files, data, xhr) {
+                $('.animalImg').css('display', 'block');
+                $('.animalImg').attr('src', '@Url.Content("~/Content/AnimalImages/" + Model.Id + ".jpg")');
+                $('.ajax-file-upload-statusbar').css('display', 'none');
+                $('#RemovePhoto').css('display', 'block');
+                $('#fileuploaderdiv').css('display', 'none');
+            }
+        });
+
+        $('#RemovePhoto').click(function () {
+            $.post("@Url.Action("RemovePhoto", new { id = Model.Id})")
+                .done(function (result) {
+                    if (result === "True") {
+                        $('.animalImg').css('display', 'none');
+                        $('#RemovePhoto').css('display', 'none');
+                        $('#fileuploaderdiv').css('display', 'inline-block');
+                    }
+                });
+            
+        });
+    });
+    </script>
+}

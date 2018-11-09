@@ -1,0 +1,45 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.ClinicalIncidentReport>
+
+
+<h2>Clinical Incident Reports for @ViewBag.AnimalName</h2>
+
+@Html.Partial("_AnimalHeaderPartial")
+<p>
+    @Html.ActionLink("New Incident Report", "Create", new { id = ViewBag.AnimalId }, new { @class = "btn  btn-outline-dark" })
+</p>
+
+<table class="table">
+    <tr>
+        <th>
+            Date of Report
+        </th>
+        <th>
+            Reported By
+        </th>
+        <th>
+            Date Reported
+        </th>
+    
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+       <td>
+           @item.Timestamp
+       </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ReportedBy)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ReportedByDate)
+        </td>
+        <td>
+            @if (!User.IsInRole("Student")) {
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark"})
+            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+            }
+        </td>
+    </tr>
+}
+</table>

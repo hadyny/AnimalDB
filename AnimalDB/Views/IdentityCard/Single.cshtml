@@ -1,0 +1,112 @@
+﻿@model AnimalDB.Models.IdentityCardViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Animal Identity Card</title>
+    @Styles.Render("~/Content/IdentityCard.css")
+</head>
+<body>
+    <div class="page">
+        <div class="card">
+            @if (string.IsNullOrEmpty(Model.Tag))
+            {
+                <div class="name" style="width: 236px;height:35px;text-align:center"><span>@Model.UniqueAnimalId.ToUpper()</span></div>
+                <img class="barcode" src="@Url.Action("Barcode", "Animals", new { id = Model.Id })?@DateTime.Now.Ticks" alt="barcode" />
+            }
+            else
+            {
+                <span id="qrcode"></span><div class="qr name"><span>@Model.UniqueAnimalId.ToUpper()</span></div>
+
+            }
+            <dl>
+                @if (!string.IsNullOrEmpty(Model.Investigator))
+                {
+                <dt>@Html.DisplayNameFor(model => model.Investigator)</dt>
+                <dd>@Html.DisplayFor(model => Model.Investigator)</dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Researcher))
+                {
+                <dt>@Html.DisplayNameFor(model => model.Researcher)</dt>
+                <dd>@Html.DisplayFor(model => Model.Researcher)</dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.EthicsNumber))
+                {
+                <dt>@Html.DisplayNameFor(model => model.EthicsNumber)</dt>
+                <dd>@Html.DisplayFor(model => Model.EthicsNumber)</dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Sex))
+                {
+                <dt>@Html.DisplayNameFor(model => model.Sex)</dt>
+                <dd>@Html.DisplayFor(model => Model.Sex)</dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Strain))
+                {
+                <dt>@Html.DisplayNameFor(model => model.Strain)</dt>
+                <dd>@Html.DisplayFor(model => Model.Strain)</dd>
+                }
+
+                @if (Model.BirthDate.HasValue)
+                {
+                    <dt>@Html.DisplayNameFor(model => model.BirthDate)</dt>
+                    <dd>@Html.DisplayFor(model => Model.BirthDate)</dd>
+                }
+
+                @if (Model.ArrivalDate.HasValue)
+                {
+                    <dt>@Html.DisplayNameFor(model => model.ArrivalDate)</dt>
+                    <dd>@Html.DisplayFor(model => Model.ArrivalDate)</dd>
+                }
+
+                @if (Model.Sex == "Female" && Model.OffspringKept != 0)
+                {
+                    <dt>@Html.DisplayNameFor(model => model.OffspringKept)</dt>
+                    <dd>@Html.DisplayFor(model => Model.OffspringKept)</dd>
+                }
+
+                @if (Model.Colour != "")
+                {
+                    <dt>@Html.DisplayNameFor(model => model.Colour)</dt>
+                    <dd>@Html.DisplayFor(model => Model.Colour)</dd>
+                }
+                
+                @if (Model.ApprovalNumber != "")
+                {
+                    <dt>@Html.DisplayNameFor(model => model.ApprovalNumber)</dt>
+                    <dd>@Html.DisplayFor(model => Model.ApprovalNumber)</dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Transgene))
+                {
+                    <dt>@Html.DisplayNameFor(model => model.Transgene)</dt>
+                    <dd>@Html.DisplayFor(model => Model.Transgene)</dd>
+                }
+
+            </dl>
+        </div>
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/Scripts/jquery.textfill.js")
+    @Scripts.Render("~/Scripts/jquery.qrcode-0.12.0.js")
+    <script>
+        if ($('#qrcode').length !== 0) {
+            $('#qrcode').qrcode({
+                size: 50,
+                color: "#3a3",
+                text: "@Model.Tag",
+                ecLevel: 'H'
+            });
+        }
+        $('.name').textfill();
+    </script>
+</body>
+</html>

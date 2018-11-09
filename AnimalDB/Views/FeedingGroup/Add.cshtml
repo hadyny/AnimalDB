@@ -1,0 +1,61 @@
+﻿@model AnimalDB.Models.AddToFeedingGroupViewModel
+
+<h3>
+    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
+</h3> 
+
+<h2>Add Animals to Feeding Group</h2>
+
+<div>
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true)
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.Id)
+            <div class="form-group">
+                @Html.LabelFor(model => model.Animal_Id, new { @class = "control-label col-md-4" })
+                <div class="col-md-4">
+                    @Html.DropDownList("Animal_Id", null, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Animal_Id)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="offset-md-2 col-md-8">
+                    <button type="submit" class="btn  btn-outline-dark">Add Animal</button>
+                </div>
+            </div>
+        }
+    </div>
+    <div>
+        <hr />
+        <table class="table table-striped col-sm-6">
+            <tbody>
+                @foreach (var animal in Model.ExistingAnimals)
+                {
+                <tr>
+                    <td>@animal.UniqueAnimalId</td>
+                    <td>@Html.ActionLink("Remove", "RemoveFrom", new { Id = animal.Id }, new { @class = "btn  btn-danger" })</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@Html.ActionLink("Finish", "Index", "FeedingGroup", null, new { @class = "btn  btn-primary" })
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+          $(document).ready(function(){
+              $('select').select2({
+                  allowClear: true,
+                  matcher: matchCustom
+              });
+          });
+    </script>
+}

@@ -1,0 +1,53 @@
+﻿@model AnimalDB.Repo.Entities.EthicsNumberHistory
+
+<h3>
+    @Html.ActionLink("Back", "Index", "EthicsNumberHistory", new { id = ViewBag.AnimalId }, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Change AUP Number for @ViewBag.AnimalName</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @Html.ActionLink("Create new AUP number", "Create", "EthicsNumber", new { returnUrl = Url.Action() }, new { @class = "btn btn-outline-dark" })
+        <hr />
+        <h4>This will also change the Investigator of @ViewBag.AnimalName to that of the new AUP number</h4>
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Ethics_Id, "AUP Number", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("Ethics_Id", null, "", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Ethics_Id)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AliveStatus, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select id="AliveStatus" name="AliveStatus" class="form-control col-md-2">
+                    <option></option>
+                    <option value="@AnimalDB.Repo.Enums.AliveStatus.Retained_ByYourInstitution">Retained [by your institution]</option>
+                    <option value="@AnimalDB.Repo.Enums.AliveStatus.Returned_ToOwner">Returned [to owner]</option>
+                    <option value="@AnimalDB.Repo.Enums.AliveStatus.Released_ToTheWild">Released [to the wild]</option>
+                    <option value="@AnimalDB.Repo.Enums.AliveStatus.DisposedOf_ToOthers">Disposed of [to others e.g. works]</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.AliveStatus)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="offset-md-2 col-md-10">
+                <input type="submit" value="Change" class="btn  btn-outline-dark" />
+            </div>
+        </div>
+    </div>
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

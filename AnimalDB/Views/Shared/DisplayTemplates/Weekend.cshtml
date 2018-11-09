@@ -1,0 +1,13 @@
+﻿@model DateTime?
+
+@if (Model.HasValue)
+{
+    if (Model.Value.DayOfWeek == DayOfWeek.Saturday)
+    {
+        @Model.Value.ToLongDateString()<text> - </text>@Model.Value.AddDays(1).ToLongDateString()
+    }
+    else if (Model.Value.DayOfWeek == DayOfWeek.Sunday)
+    {
+        @Model.Value.AddDays(-1).ToLongDateString()<text> - </text>@Model.Value.ToLongDateString()
+    }
+}

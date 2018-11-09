@@ -1,0 +1,58 @@
+﻿@model AnimalDB.Repo.Entities.CulledPups
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>CulledPups</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Animal.UniqueAnimalId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Animal.UniqueAnimalId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AmountCulled)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AmountCulled)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NumFemale)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NumFemale)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NumMale)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NumMale)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateCulled)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateCulled)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

@@ -1,0 +1,36 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.ApprovalNumber>
+
+<h3>@Html.ActionLink("Back to Admin", "Index", "Admin", null, new { @class = "btn btn-primary" })</h3>
+
+<h2>Approval Numbers</h2>
+
+<p>
+    @Html.ActionLink("Create New Approval Number", "Create", null, new { @class = "btn btn-outline-dark " })
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr class="row">
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FriendlyName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FriendlyName)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+        </td>
+    </tr>
+}
+
+</table>

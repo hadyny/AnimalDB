@@ -1,0 +1,24 @@
+﻿@model AnimalDB.Repo.Entities.VetSchedule
+
+<h3>
+    @Html.ActionLink("Download", "GetDoc", null, new { @class = "btn btn-outline-dark " })
+    @if (User.IsInRole("Administrator") || User.IsInRole("Technician"))
+    {
+        @Html.ActionLink("Upload new schedule", "Upload", null, new { @class = "btn btn-outline-dark " })
+        @Html.ActionLink("Delete schedule", "Delete", null, new { @class = "btn btn-danger " })
+    }
+</h3>
+
+<hr />
+
+<div class="row">
+    @if (!(bool)ViewBag.Exists)
+    {
+        <h3 class="text-center">The vet schedule has not been uploaded yet.</h3>
+    }
+    else
+    {
+        <embed src="@Url.Action("GetDoc", "VetSchedules")" class="offset-md-1 col-md-10" height="842" />
+    }
+</div>
+<hr />

@@ -1,0 +1,55 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Rack>
+
+<h3>@Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })</h3>
+
+<h2>Racks</h2>
+
+<p>
+    @Html.ActionLink("Add a new rack", "Create", null, new { @class = "btn  btn-outline-dark" })
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Room)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reference_Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Width)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Height)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Room.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reference_Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Width)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Height)
+                </td>
+                <td>
+                    @Html.ActionLink("View Animals", "AnimalGrid", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+                    @if (item.RackEntries.Count() == 0)
+                    {
+                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-danger " })
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

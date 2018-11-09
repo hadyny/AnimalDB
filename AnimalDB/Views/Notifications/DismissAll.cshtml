@@ -1,0 +1,12 @@
+﻿<h2>Dismiss All</h2>
+
+<h3>Are you sure you want to dismiss all notifications?</h3>
+<div>
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Dismiss All" class="btn  btn-danger" />
+        </div>
+    }
+</div>

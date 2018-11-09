@@ -1,0 +1,70 @@
+﻿@model AnimalDB.Models.AddToEthicsViewModel
+
+<h3>
+    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Add Animals to AUP Number</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal clearfix">
+        <div class="col-md-6">
+            <h4>@ViewBag.EthicsName</h4>
+            <hr />
+            @Html.ValidationSummary(true)
+            @Html.HiddenFor(m => m.EthicsId)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AnimalId, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("AnimalId", null, "", new { @class = "form-control", style="max-width: 280px" })
+                    @Html.ValidationMessageFor(model => model.AnimalId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="offset-md-2 col-md-10">
+                    <input type="submit" value="Add Animal" class="btn  btn-outline-dark" />
+                </div>
+            </div>
+        </div>
+
+
+        <div>
+            <h4>Animals in Group</h4>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            Unique Animal Id
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (AnimalDB.Repo.Entities.EthicsNumberHistory history in ViewBag.EthicsNumberHistoryList)
+                    {
+                    <tr>
+                        <td>@history.Animal.UniqueAnimalId</td>
+                        <td>@Html.ActionLink("View", "Details", "Animals", new { id = history.Animal_Id }, new { @class = "btn btn-primary " })</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+    $('select').select2({ allowClear: true, placeholder: "Scan or Select..." });
+    </script>
+}
+
+

@@ -1,0 +1,38 @@
+﻿@using AnimalDB.Repo.Enums
+@model AnimalDB.Models.MenuViewModel
+
+@if (Request.IsAuthenticated)
+{
+    <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
+        <!--<div class="container-fluid">-->
+        @Html.ActionLink("Animal DB", "Index", "Home", null, new { @class = "navbar-brand" })
+
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse collapse" id="navbarContent">
+            <ul class="navbar-nav mr-md-auto">
+                <li class="nav-item @Model.a">@Html.ActionLink("Animals", "Index", "Home", null, new { @class = "nav-link" })</li>
+                @if (Model.UserRole != UserType.Veterinarian)
+                {
+                    <li class="nav-item @Model.w">@Html.ActionLink("Feeding", "Index", "Feed", null, new { @class = "nav-link" })</li>
+                    <li class="nav-item @Model.f">@Html.ActionLink("Groups", "Index", "FeedingGroup", null, new { @class = "nav-link" })</li>
+                    if (Model.UserRole != UserType.Student)
+                    {
+                        <li class="nav-item @Model.ad">@Html.ActionLink("Admin", "Index", "Admin", null, new { @class = "nav-link" })</li>
+                    }
+                }
+                <li class="nav-item @Model.s">@Html.ActionLink("SOP", "Index", "SOPCategories", null, new { @class = "nav-link" })</li>
+                <li class="nav-item @Model.v">
+                    @Html.ActionLink("Vet Schedule", "Index", "VetSchedules", null, new { @class = "nav-link" })
+                @if (Model.UserRole == UserType.Administrator || Model.UserRole == UserType.Technician)
+                {
+                <li class="nav-item @Model.n"><a class="nav-link" href="@Url.Action("Index", "Notifications")">Alerts&nbsp;&nbsp;@if (Model.NotificationAmount != 0) {<span class="badge bg-success">@Model.NotificationAmount</span>}</a></li>
+            }
+            </ul>
+            @Html.Partial("_LoginPartial")
+        </div>
+        <!--</div>-->
+    </nav>
+}

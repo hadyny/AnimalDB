@@ -1,0 +1,13 @@
+﻿@model AnimalDB.Models.AnimalGroup
+@{
+    ViewBag.Group_Id = Model.Group_Id;
+}
+<div class="form-group">
+    <div>
+        @Html.HiddenFor(m => m.Id)
+        @Html.DisplayFor(m => m.UniqueAnimalId, new { htmlAttributes = new { @class = "form-control" } })
+    </div>
+    <div>
+        @Html.DropDownList("Group_Id", (SelectList)ViewBag.Groups, "", new { @class = "form-control" })
+    </div>
+</div>

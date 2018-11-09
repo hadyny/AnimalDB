@@ -1,0 +1,94 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Notification>
+
+
+<h3>Current Notifications @Html.ActionLink("Dismiss all", "DismissAll", null, new { @class = "btn  btn-primary" })</h3>
+
+<table class="table">
+    <tr class="row">
+        <th class="col-md-2">
+            @Html.DisplayNameFor(model => model.Animal.UniqueAnimalId)
+        </th>
+        <th class="col-md-2">
+            Action Due
+        </th>
+        <th class="col-md-6">
+            @Html.DisplayNameFor(model => model.Type)
+        </th>
+        <th class="col-md-2"></th>
+    </tr>
+
+@foreach (var item in Model.Where(m => m.NotificationDate < DateTime.Now)) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.NotificationDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Type)
+            @if (item.Type == AnimalDB.Repo.Enums.NotificationType.Medication)
+            {
+                <text>:</text> @item.Medication.MedicationType.Description <text>(prescribed on @item.Medication.Timestamp.ToShortDateString())</text>
+            }
+        </td>
+        <td>
+            @if (item.Type == AnimalDB.Repo.Enums.NotificationType.Injection)
+            {
+                @Html.ActionLink("View", "Details", "Animals", new { id = item.Animal_Id }, new { @class = "btn  btn-outline-dark" })
+            }
+            else
+            {
+                @Html.ActionLink("View", "Index", "Medication", new { id = item.Animal_Id }, new { @class = "btn  btn-outline-dark" })
+            }
+            @Html.ActionLink("Dismiss", "Delete", new { id = item.Id, task = "dismiss" }, new { @class = "btn  btn-primary" })
+        </td>
+    </tr>
+}
+
+</table>
+<hr class="large" />
+<h3>Upcoming Notifications</h3>
+
+<table class="table">
+    <tr class="row">
+        <th class="col-md-2">
+            @Html.DisplayNameFor(model => model.Animal.UniqueAnimalId)
+        </th>
+        <th class="col-md-2">
+            Action Due
+        </th>
+        <th class="col-md-6">
+            @Html.DisplayNameFor(model => model.Type)
+        </th>
+        <th class="col-md-2"></th>
+    </tr>
+
+    @foreach (var item in Model.Where(m => m.NotificationDate >= DateTime.Now).Take(20))
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NotificationDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+                @if (item.Type == AnimalDB.Repo.Enums.NotificationType.Medication)
+                {
+                    <text>:</text> @item.Medication.MedicationType.Description <text>(prescribed on @item.Medication.Timestamp.ToShortDateString())</text>
+                }
+            </td>
+            <td>
+                @if (item.Type == AnimalDB.Repo.Enums.NotificationType.Injection) {
+                @Html.ActionLink("View", "Details", "Animals", new { id = item.Animal_Id }, new { @class = "btn  btn-outline-dark" })
+                }else {
+                @Html.ActionLink("View", "Index", "Medication", new { id = item.Animal_Id }, new { @class = "btn  btn-outline-dark" })
+                }
+                @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+            </td>
+        </tr>
+    }
+
+</table>

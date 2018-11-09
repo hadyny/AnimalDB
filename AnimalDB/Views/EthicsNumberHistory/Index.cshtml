@@ -1,0 +1,92 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.EthicsNumberHistory>
+
+@{
+    bool first = true;
+}
+
+<h2>AUP Number History for @ViewBag.AnimalName</h2>
+
+@Html.Partial("_AnimalHeaderPartial")
+
+<h3>Current AUP Number: @if (Model.Count() != 0)
+{@Model.First().EthicsNumber.Text;
+}</h3>
+
+<p>
+    @Html.ActionLink("Transfer to new AUP Number", "Create", new { id = ViewBag.AnimalId }, new { @class = "btn btn-outline-dark" })
+    @if (User.IsInRole("Administrator"))
+    {
+    @Html.ActionLink("Revert Animal to Stock", "RevertToStock", new { id = ViewBag.AnimalId }, new { @class = "btn btn-outline-dark" })
+    }
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Timestamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EthicsNumber.Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EthicsNumber.StartYear)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AliveStatus)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        if (first) {
+            first = false;
+        <tr class="table-success" title="Current AUP Number">
+            <td>
+                @Html.DisplayFor(modelItem => item.Timestamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EthicsNumber.Text)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EthicsNumber.StartYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AliveStatus)
+            </td>
+            <td>
+                @if (!User.IsInRole("Student") && !User.IsInRole("Veterinarian"))
+                {
+                    @Html.ActionLink("Change", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                }
+            </td>
+        </tr>
+        } else {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Timestamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EthicsNumber.Text)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EthicsNumber.StartYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AliveStatus)
+            </td>
+            <td>
+                @*
+            @if (!User.IsInRole("Student") && !User.IsInRole("Veterinarian"))
+            {
+                @Html.ActionLink("View / Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            }
+                *@
+            </td>
+        </tr>
+        }
+    }
+    </tbody>
+</table>

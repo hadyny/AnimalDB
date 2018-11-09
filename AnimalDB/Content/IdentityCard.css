@@ -1,0 +1,113 @@
+﻿body {
+  margin: 0;
+  padding: 0;
+  background: #cccccc;
+  font: 11pt "Tahoma";
+}
+.page {
+  background: white;
+  width: 21cm;
+  height: 29.7cm;
+  display: block;
+  margin: 20px auto;
+  margin-bottom: 16px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+.card {
+  border: 1px dotted #aaa;
+  width: 30%;
+  height: 12.5cm;
+  margin-left: 1.75%;
+  margin-top: 4%;
+  float: left;
+  padding: 3px;
+}
+
+.smallcard {
+    border: 1px dotted #aaa;
+    width: 42%;
+    height: 170px;
+    float: left;
+    margin-left: 5.5%;
+    margin-top: 3%;
+    padding: 2px;
+    font: 9pt "Tahoma";
+}
+
+.stocklabel {
+    transform: rotate(270deg);
+    float: left;
+    text-align: center;
+    display: inline;
+    margin-top: 70px;
+    padding: 0;
+    font: 16pt "Tahoma";
+    text-transform: uppercase;
+}
+
+.smallcard th {
+    text-align: left;
+    width: 40%
+}
+
+.smallcard td {
+    border-bottom: 1px dotted #000;
+}
+
+.smallcard table {
+    width: 80%;
+    float: left;
+}
+
+.barcode {
+  display: block;
+  width: 100%;
+  max-width: 450px;
+  margin-left: auto;
+  margin-right: auto;
+}
+dt {
+  margin: 3px;
+  font-weight: bold;
+}
+
+.qr.name {
+     width:172px;
+     height:50px;
+     float:right;
+     text-align: center;
+     margin-right: 5px;
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
+@media print {
+    body {
+        background-color: #fff;
+    }
+  .page {
+    margin: 0;
+    width: initial;
+    height: initial;
+    box-shadow: initial;
+    background: initial;
+    page-break-after: always;
+  }
+    .card {
+        min-height: 12.5cm;
+        page-break-inside: avoid;
+
+    }
+
+    .smallcard {
+        page-break-inside: avoid;
+    }
+
+  .qr.name {
+    width: 172px;
+    text-align: center;
+    margin-right: 0;
+  }
+}

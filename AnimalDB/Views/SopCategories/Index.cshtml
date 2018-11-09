@@ -1,0 +1,33 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.SopCategory>
+
+
+<h2>S.O.P. Categories</h2>
+
+@if (User.IsInRole("Administrator") || User.IsInRole("Technician"))
+{
+<p>
+    @Html.ActionLink("Create New Category", "Create", null, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Upload New Document", "Upload", "SOPs", new { returnUrl = Request.Path }, new { @class = "btn btn-primary" })
+</p>
+}
+<hr />
+<table class="table table-striped">
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.ActionLink("View Documents (" + item.Sops.Count() + ")", "Index", "SOPs", new { id=item.Id }, new { @class = "btn btn-outline-dark " })
+        </td>
+        @if (User.IsInRole("Administrator") || User.IsInRole("Technician"))
+        {
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-danger " })
+        </td>
+        }
+    </tr>
+}
+
+</table>

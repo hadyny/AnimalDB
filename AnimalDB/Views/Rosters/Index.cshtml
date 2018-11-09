@@ -1,0 +1,54 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Roster>
+
+<h3>
+    @Html.ActionLink("Back", "RosterRooms", null, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Weekend Roster: @ViewBag.Room</h2>
+
+<p>
+    @Html.ActionLink("Create a roster entry", "Create", new { id = ViewBag.Room_Id }, new { @class = "btn btn-outline-dark " })
+    @Html.ActionLink("View Vet Schedule", "Index", "VetSchedules", new { returnUrl = Request.RawUrl }, new { @class = "btn btn-outline-dark " })
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr class="row">
+            <th class="col-md-5">
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th class="col-md-3">
+                @Html.DisplayNameFor(model => model.Student)
+            </th>
+            <th class="col-md-1">
+                @Html.DisplayNameFor(model => model.Notes)
+            </th>
+            <th class="col-md-3"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Where(m => m.Date > DateTime.Now.Date.AddDays(-3)).OrderBy(m => m.Date))
+        {
+            string cl = "";
+            if (item.Date < DateTime.Now.AddDays(7) && item.Date > DateTime.Now)
+            {
+                cl = "success";
+            }
+            <tr class="@cl">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Student.FirstName) @Html.DisplayFor(modelItem => item.Student.LastName)
+                </td>
+                <td>
+                    @item.Notes.Count()
+                </td>
+                <td>
+                    @Html.ActionLink("Notes", "Index", "RosterNotes", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-danger " })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

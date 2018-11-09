@@ -1,0 +1,52 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Note>
+
+<h2>Notes for @ViewBag.AnimalName</h2>
+
+@Html.Partial("_AnimalHeaderPartial")
+
+<p>
+    @Html.ActionLink("Create New Note", "Create", new { id=ViewBag.AnimalId }, new { @class = "btn btn-outline-dark" })
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Date
+            </th>
+            <th>
+                Type of Note
+            </th>
+            <th>
+                Note Content
+            </th>
+            <th>
+                Notify Tech
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderByDescending(m => m.Timestamp))
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Timestamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Text)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TechnicianNotified.FullName)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark" })
+                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>

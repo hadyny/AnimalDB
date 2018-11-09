@@ -1,0 +1,32 @@
+﻿@model AnimalDB.Repo.Entities.Feed
+
+@{
+    string classes = "";
+    if (Model.Weight != null && Model.Weight < (Model.Animal.BaseWeight * .85)) {
+        classes += "lowweight ";
+    }
+    if (Model.Date.DayOfWeek == DayOfWeek.Saturday || Model.Date.DayOfWeek == DayOfWeek.Sunday) {
+        classes += "weekend ";
+    }
+    if (Model.CombinedFeed) 
+    {
+        classes += "combinedfeed";
+    }
+    
+    
+}
+
+<tr class="@classes">
+    <td>
+        @Html.HiddenFor(m => m.Id)
+        @Html.HiddenFor(m => m.Animal_Id)
+        @Html.HiddenFor(m => m.Date)
+        @Html.HiddenFor(m => m.FeedingGroupId)
+        @Html.TextBoxFor(m => m.Weight, new { placeholder = "Weight (g)", @class = "form-control weight" })
+    </td>
+    <td>
+        @Html.HiddenFor(m => m.CombinedFeed)
+        @Html.TextBoxFor(m => m.FeedAmount, new { placeholder = "Feed (g)", @class = "form-control feed" })
+        <span class="combinedfeedmsg">Combined</span>
+    </td>
+</tr>

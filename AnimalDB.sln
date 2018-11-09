@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2027
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalDB.Web", "AnimalDB\AnimalDB.Web.csproj", "{40FDD1C6-DC77-472F-AC4A-0C369BF02D78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalDB.Notifier", "AnimalDBNotifier\AnimalDB.Notifier.csproj", "{B2A6F71C-89DC-403B-91B5-24E0E23784B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalDB.Checker", "AnimalCheckChecker\AnimalDB.Checker.csproj", "{90106E2D-3FBF-4553-A3D8-7B26C1600DEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalDB.Web.Tests", "AnimalDB.Tests\AnimalDB.Web.Tests.csproj", "{B37438B2-657E-4426-8AEA-FB74B57D8AAB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalDB.Repo", "AnimalDB.BLL\AnimalDB.Repo.csproj", "{6815A7E4-19C9-4763-A662-AD794E9D4CF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalDB.Repo.Tests", "AnimalDB.Repo.Tests\AnimalDB.Repo.Tests.csproj", "{86ED01E6-6C6B-470A-8BEA-37B7C3668D56}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{82913C5F-A32C-4778-ABCD-4C28A6BC85A7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40FDD1C6-DC77-472F-AC4A-0C369BF02D78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40FDD1C6-DC77-472F-AC4A-0C369BF02D78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40FDD1C6-DC77-472F-AC4A-0C369BF02D78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40FDD1C6-DC77-472F-AC4A-0C369BF02D78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2A6F71C-89DC-403B-91B5-24E0E23784B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2A6F71C-89DC-403B-91B5-24E0E23784B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2A6F71C-89DC-403B-91B5-24E0E23784B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2A6F71C-89DC-403B-91B5-24E0E23784B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90106E2D-3FBF-4553-A3D8-7B26C1600DEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90106E2D-3FBF-4553-A3D8-7B26C1600DEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90106E2D-3FBF-4553-A3D8-7B26C1600DEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90106E2D-3FBF-4553-A3D8-7B26C1600DEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B37438B2-657E-4426-8AEA-FB74B57D8AAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B37438B2-657E-4426-8AEA-FB74B57D8AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B37438B2-657E-4426-8AEA-FB74B57D8AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B37438B2-657E-4426-8AEA-FB74B57D8AAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6815A7E4-19C9-4763-A662-AD794E9D4CF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6815A7E4-19C9-4763-A662-AD794E9D4CF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6815A7E4-19C9-4763-A662-AD794E9D4CF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6815A7E4-19C9-4763-A662-AD794E9D4CF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86ED01E6-6C6B-470A-8BEA-37B7C3668D56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86ED01E6-6C6B-470A-8BEA-37B7C3668D56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86ED01E6-6C6B-470A-8BEA-37B7C3668D56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86ED01E6-6C6B-470A-8BEA-37B7C3668D56}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B37438B2-657E-4426-8AEA-FB74B57D8AAB} = {82913C5F-A32C-4778-ABCD-4C28A6BC85A7}
+		{86ED01E6-6C6B-470A-8BEA-37B7C3668D56} = {82913C5F-A32C-4778-ABCD-4C28A6BC85A7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8E0146A3-4781-41D1-B87B-567183A5B8BE}
+	EndGlobalSection
+EndGlobal

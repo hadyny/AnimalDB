@@ -1,0 +1,187 @@
+﻿@model AnimalDB.Repo.Entities.Animal
+
+<h3>
+    @Html.ActionLink("Back", "Details", "Animals", new { id = Model.Id }, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Edit Details for @Model.UniqueAnimalId</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal student-edit">
+        <hr />
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.FeedingGroup_Id)
+        @Html.HiddenFor(model => model.Group_Id)
+        @Html.HiddenFor(model => model.HasPicture)
+        @Html.HiddenFor(model => model.UniqueAnimalId)
+        @*Html.HiddenFor(model => model.ChargeCode_Id)*@
+        @Html.HiddenFor(model => model.ArrivalDate)
+        @Html.HiddenFor(model => model.BornHere)
+        @Html.HiddenFor(model => model.BirthDate)
+        @Html.HiddenFor(model => model.Investigator_Id)
+        @Html.HiddenFor(model => model.Researcher_Id)
+        @Html.HiddenFor(model => model.Tag)
+        @Html.HiddenFor(model => model.Strain_Id)
+        @Html.HiddenFor(model => model.Source_Id)
+        @Html.HiddenFor(model => model.ArrivalStatus_Id)
+        @Html.HiddenFor(model => model.Sex)
+        @Html.HiddenFor(model => model.Manipulation)
+        @Html.HiddenFor(model => model.Grading)
+        @Html.HiddenFor(model => model.LastChecked)
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Room, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("Room_Id", null, "", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Room_Id)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.UniqueAnimalId, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.UniqueAnimalId)</span>
+            </div>
+        </div>
+        @*
+        <div class="form-group">
+            @Html.LabelFor(model => model.ChargeCode, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.ChargeCode.Text)</span>
+            </div>
+        </div>
+            *@
+        <div class="form-group">
+            @Html.LabelFor(model => model.ArrivalDate, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.ArrivalDate)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BornHere, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.BornHere)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BirthDate, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.BirthDate)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DeathDate, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DeathDate)
+                @Html.ValidationMessageFor(model => model.DeathDate)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CauseOfDeath, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EnumDropDownListFor(model => model.CauseOfDeath, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.CauseOfDeath)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Investigator_Id, "Investigator", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.Investigator.FullName)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ApprovalNumber_Id, "Approval Number", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("ApprovalNumber_Id", null, "", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.ApprovalNumber_Id)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Colour_Id, "Colour", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("Colour_Id", null, "", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Colour_Id)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Tag, "Tag", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.Tag)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Strain_Id, "Strain", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.Strain.Description)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Source_Id, "Source", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.Source.Description)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ArrivalStatus_Id, "Arrival Status", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.ArrivalStatus.Description)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Sex, "Sex", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.Sex)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BaseWeight, "Base Weight", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.BaseWeight)
+                @Html.ValidationMessageFor(model => model.BaseWeight)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Manipulation, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.Manipulation)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Grading, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <span class="form-control-static">@Html.DisplayFor(m => m.Grading)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="offset-md-2 col-md-10">
+                <input type="submit" value="Save" class="btn  btn-outline-dark" />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

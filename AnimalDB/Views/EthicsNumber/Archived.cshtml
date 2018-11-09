@@ -1,0 +1,44 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.EthicsNumber>
+
+<h3>@Html.ActionLink("Back", "Index", "EthicsNumber", null, new { @class = "btn btn-primary" })</h3>
+
+<h2>Archived AUP Numbers</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartYear)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Investigator)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+@foreach (var item in Model.OrderByDescending(m => m.StartYear)) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Text)
+            @if (item.EthicsNumberHistory.Where(m => m.EthicsNumber.Id == item.Id && m.Animal.EthicsNumbers.OrderByDescending(n => n.Timestamp).FirstOrDefault().Ethics_Id == m.Ethics_Id).Count() == 1)
+            {
+                <text>(1 animal)</text>
+            }
+            else
+            {
+                <text>(</text>@item.EthicsNumberHistory.Where(m => m.EthicsNumber.Id == item.Id && m.Animal.EthicsNumbers.OrderByDescending(n => n.Timestamp).FirstOrDefault().Id == m.Id).Count() <text>animals)</text>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.StartYear)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Investigator.FullName)
+        </td>
+    </tr>
+}
+
+</table>

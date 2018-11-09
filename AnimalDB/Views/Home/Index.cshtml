@@ -1,0 +1,29 @@
+﻿<form method="post" class="findanimal">
+    <div>
+        <hr />
+        @Html.DropDownList("animalid", "")
+        <h2 class="field-validation-error">@ViewBag.Errors</h2>
+        <hr />
+    </div>
+</form>
+
+<footer>
+    <h4>
+        Laboratory Animal Allergy Information
+        @Html.ActionLink("Find out more >>", "AllergyInfo", null, new { @class = "btn btn-outline-dark" })
+    </h4>
+</footer>
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#animalid').select2({ allowClear: true, matcher: matchCustom, placeholder: "Select animal:" });
+            $('#animalid').select2('open');
+            $('#animalid').on("change", function (e) {
+                if (e.val !== '') {
+                    $('.findanimal').submit();
+                }
+            });
+        });
+</script>
+}

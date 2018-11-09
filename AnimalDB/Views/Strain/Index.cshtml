@@ -1,0 +1,47 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Strain>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h3>@Html.ActionLink("Back to Admin", "Index", "Admin", null, new { @class = "btn btn-primary" })</h3>
+
+<h2>Strains</h2>
+
+<p>
+    @Html.ActionLink("Add New Strain", "Create", null, new { @class = "btn  btn-outline-dark" })
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Species.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Code)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Species.Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Code)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+        </td>
+    </tr>
+}
+
+</table>

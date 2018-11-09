@@ -1,0 +1,33 @@
+﻿@model AnimalDB.Repo.Entities.Rack
+@{char c = 'A'; }
+
+<table class="table table-striped table-bordered" id="rack@(Model.Id)">
+    @for (int i = 0; i < Model.Width; i++)
+    {
+        <tr class="small info">
+            @for (int j = 1; j <= Model.Height; j++)
+            {
+                <th>@c@j</th>
+            }
+        </tr>
+        <tr>
+            @for (int j = 1; j <= Model.Height; j++)
+            {
+                <td>
+                    @{
+                        var entry = Model.RackEntries.Single(m => m.LocationReferenceX == j && m.LocationReferenceY == c.ToString() && m.IsCurrent);
+                        if (entry.Animal_Id != null)
+                        {
+                            @entry.Animal.UniqueAnimalId
+                        }
+                        else
+                        {
+                            <input type="radio" onchange="selectRadio('@Model.Id', '@entry.LocationReferenceX', '@entry.LocationReferenceY')" name="rackEntry" />
+                        }
+                    }
+                </td>
+             }
+        </tr>
+        c++;
+    }
+</table>

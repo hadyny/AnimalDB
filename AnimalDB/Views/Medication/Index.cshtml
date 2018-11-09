@@ -1,0 +1,88 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Medication>
+
+<h2>Medication History for @ViewBag.AnimalName</h2>
+
+@Html.Partial("_AnimalHeaderPartial")
+
+<p>
+
+    @Html.ActionLink("Add New Course of Medication", "Create", new { id = ViewBag.AnimalId }, new { @class = "btn  btn-outline-dark" })
+
+    @Html.ActionLink("Administer Medication", "FollowUps", new { id = ViewBag.AnimalId }, new { @class = "btn  btn-outline-dark" })
+
+    @Html.ActionLink("Full Medical History", "Index", "FullMedical", new { id = ViewBag.AnimalId }, new { @class = "btn  btn-outline-dark" })
+</p>
+<p>
+    <span class="btn btn-danger disabled">Medication is overdue</span>
+
+    <span class="btn btn-warning disabled">Medication is due soon</span>
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Prescribed on
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MedicationType.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dosage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Frequency)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Duration)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comments)
+            </th>
+            <th class="col-md-2"></th>
+        </tr>
+    </thead>
+@foreach (var item in Model) {
+    string alertlevel = "";
+    if (item.Reminders.Count(m => m.NotificationDate < DateTime.Now) != 0)
+    {
+        alertlevel = "danger";
+    }
+    else if (item.Reminders.Count(m => m.NotificationDate < DateTime.Now.AddMinutes(30)) != 0)
+    {
+        alertlevel = "warning";
+    }
+    <tr class="@alertlevel">
+        <td>
+            @Html.DisplayFor(modelItem => item.Timestamp)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.MedicationType.Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Dosage)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Rate)
+        </td>
+        <td>
+            Every: @Html.DisplayFor(modelItem => item.Frequency) @Html.DisplayFor(modelItem => item.FrequencyValue)
+        </td>
+        <td>
+            For: @Html.DisplayFor(modelItem => item.Duration) @Html.DisplayFor(modelItem => item.DurationValue)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Comments)
+        </td>
+        <td>
+            @if (!User.IsInRole("Student")) {
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+            }
+        </td>
+    </tr>
+}
+
+</table>

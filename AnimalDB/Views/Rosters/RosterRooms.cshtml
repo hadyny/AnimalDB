@@ -1,0 +1,13 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Room>
+
+<h2>Rosters</h2>
+
+<h3>Select a room to view the roster:</h3>
+
+<ul class="select-room">
+@foreach (var item in Model.OrderBy(m => m.Description)) {
+    <li>
+        @Html.ActionLink(item.Description, "Index", new { id = item.Id }, new { @class = "btn btn-primary " })
+    </li>
+}
+</ul>

@@ -1,0 +1,53 @@
+﻿@model AnimalDB.Models.AddInvestigatorVM
+
+
+<h3>
+    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Assign @ViewBag.StudentName to Investigators</h2>
+
+<hr />
+
+<div>
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true)
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.StudentId)
+            <div class="form-group">
+                @Html.LabelFor(model => model.Selected_Investigator_Id, "Investigator", new { @class = "control-label col-md-4" })
+                <div class="col-md-4">
+                    @Html.DropDownList("Selected_Investigator_Id", null, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Selected_Investigator_Id, "The Investigator field is required")
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="offset-md-2 col-md-8">
+                    <button type="submit" class="btn  btn-outline-dark">Add Investigator</button>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-md-6">
+        <hr />
+        <table class="table table-striped">
+            <tbody>
+                @foreach (var investigator in Model.Investigators)
+                {
+                <tr>
+                    <td>@investigator.FullName</td>
+                    <td>@Html.ActionLink("Remove", "RemoveInvestigator", new { Id = Model.StudentId, inv = investigator.Id }, new { @class = "btn  btn-danger" })  </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<h3>
+    @Html.ActionLink("Finished", "Index", null, new { @class = "btn btn-outline-dark " })
+</h3>

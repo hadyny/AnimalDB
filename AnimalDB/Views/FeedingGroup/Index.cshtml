@@ -1,0 +1,38 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.FeedingGroup>
+
+<h2>Feeding Groups</h2>
+
+@if (!User.IsInRole("Student"))
+{
+<p>
+    @Html.ActionLink("Create New Feeding Group", "Create", null, new { @class = "btn  btn-outline-dark" })
+</p>
+}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+
+@foreach (var item in Model.OrderBy(m => m.Description)) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.ActionLink("Add/View Animals", "Add", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            @if (!User.IsInRole("Student"))
+            {
+            @Html.ActionLink("Create Groups", "Group", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            @Html.ActionLink("Edit Group", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+            }
+        </td>
+    </tr>
+}
+
+</table>

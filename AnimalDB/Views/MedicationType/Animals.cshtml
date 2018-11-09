@@ -1,0 +1,56 @@
+﻿@model AnimalDB.Repo.Entities.MedicationType
+
+<h3>
+    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Animals that have used @Model.Description</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Unique Animal Id
+            </th>
+            <th>
+                Dosage
+            </th>
+            <th>
+                Rate
+            </th>
+            <th>
+                Frequency
+            </th>
+            <th>
+                Duration
+            </th>
+            <th>
+                Date Administered
+            </th>
+        </tr>
+    </thead>
+
+@foreach (var item in Model.Medication) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Dosage)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Rate)
+        </td>
+        <td>
+            Every: @Html.DisplayFor(modelItem => item.Frequency) @Html.DisplayFor(modelItem => item.FrequencyValue)
+        </td>
+        <td>
+            For: @Html.DisplayFor(modelItem => item.Duration) @Html.DisplayFor(modelItem => item.DurationValue)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Timestamp)
+        </td>
+    </tr>
+}
+
+</table>

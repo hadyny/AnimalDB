@@ -1,0 +1,33 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.NotificationEmail>
+
+<h3>
+    @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Notification Emails</h2>
+<h4>Notifications for injections and medication will be sent to these addresses</h4>
+
+<p>
+    @Html.ActionLink("Add New Email Address", "Create", null, new { @class = "btn  btn-outline-dark" })
+</p>
+<table class="table table-striped">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Email)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+        </td>
+    </tr>
+}
+
+</table>

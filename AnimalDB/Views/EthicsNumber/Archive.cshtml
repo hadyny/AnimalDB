@@ -1,0 +1,55 @@
+﻿@model AnimalDB.Repo.Entities.EthicsNumber
+
+<h2>@Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })</h2>
+
+<h3>Are you sure you want to archive this AUP Number?</h3>
+<div>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.Text)
+        @Html.HiddenFor(model => model.StartYear)
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Investigator)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Investigator.FullName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Species.Description)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Species.Description)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Text)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Text)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.StartYear)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.StartYear)
+            </dd>
+
+        </dl>
+
+
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Archive" class="btn btn-danger" />
+        </div>
+    }
+</div>

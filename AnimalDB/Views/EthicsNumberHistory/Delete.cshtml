@@ -1,0 +1,36 @@
+﻿@model AnimalDB.Repo.Entities.EthicsNumberHistory
+
+<h3>
+    @Html.ActionLink("Back", "Index", "EthicsNumberHistory", new { id = Model.Animal_Id }, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Delete AUP Number for @Model.Animal.UniqueAnimalId</h2>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.EthicsNumber.Text)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EthicsNumber.Text)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Timestamp)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Timestamp)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn  btn-danger" />
+        </div>
+    }
+</div>

@@ -1,0 +1,249 @@
+﻿@model AnimalDB.Repo.Entities.Animal
+
+<h3>@Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })</h3>
+
+<h2>Create New Animal</h2>
+
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    @if (ViewBag.SuccessMsg != null)
+    {
+        <div class="alert alert-success" role="alert">@ViewBag.SuccessMsg</div>
+    }
+    <hr />
+    @Html.ValidationSummary(true)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Room, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("Room_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Room_Id)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.UniqueAnimalId, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.UniqueAnimalId)
+            @Html.ValidationMessageFor(model => model.UniqueAnimalId)
+        </div>
+    </div>
+    @*
+    <div class="form-group">
+        @Html.LabelFor(model => model.ChargeCode, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("ChargeCode_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.ChargeCode)
+        </div>
+    </div>
+    *@
+    <div class="form-group">
+        @Html.LabelFor(model => model.ArrivalDate, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.ArrivalDate)
+            @Html.ValidationMessageFor(model => model.ArrivalDate)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.BornHere, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.BornHere)
+            @Html.ValidationMessageFor(model => model.BornHere)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.BirthDate, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.BirthDate)
+            @Html.ValidationMessageFor(model => model.BirthDate)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.DeathDate, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.DeathDate)
+            @Html.ValidationMessageFor(model => model.DeathDate)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.CauseOfDeath, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EnumDropDownListFor(model => model.CauseOfDeath, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.CauseOfDeath)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Investigator_Id, "Investigator", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("Investigator_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Investigator_Id)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Researcher_Id, "Researcher", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("Researcher_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Researcher_Id)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ApprovalNumber_Id, "Approval Number", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("ApprovalNumber_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.ApprovalNumber_Id)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Colour_Id, "Colour", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("Colour_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Colour_Id)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Tag, "Tag", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Tag)
+            @Html.ValidationMessageFor(model => model.Tag)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Strain_Id, "Strain", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("Strain_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Strain_Id)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Transgene_Id, "Transgene ID", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("Transgene_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Transgene_Id)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Source_Id, "Source", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("Source_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Source_Id)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ArrivalStatus_Id, "Arrival Status", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("ArrivalStatus_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.ArrivalStatus_Id)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Sex, "Sex", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EnumDropDownListFor(m => m.Sex, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Sex)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.StockAnimal, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.StockAnimal)
+            @Html.ValidationMessageFor(model => model.StockAnimal)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.BaseWeight, "Base Weight", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.BaseWeight)
+            @Html.ValidationMessageFor(model => model.BaseWeight)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Manipulation, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <select id="Manipulation" name="Manipulation" class="form-control col-md-2">
+                <option value="@AnimalDB.Repo.Enums.Manipulation.Teaching">Teaching</option>
+                <option value="@AnimalDB.Repo.Enums.Manipulation.SpeciesConservation">Species conservation</option>
+                <option value="@AnimalDB.Repo.Enums.Manipulation.EnvironmentalManagement">Environmental management</option>
+                <option value="@AnimalDB.Repo.Enums.Manipulation.AnimalHusbandry">Animal husbandry</option>
+                <option value="@AnimalDB.Repo.Enums.Manipulation.BasicBiologicalResearch">Basic biological research</option>
+                <option value="@AnimalDB.Repo.Enums.Manipulation.MedicalResearch">Medical research</option>
+                <option value="@AnimalDB.Repo.Enums.Manipulation.VeterinaryResearch">Veterinary research</option>
+                <option value="@AnimalDB.Repo.Enums.Manipulation.Testing">Testing</option>
+                <option value="@AnimalDB.Repo.Enums.Manipulation.ProductionOfBiologicalAgents">Production of biological agents</option>
+                <option value="@AnimalDB.Repo.Enums.Manipulation.DevelopmentOfAlternatives">Development of alternatives</option>
+                <option value="@AnimalDB.Repo.Enums.Manipulation.Other">Other</option>
+            </select>
+            @Html.ValidationMessageFor(model => model.Manipulation)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Grading, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <select id="Grading" name="Grading" class="form-control col-md-2">
+                <option value="@AnimalDB.Repo.Enums.Grading.NoSuffering">A - No Impact</option>
+                <option value="@AnimalDB.Repo.Enums.Grading.LittleSuffering">B - Little Impact</option>
+                <option value="@AnimalDB.Repo.Enums.Grading.ModerateSuffering">C - Moderate Impact</option>
+                <option value="@AnimalDB.Repo.Enums.Grading.SevereSuffering">D - High Impact</option>
+                <option value="@AnimalDB.Repo.Enums.Grading.VerySevereSuffering">E - Very High Impact</option>
+            </select>
+            @Html.ValidationMessageFor(model => model.Grading)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Ethics Number", new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("Ethics_Id", null, "", new { @class = "form-control" })
+            @Html.ValidationMessage("Ethics_Id")
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="offset-md-2 col-md-10">
+            <button type="submit" value="finish" name="next" class="btn  btn-outline-dark">Save and finish</button>
+            <button type="submit" value="create" name="next" class="btn  btn-outline-dark">Save and create another</button>
+        </div>
+    </div>
+</div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+<script>
+    $('#Manipulation').val('@Model.Manipulation');
+    $('#Grading').val('@Model.Grading');
+    $('#StockAnimal').val('@Model.StockAnimal.ToString().ToLower()');
+
+
+    $('form').find('input').keypress(function (e) {
+        if (e.which === 13) 
+        {
+            var els = $('input,select');
+            var next = els.eq(els.index(this) + 1);
+            next.focus();
+            return false;
+        }
+    });
+</script>
+}

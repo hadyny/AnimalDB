@@ -1,0 +1,65 @@
+﻿@model IEnumerable<AnimalDB.Models.SmallIdentityCardViewModel>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Animal Identity Card</title>
+    @Styles.Render("~/Content/IdentityCard.css")
+</head>
+<body>
+    @for (int i = 0; i < Model.Count(); i++)
+    {
+        <div class="page">
+                @for (int j = 0; j < 10 && i < Model.Count(); j++)
+                {
+                    var item = Model.ElementAt(i);
+                    <div class="smallcard">
+                        <div class="stocklabel">Stock</div>
+                        <table>
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.UniqueAnimalId)</th>
+                                <td>@Html.DisplayFor(model => item.UniqueAnimalId)</td>
+
+                            </tr>
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.BirthDate)</th>
+                                <td>@Html.DisplayFor(model => item.BirthDate)</td>
+                            </tr>
+
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.ArrivalDate)</th>
+                                <td>@Html.DisplayFor(model => item.ArrivalDate)</td>
+                            </tr>
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.Strain)</th>
+                                <td>@Html.DisplayFor(model => item.Strain)</td>
+                            </tr>
+                            <tr>
+                                <th>Ethics Number</th>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>Date of Death</th>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>By Whom</th>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>Impact Grade</th>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                    i++;
+                }
+                @{i--;}
+        </div>
+    }
+</body>
+</html>

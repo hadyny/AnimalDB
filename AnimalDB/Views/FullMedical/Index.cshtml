@@ -1,0 +1,117 @@
+﻿@model AnimalDB.Models.MedicalReportViewModel
+
+@{
+    ViewBag.Title = "Full Medical History";
+    ViewBag.AnimalId = Model.Animal.Id;
+}
+
+<h2>Reports for @Model.Animal.UniqueAnimalId</h2>
+
+@Html.Partial("_AnimalHeaderPartial")
+
+<h3>@Html.ActionLink("Back", "Index", "Medication", new { id=Model.Animal.Id }, new { @class = "btn btn-primary" })</h3>
+
+<h4>Include:</h4>
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+    <label class="btn btn-primary" id="btnnotes">
+        <input type="checkbox">Notes
+    </label>
+    <label class="btn  btn-primary" id="btnmeds">
+        <input type="checkbox">Medication
+    </label>
+    <label class="btn  btn-primary" id="btnsurg">
+        <input type="checkbox">Surgical Notes
+    </label>
+</div>
+<button class="btn  btn-outline-dark" onclick="javascript: printreport()">Print Page</button>
+<hr />
+<div class="row">
+<div class="offset-md-2 col-md-8">
+    <table class="table table-striped">
+        <thead>
+            <tr class="row">
+                <th class="col-md-2">
+                    Type
+                </th>
+                <th class="col-md-2">
+                    Date
+                </th>
+                <th class="col-md-2">
+                    Details
+                </th>
+                <th class="col-md-6">
+                    Description
+                </th>
+            </tr>
+        </thead>
+        
+        @foreach (var item in Model.MedicalItems.OrderByDescending(m => m.Timestamp))
+        {
+            <tr class="@item.Css">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Timestamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Details)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+            </tr>
+        }
+
+    </table>
+</div>
+    </div>
+@section scripts {
+    <script>
+        $('#btnnotes').click(function () {
+            if ($(this).attr('class') == 'btn  btn-primary active') {
+                $('.note td').hide();
+            } else {
+                $('.note td').show();
+            }
+        });
+
+        $('#btnmeds').click(function () {
+            if ($(this).attr('class') == 'btn  btn-primary active') {
+                $('.med td').hide();
+            } else {
+                $('.med td').show();
+            }
+        });
+
+        $('#btnsurg').click(function () {
+            if ($(this).attr('class') == 'btn  btn-primary active') {
+                $('.surg td').hide();
+            } else {
+                $('.surg td').show();
+            }
+        });
+
+        $('#btnnotes').button('toggle');
+        $('#btnmeds').button('toggle');
+        $('#btnsurg').button('toggle');
+
+        function printreport() {
+            print_window = window.open("", "printwindow", "status=1,width=595,height=842");
+            print_window.document.write('<html><head>');
+            print_window.document.write('<title>Medical History</title>');
+            print_window.document.write('<link href="@Styles.Url("~/Content/printcss")" rel="stylesheet" />');
+            print_window.document.write('<link href="@Styles.Url("~/Content/printcss2")" rel="stylesheet" media="print" />');
+            print_window.document.write('</head>');
+            print_window.document.write('<body><div class="noprint">');
+            print_window.document.write('<button onclick="window.close()">Close Preview</button>');
+            print_window.document.write('<h3>Swipe from right side of screen, and select "Devices" followed by "Print" to print the report.</h3>');
+            print_window.document.write('</div><h2>Medical history for @Model.Animal.UniqueAnimalId</h2>');
+            print_window.document.write($('<div />').append($('.table').clone()).html());
+            print_window.document.write('</body></html>');
+            print_window.document.close();
+            print_window.focus();
+        }
+    </script>
+
+}

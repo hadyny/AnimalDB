@@ -1,0 +1,163 @@
+﻿@model AnimalDB.Repo.Entities.Animal
+
+<h3>
+    @Html.ActionLink("Cancel", "Details", "Animals", new { id = Model.Id }, new { @class = "btn  btn-primary" })
+</h3>
+<h3>Are you sure you want to delete this Animal?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UniqueAnimalId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UniqueAnimalId)
+        </dd>
+        @*
+        <dt>
+            @Html.DisplayNameFor(model => model.ChargeCode)
+        </dt>
+        
+        <dd>
+            @Html.DisplayFor(model => model.ChargeCode)
+        </dd>
+        *@
+        <dt>
+            @Html.DisplayNameFor(model => model.ArrivalDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ArrivalDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BornHere)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BornHere)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BirthDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BirthDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DeathDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DeathDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PlugDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PlugDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.InjectionDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.InjectionDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SurgeryDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SurgeryDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CauseOfDeath)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CauseOfDeath)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ArrivalStatus.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ArrivalStatus.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Colour.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Colour.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Investigator.FullName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Investigator.FullName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Sex)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Sex)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Source.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Source.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Strain.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Strain.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Surgeon.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Surgeon.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SurgeryType.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SurgeryType.Description)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn  btn-danger" />
+        </div>
+    }
+</div>

@@ -1,0 +1,187 @@
+﻿* {
+    font-family: sans-serif;
+}
+button {
+    
+    font-size: 18px;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+    padding: 15px;
+    background-color: #428bca;
+    color: #fff;
+}
+table {
+    
+    margin: 0;
+    border-spacing: 0;
+
+    th {
+        padding: 10px;
+        text-align: left;
+    }
+
+    td {
+        padding: 10px;
+        border-top: 1px solid #ddd;
+    }
+
+    > tbody > tr:nth-child(odd) {
+        > td,
+        > th {
+            background-color: #f9f9f9;
+        }
+    }
+}
+
+.printmanipulationreport {
+    table {
+        font-size: 85%;
+    }
+
+    td:first-child {
+        width: 200px;
+    }
+
+    .row input:not(#CompletedBy) {
+        width: 50px;
+    }
+
+    input#CompletedBy, textarea {
+        width: 160px;
+    }
+
+    .col-md-6 {
+        width: 50%;
+        float: left;
+    }
+
+    .reportheader .form-group {
+        display: inline;
+        float: left;
+
+        input {
+            width: 100px;
+            margin: 2px 5px;
+        }
+
+        label {
+            margin: 2px 5px;
+        }
+    }
+
+    .clearfix {
+        clear: both;
+    }
+
+    input[type=submit] {
+        display: none;
+    }
+
+    hr {
+        border: none;
+        padding: 5px;
+    }
+
+    hr:first-of-type {
+        display: none;
+    }
+
+    td {
+        padding: 1px;
+    }
+
+    h2 {
+        margin-bottom: 0;
+        font-size: 100%;
+        text-transform: uppercase;
+    }
+
+    h2 span {
+        padding-left: 40px;
+        font-size: 12px;
+        text-transform: none;
+    }
+
+    .form-group div {
+        display: inline-block;
+    }
+
+    .header label {
+        font-weight: bold;
+    }
+
+    .header {
+        font-size: 12px;
+    }
+}
+
+.clinicalIncidentReport {
+    font-size: 80%;
+
+    table {
+        font-size: 80%;
+    }
+
+    td,th {
+        padding: 1px;
+    }
+
+    .dl-horizontal dt {
+        float: left;
+        width: 160px;
+        clear: left;
+        text-align: right;
+        overflow: hidden;
+        -ms-text-overflow: ellipsis;
+        -webkit-text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        -moz-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dl-horizontal dd {
+        margin-left: 180px;
+    }
+
+    dt {
+        font-weight: bold;
+    }
+
+    .bootstrap-switch-label {
+        display: none;
+    }
+
+    .clinical-finding .control-label {
+        min-width: 300px;
+    }
+
+    .col-md-6 {
+        width: 50%;
+        float: left;
+    }
+
+    button[type=submit], a.btn-danger, input[type=submit] {
+        display: none;
+    }
+
+    h3 {
+        font-size: 110%;
+        margin: 4px;
+    }
+
+    h2 {
+        font-size: 130%;
+        margin: 4px;
+    }
+
+    textarea {
+        max-height: 80px;
+        width: 100%;
+    }
+
+    hr.last-of-page {
+        page-break-after:always;
+    }
+}

@@ -1,0 +1,24 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.ChargeCode>
+
+<h3>
+    @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Charge Codes</h2>
+
+<p>
+    @Html.ActionLink("Create New Charge Code", "Create", null, new { @class = "btn  btn-outline-dark" })
+</p>
+<table class="table table-striped">
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Text)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-primary" })
+        </td>
+    </tr>
+}
+
+</table>

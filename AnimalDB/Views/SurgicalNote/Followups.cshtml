@@ -1,0 +1,347 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.SurgicalWelfareScore>
+
+<h3>
+    @Html.ActionLink("Back", "Index", "SurgicalNote", new { id = ViewBag.Animal_Id }, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Animal Welfare Score Sheet</h2>
+<h3>
+    
+</h3>
+<div class="AnimalWelfareSheet">
+    <div class="row">
+        <div>
+            <table class="table">
+                <tr>
+                    <th></th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.ActionLink("Edit", "EditFollowup", new { id = item.Id }, new { @class = "btn btn-outline-dark btn-sm" })</td>
+                    }
+                    <td>@Html.ActionLink("Enter scores", "Followup", new { id = ViewBag.SurgicalNote_Id }, new { @class = "btn btn-outline-dark" })</td>
+                </tr>
+                <tr>
+                    <th>
+                        Date
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Timestamp)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        Day
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Day)</td>
+                    }
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div>
+            <h3>Body weight &amp; B.A.R. score</h3>
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BodyWtYesterday)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.BodyWtYesterday)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BodyWtToday)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.BodyWtToday)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BodyWtChange)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.BodyWtChange)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BAR)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.BAR)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ApproachResponse)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.ApproachResponse)</td>
+                    }
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div>
+            <h3>General Clinical Signs</h3>
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Inactive)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Inactive)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.HunchedPosture)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.HunchedPosture)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CoatRough)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.CoatRough)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.RedDischarges)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.RedDischarges)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PinkStaining)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.PinkStaining)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Dehydration)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Dehydration)</td>
+                    }
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div>
+            <h3>Behavioural Signs of Pain in Rats</h3>
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BackArch)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.BackArch)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BellyPress)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.BellyPress)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Writhe)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Writhe)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Stagger)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Stagger)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Twitch)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Twitch)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Fall)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Fall)</td>
+                    }
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div>
+            <h3>Water Balance</h3>
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StartWeight)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.StartWeight)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CurrentWeight)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.CurrentWeight)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.WaterIntake)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.WaterIntake)</td>
+                    }
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div>
+            <h3>Operation Site</h3>
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Wound)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Wound)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Bleeding)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Bleeding)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SuturesClips)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.SuturesClips)</td>
+                    }
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div>
+            <h3>Post-op Support - Analgesic Administration</h3>
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Drug)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Drug)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Dose)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Dose)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Fluids)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Fluids)</td>
+                    }
+                </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OtherDrugs)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.OtherDrugs)</td>
+                    }
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div>
+            <h3>Other</h3>
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Comments)
+                    </th>
+                    @foreach (var item in Model)
+                    {
+                        <td>@Html.DisplayFor(modelItem => item.Comments)</td>
+                    }
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

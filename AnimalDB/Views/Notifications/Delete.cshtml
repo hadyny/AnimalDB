@@ -1,0 +1,65 @@
+﻿@model AnimalDB.Repo.Entities.Notification
+
+<h2>@ViewBag.Action</h2>
+
+<h3>Are you sure you want to @ViewBag.Action.ToLower() this notification?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            Date and time
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NotificationDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Type)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+
+        @if (Model.Type == AnimalDB.Repo.Enums.NotificationType.Injection)
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.Animal)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Animal.UniqueAnimalId)
+            </dd>
+        }
+        else if (Model.Type == AnimalDB.Repo.Enums.NotificationType.Medication)
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.Medication)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Medication.MedicationType.Description)
+            </dd>
+            
+            <dt>
+                @Html.DisplayNameFor(model => model.Medication.Animal)
+            </dt>
+            
+            <dd>
+                @Html.DisplayFor(model => model.Medication.Animal.UniqueAnimalId)
+            </dd>
+        }
+
+    </dl>
+
+
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="@ViewBag.Action" class="btn  btn-danger" />
+        </div>
+    }
+</div>

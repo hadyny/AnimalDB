@@ -1,0 +1,21 @@
+﻿@model AnimalDB.Repo.Entities.Feed
+
+@{
+    string classes = "";
+    if (Model.Weight < (Model.Animal.BaseWeight * .90)) {
+        classes += "lowweight ";
+    }
+    if (Model.Date.DayOfWeek == DayOfWeek.Saturday || Model.Date.DayOfWeek == DayOfWeek.Sunday) {
+        classes += "weekend";
+    }
+    
+}
+
+<tr class="@classes">
+    <td>
+        @Html.DisplayFor(m => m.Weight)
+    </td>
+    <td>
+        @Html.DisplayFor(m => m.FeedAmount)
+    </td>
+</tr>

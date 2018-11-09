@@ -1,0 +1,49 @@
+﻿@model AnimalDB.Repo.Entities.SurgeryTypeViewModel
+
+<h2>Add the relevant surgery types</h2>
+
+@Html.ActionLink("Create new surgery type", "Create", "SurgeryType", new { returnUrl = Url.Action() }, new { @class = "btn btn-outline-dark" })
+
+<div class="row">
+    <div class="col-md-8 form-horizontal">
+        <hr />
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.SurgeryType_Id, "Surgery Type", htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-9">
+                    @Html.DropDownList("SurgeryType_Id", null, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.SurgeryType_Id, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="offset-md-3 col-md-9">
+                    <input type="submit" value="Add" class="btn btn-outline-dark " />
+                </div>
+            </div>
+
+        }
+    </div>
+
+    <div class="col-md-4 surgeryTypeList">
+        <hr />
+        <ul>
+            @foreach (var surgery in Model.SurgeryTypes)
+            {
+                <li>@Html.ActionLink("X", "RemoveFrom", new { id = Model.Id, surgeryType = surgery.Id }, new { @class = "btn btn-danger " }) @surgery.Description</li>
+            }
+        </ul>
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.ActionLink("Finish", "Index", "SurgicalNote", new { id = ViewBag.ReturnId }, new { @class = "btn  btn-outline-dark" })
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

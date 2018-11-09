@@ -1,0 +1,83 @@
+﻿@model AnimalDB.Repo.Entities.CulledPups
+<h3>@Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })</h3>
+<h2>Edit details for culled pups</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AnimalId, "AnimalId", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("AnimalId", null, htmlAttributes: new { @class = "form-control", style="max-width: 280px" })
+                @Html.ValidationMessageFor(model => model.AnimalId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AmountCulled, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.AmountCulled, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.AmountCulled, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.NumFemale, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.NumFemale, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.NumFemale, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.NumMale, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.NumMale, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.NumMale, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DateCulled, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DateCulled, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DateCulled, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="offset-md-2 col-md-10">
+                <input type="submit" value="Save" class="btn  btn-outline-dark" />
+            </div>
+        </div>
+    </div>
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+<script>
+    $('select').select2({ allowClear: true, matcher: matchCustom, placeholder: "Scan or Select..." });
+
+    $('#NumFemale').keyup(function () {
+        if (!isNaN($('#AmountCulled').val()) && !isNaN($('#NumFemale').val())) {
+            var total = +$('#AmountCulled').val() - +$('#NumFemale').val();
+            $('#NumMale').val(total);
+        }
+    });
+
+    $('#NumMale').keyup(function () {
+        if (!isNaN($('#AmountCulled').val()) && !isNaN($('#NumMale').val())) {
+            var total = +$('#AmountCulled').val() - +$('#NumMale').val()
+            $('#NumFemale').val(total);
+        }
+    });
+</script>
+}

@@ -1,0 +1,251 @@
+﻿@model AnimalDB.Repo.Entities.ClinicalIncidentReport
+
+<h3>
+    @Html.ActionLink("Back", "Index", "ClinicalIncidentReports", new { id = Model.Animal_Id }, new { @class = "btn btn-primary" })
+</h3>
+
+<div class="clinicalIncidentReport">
+    <h2>Clinical Incidence Report Form - SICK REPORT</h2>
+
+    <h4>Animal Information:</h4>
+    <div class="row">
+
+        <div class="col-md-4">
+            <div>AUP #: @Html.DisplayFor(m => m.EthicsNumber)</div>
+            <div>
+                Animal ID: @Html.DisplayFor(m => m.Animal.UniqueAnimalId)
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div>
+                PI: @Html.DisplayFor(m => m.Animal.Investigator.FullName)
+            </div>
+            <div>
+                Cage Card #:
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div>Room #: @Html.DisplayFor(m => m.Animal.Room.Description)</div>
+            <div>Sex: @Html.DisplayFor(m => m.Animal.Sex)</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div>
+                Species (&amp; Strain): @Html.DisplayFor(m => m.Animal.Strain.Species.Description) (@Html.DisplayFor(m => m.Animal.Strain.Description))
+            </div>
+            <div>
+                Person working with animal:
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div>DOB: @Html.DisplayFor(m => m.Animal.BirthDate)</div>
+            <div>DOA: @Html.DisplayFor(m => m.Animal.ArrivalDate)</div>
+        </div>
+    </div>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Animal_Id)
+        <hr />
+
+        <h4>Clinical Finding - Please Check appropriate box(es)</h4>
+        <div class="row">
+            <div class="col-md-3">
+                <div>@Html.CheckBoxFor(m => m.Dying) @Html.LabelFor(model => model.Dying, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.Lethargic) @Html.LabelFor(model => model.Lethargic, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.Appetite) @Html.LabelFor(model => model.Appetite, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.Alopecia) @Html.LabelFor(model => model.Alopecia, htmlAttributes: new { @class = "control-label" })</div>
+            </div>
+            <div class="col-md-3">
+                <div>@Html.CheckBoxFor(m => m.EyeProblem) @Html.LabelFor(model => model.EyeProblem, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.Malocclusion) @Html.LabelFor(model => model.Malocclusion, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.Respiratory) @Html.LabelFor(model => model.Respiratory, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.Mass) @Html.LabelFor(model => model.Mass, htmlAttributes: new { @class = "control-label" })</div>
+            </div>
+            <div class="col-md-3">
+                <div>@Html.CheckBoxFor(m => m.FightWounds) @Html.LabelFor(model => model.FightWounds, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.Dying) @Html.LabelFor(model => model.Dying, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.Lame) @Html.LabelFor(model => model.Lame, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.PostSurgicalProblem) @Html.LabelFor(model => model.PostSurgicalProblem, htmlAttributes: new { @class = "control-label" })</div>
+            </div>
+            <div class="col-md-3">
+                <div>@Html.CheckBoxFor(m => m.Prolapse) @Html.LabelFor(model => model.Prolapse, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.Diarrhoea) @Html.LabelFor(model => model.Diarrhoea, htmlAttributes: new { @class = "control-label" })</div>
+                <div>@Html.CheckBoxFor(m => m.Other) @Html.LabelFor(model => model.Other, htmlAttributes: new { @class = "control-label" })</div>
+                <div><label>Body Weight:</label> @Html.TextBoxFor(m => m.Weight, new { @class = "form-control" })</div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                @Html.EditorFor(m => m.AdditionalHistory, new { htmlAttributes = new { @class = "form-control", placeholder = "Additional relevant history" } })
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="offset-md-7 col-md-5">
+                <div class="col-md-7">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ReportedBy, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            @Html.EditorFor(model => model.ReportedBy, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.ReportedBy, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ReportedByDate, htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.ReportedByDate, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.ReportedByDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-12">
+                @Html.EditorFor(m => m.VetEvaluation, new { htmlAttributes = new { @class = "form-control", placeholder = "Veterinary Evaluation" } })
+            </div>
+        </div>
+        <div class="row">
+            <div class="offset-md-7 col-md-5">
+                <div class="col-md-7">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.VetEvaluationSignature, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            @Html.EditorFor(model => model.VetEvaluationSignature, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.VetEvaluationSignature, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.VetEvaluationDate, htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.VetEvaluationDate, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.VetEvaluationDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.TreatmentRequired, htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EnumDropDownListFor(model => model.TreatmentRequired, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.TreatmentRequired, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.EuthanasiaRequired, htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EnumDropDownListFor(model => model.EuthanasiaRequired, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.EuthanasiaRequired, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <h3>Summary of Treatment Plan</h3>
+
+        <div class="row">
+            <table class="col-md-12">
+                <thead>
+                    <tr>
+                        <th class="col-md-3">Treatment (drug etc.)</th>
+                        <th class="col-md-2">Dose rate</th>
+                        <th class="col-md-2">Frequency</th>
+                        <th class="col-md-2">Duration</th>
+                        <th class="col-md-3">Comments</th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td>@Html.EditorFor(m => m.Treatment1)</td>
+                    <td>@Html.EditorFor(m => m.Dose1)</td>
+                    <td>@Html.EditorFor(m => m.Frequency1)</td>
+                    <td>@Html.EditorFor(m => m.Duration1)</td>
+                    <td>@Html.EditorFor(m => m.Comments1)</td>
+                </tr>
+                <tr>
+                    <td>@Html.EditorFor(m => m.Treatment2)</td>
+                    <td>@Html.EditorFor(m => m.Dose2)</td>
+                    <td>@Html.EditorFor(m => m.Frequency2)</td>
+                    <td>@Html.EditorFor(m => m.Duration2)</td>
+                    <td>@Html.EditorFor(m => m.Comments2)</td>
+                </tr>
+                <tr>
+                    <td>@Html.EditorFor(m => m.Treatment3)</td>
+                    <td>@Html.EditorFor(m => m.Dose3)</td>
+                    <td>@Html.EditorFor(m => m.Frequency3)</td>
+                    <td>@Html.EditorFor(m => m.Duration3)</td>
+                    <td>@Html.EditorFor(m => m.Comments3)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label for="TreatmentPerformedBy" class="col-md-4">Treatment performed by: </label>
+                @Html.EnumDropDownListFor(m => m.TreatmentPerformedBy, new { @class = "form-control col-md-8" })
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-md-12">
+                @Html.EditorFor(m => m.FollowupExamination, new { htmlAttributes = new { @class = "form-control", placeholder = "Follow-up Examination" } })
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="offset-md-7 col-md-5">
+                <div class="col-md-7">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FollowupSignature, htmlAttributes: new { @class = "control-label col-md-5" })
+                        <div class="col-md-7">
+                            @Html.EditorFor(model => model.FollowupSignature, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.FollowupSignature, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FollowupSignatureDate, htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.FollowupSignatureDate, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.FollowupSignatureDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div>
+                <input type="submit" value="Create Report" class="btn  btn-outline-dark" />
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

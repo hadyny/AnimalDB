@@ -1,0 +1,69 @@
+﻿@model AnimalDB.Repo.Entities.Animal
+
+@Html.HiddenFor(m => m.Id)
+@Html.HiddenFor(m => m.UniqueAnimalId)
+@Html.HiddenFor(m => m.ArrivalStatus_Id)
+@Html.HiddenFor(m => m.Source_Id)
+@Html.HiddenFor(m => m.Room_Id)
+<div class="col-md-2">
+    <div class="headercontainer">
+        <table>
+            <tr class="groupname">
+                <td>
+                    <span>
+                        @Html.DisplayTextFor(m => m.Group.Description) &nbsp;
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="uniqueanimalid">
+                        @if (Model.HasPicture)
+                        {
+                            <a style="cursor:pointer" onclick="javascript: loadModalImage(@Model.Id, '@Model.UniqueAnimalId')" class="fas fa-camera"></a><text>&nbsp;</text>
+                        }
+                        <b>@Html.DisplayTextFor(m => m.UniqueAnimalId)</b>
+                    </span>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    <span>
+                        @Html.DisplayTextFor(m => m.Colour.Description) &nbsp;
+                    </span>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="baseweight">
+                        @Html.DisplayTextFor(m => m.BaseWeight) g
+                    </span>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    <span>
+                        @if (Model.BaseWeight.HasValue)
+                        {
+                            @Convert.ToInt32(Model.BaseWeight * .85);
+                        }
+                        g
+                    </span>
+                </td>
+                <td></td>
+            </tr>
+            <tr class="blankrow">
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    <div class="feedingtable">
+        <table>
+            @Html.EditorFor(m => m.Feeds)
+        </table>
+    </div>
+</div>

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Animal>
+
+@if (string.IsNullOrEmpty(ViewBag.BackToGroups))
+{
+<h3>
+    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
+</h3>
+}
+else
+{
+    <h3>
+        @Html.ActionLink("Back", "Groups", "Feed", new { id = ViewBag.RoomId }, new { @class = "btn btn-primary" })
+    </h3>
+}
+<h2>Animals in @ViewBag.RoomName</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueAnimalId)
+            </th>
+            <th>
+                AUP Number
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UniqueAnimalId)
+            </td>
+            <td>
+                @(item.EthicsNumbers.OrderByDescending(m => m.Timestamp).FirstOrDefault()?.EthicsNumber.Text)
+            </td>
+            <td>
+                @Html.ActionLink("View", "Details", "Animals", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

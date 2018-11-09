@@ -1,0 +1,78 @@
+﻿@model AnimalDB.Models.CageLocationHistoryViewModel
+
+<h3>
+    @Html.ActionLink("Back", "Index", "CageLocationHistory", new { id = ViewBag.AnimalId }, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Move location of @ViewBag.AnimalName</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.RackEntry_X)
+    @Html.HiddenFor(m => m.RackEntry_Y)
+    @Html.HiddenFor(m => m.SelectedRack)
+
+    <div class="form-horizontal">
+        @Html.ActionLink("Add new location", "Create", "CageLocation", new { returnUrl = Url.Action() }, new { @class = "btn btn-outline-dark" })
+        <hr />
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CageLocation_Id, "New Location", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("CageLocation_Id", null, string.Empty, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.CageLocation_Id)
+            </div>
+        </div>
+
+        <p class="offset-md-3">OR</p>
+
+        <div class="form-group">
+            @Html.Label("Rack_Id", "New Rack Location", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("Rack_Id", null, string.Empty, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="selectGrid offset-md-2">
+            <h4>Select Rack Location: <span id="rackname"></span></h4>
+            @Html.EditorFor(m => m.Racks)
+        </div>
+        <div class="form-group">
+            <div class="offset-md-2 col-md-10">
+                <input type="submit" value="Move" class="btn  btn-outline-dark" />
+            </div>
+        </div>
+    </div>
+}
+
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $('#Rack_Id').change(function () {
+            $('#CageLocation_Id').val('');
+            if ($("#Rack_Id").val() != '') {
+                $('.selectGrid table').css('display', 'none');
+                $('.selectGrid').css('display', 'block');
+                $('#rack' + $('#Rack_Id').val()).css('display', 'block');
+                $('#rackname').text($('#Rack_Id option:selected').text());
+            }
+            else {
+                $('.selectGrid, .selectGrid table').css('display', 'none');
+            }
+        });
+
+        $('#CageLocation_Id').change(function () {
+            $('.selectGrid, .selectGrid table').css('display', 'none');
+            $('#Rack_Id').val('');
+        });
+
+        var selectRadio = function (rack, x, y) {
+            $('input#RackEntry_X').val(x);
+            $('input#RackEntry_Y').val(y);
+            $('input#SelectedRack').val(rack);
+        }
+    </script>
+}

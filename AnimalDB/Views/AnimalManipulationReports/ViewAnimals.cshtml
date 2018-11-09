@@ -1,0 +1,31 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Animal>
+
+
+<h2>View</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueAnimalId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model.OrderBy(m => m.UniqueAnimalId))
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.UniqueAnimalId)
+                </td>
+                <td>
+                    @Html.ActionLink("View", "Details", "Animals", new { id = item.Id }, null)
+                </td>
+            </tr>
+        }
+    <tbody>
+
+</table>

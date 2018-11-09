@@ -1,0 +1,12 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Investigator>
+
+
+<h2>Select Investigator</h2>
+
+<ul>
+@foreach (var item in Model) {
+    <li>
+        @Html.ActionLink(item.FullName, "Index", new { id = item.Id }, new { @class = "btn btn-primary " })
+    </li>
+}
+</ul>

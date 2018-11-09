@@ -1,0 +1,59 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Student>
+
+<h3>
+    @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>Researchers</h2>
+
+<p>
+    @Html.ActionLink("Create New Researcher Login", "Create", null, new { @class = "btn  btn-outline-dark" })
+</p>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.UserName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LastName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Investigators)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        <th></th>
+    </tr>
+        </thead>
+    <tbody>
+@foreach (var item in Model.OrderBy(m => m.UserName)) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FirstName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.LastName)
+        </td>
+        <td>
+            @string.Join(", ", item.Investigators.Select(m => m.FullName)).ToString()
+
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Email)
+        </td>
+        <td>
+            @Html.ActionLink("Investigators", "AddInvestigator", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+        </td>
+    </tr>
+}
+        </tbody>
+</table>

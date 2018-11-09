@@ -1,0 +1,151 @@
+﻿@model IEnumerable<AnimalDB.Repo.Entities.Room>
+
+<h3>
+    KEY: <span class="btn btn-navy ">All animals checked today</span>&nbsp;<span class="btn btn-info ">Some animals checked today</span>&nbsp;<span class="btn btn-warning ">No animals checked today</span>
+</h3>
+<hr />
+<h2>Select Room:</h2>
+
+<table class="table table-striped table-hover select-room">
+
+    <thead>
+        <tr>
+            <th>
+                Room
+            </th>
+            <th>
+                Total Animals
+            </th>
+            <th>
+                Stock Animals
+            </th>
+            <th>
+                GMO Animals
+            </th>
+        </tr>
+    </thead>
+
+    @foreach (var item in Model.OrderBy(m => m.Description))
+    {
+        int animalsNotChecked = item.Animals.Count(m => m.DeathDate == null && m.LastChecked.Date != DateTime.Now.Date);
+        string _class = "";
+
+        if (!item.NoDBAnimals)
+        {
+            if (item.Animals.Count(m => m.DeathDate == null) == 0)
+            {
+                _class = "btn-outline-dark";
+            }
+            else if (animalsNotChecked == item.Animals.Count(m => m.DeathDate == null))
+            {
+                _class = "btn-warning";
+            }
+            else if (animalsNotChecked < item.Animals.Count(m => m.DeathDate == null) && animalsNotChecked > 0)
+            {
+                _class = "btn-info";
+            }
+            else
+            {
+                _class = "btn-navy";
+            }
+        }
+        else
+        {
+            if (item.NoDBAnimalsLastCheck.HasValue && item.NoDBAnimalsLastCheck.Value.Date == DateTime.Now.Date)
+            {
+                _class = "btn-navy";
+            }
+            else
+            {
+                _class = "btn-warning";
+            }
+        }
+    <tr>
+        <td>
+            @Html.ActionLink(Html.DisplayFor(modelItem => item.Description).ToString(), "Groups", new { id = item.Id }, new { @class = "btn  " + _class })
+        </td>
+        <td>
+            @item.Animals.Where(m => m.DeathDate == null).Count() Animals
+        </td>
+        <td>
+            @if (item.Animals.Where(m => m.DeathDate == null && m.StockAnimal).Count() == 1)
+            {
+                @item.Animals.Where(m => m.DeathDate == null && m.StockAnimal).Count() <text>Stock Animal</text>
+            }
+            else if (item.Animals.Where(m => m.DeathDate == null && m.StockAnimal).Count() != 0)
+            {
+                @item.Animals.Where(m => m.DeathDate == null && m.StockAnimal).Count() <text>Stock Animals</text>
+            }
+        </td>
+        <td>
+            @if (item.Animals.Where(m => m.DeathDate == null && m.ApprovalNumber_Id != null).Count() == 1)
+            {
+                @item.Animals.Where(m => m.DeathDate == null && m.ApprovalNumber_Id != null).Count() <text>GMO Animal</text>
+            } else if (item.Animals.Where(m => m.DeathDate == null && m.ApprovalNumber_Id != null).Count() != 0)
+            { 
+                @item.Animals.Where(m => m.DeathDate == null && m.ApprovalNumber_Id != null).Count() <text>GMO Animals</text>
+            }
+        </td>
+
+    </tr>
+
+        /*
+        string _class = "";
+        int total = item.FeedingGroups.Count(m => m.Animals.Count() != 0);
+        int fed = item.FeedingGroups.Where(
+            m =>
+                m.Animals.Where(
+                    n =>
+                        n.Feeds.Count(
+                            o =>
+                                o.Date == DateTime.Now.Date &&
+                                o.FeedAmount != null
+                        ) != 0 ||
+                        (n.Feeds.Count() != 0 && n.Feeds.OrderBy(p => p.Date).Last().FeedAmount == -1)
+                    ).Count() == m.Animals.Count() &&
+                    m.Animals.Count() != 0
+                ).Count();
+
+        int partiallyfed = item.FeedingGroups.Where(
+            m =>
+                m.Animals.Where(
+                    n =>
+                        n.Feeds.Count(
+                            o =>
+                                o.Date == DateTime.Now.Date &&
+                                o.FeedAmount != null
+                            ) != 0 ||
+                            (n.Feeds.Count() != 0 && n.Feeds.OrderBy(p => p.Date).Last().FeedAmount == -1)
+                        ).Count() != m.Animals.Count() &&
+                        m.Animals.Where(
+                            n =>
+                                n.Feeds.Count(
+                                    o =>
+                                        o.Date == DateTime.Now.Date &&
+                                        o.FeedAmount != null
+                                    ) != 0 ||
+                                    (n.Feeds.Count() != 0 && n.Feeds.OrderBy(p => p.Date).Last().FeedAmount == -1)
+                                ).Count() != 0
+                            ).Count();
+
+        if (fed == 0 && total != 0 && partiallyfed == 0)
+        {
+            _class = "btn-danger";
+        }
+        else if ((fed > 0 && fed < total) || partiallyfed != 0)
+        {
+            _class = "btn-warning";
+        }
+        else
+        {
+            _class = "btn-success";
+        }
+
+        <li>
+            @Html.ActionLink(Html.DisplayFor(modelItem => item.Description).ToString(), "Groups", new { id = item.Id }, new { @class = "btn  " + _class })
+        </li>
+        */
+    }
+</table>
+<hr />
+<h4>Total Animals: @ViewBag.Num_Animals</h4>
