@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class EthicsDocumentRepo : IEthicsDocument, IDisposable
+    public class EthicsDocumentRepo : IEthicsDocument
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public EthicsDocumentRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.EthicsDocuments.Remove(ethicsDocument);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<EthicsDocument> GetEthicsDocumentById(int id)

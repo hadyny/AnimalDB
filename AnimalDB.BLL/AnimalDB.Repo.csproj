@@ -84,6 +84,8 @@
     <Compile Include="Entities\ClinicalIncidentReport.cs" />
     <Compile Include="Entities\Colour.cs" />
     <Compile Include="Entities\CulledPups.cs" />
+    <Compile Include="Entities\Document.cs" />
+    <Compile Include="Entities\DocumentCategory.cs" />
     <Compile Include="Entities\EthicsDocument.cs" />
     <Compile Include="Entities\EthicsNumber.cs" />
     <Compile Include="Entities\EthicsNumberHistory.cs" />
@@ -123,6 +125,7 @@
     <Compile Include="Enums\TreatmentPerformedBy.cs" />
     <Compile Include="Enums\TreatmentRequired.cs" />
     <Compile Include="Enums\UserType.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Implementations\AdministratorRepo.cs" />
     <Compile Include="Implementations\AnimalManipulationReportRepo.cs" />
     <Compile Include="Implementations\AnimalRepo.cs" />
@@ -136,6 +139,8 @@
     <Compile Include="Implementations\ClinicalIncidentReportRepo.cs" />
     <Compile Include="Implementations\ColourRepo.cs" />
     <Compile Include="Implementations\CulledPupsRepo.cs" />
+    <Compile Include="Implementations\DocumentCategoryRepo.cs" />
+    <Compile Include="Implementations\DocumentRepo.cs" />
     <Compile Include="Implementations\EthicsNumberHistoryRepo.cs" />
     <Compile Include="Implementations\EthicsNumberRepo.cs" />
     <Compile Include="Implementations\EthicsDocumentRepo.cs" />
@@ -178,6 +183,8 @@
     <Compile Include="Interfaces\IArrivalStatus.cs" />
     <Compile Include="Interfaces\ICageLocation.cs" />
     <Compile Include="Interfaces\ICageLocationHistory.cs" />
+    <Compile Include="Interfaces\IDocument.cs" />
+    <Compile Include="Interfaces\IDocumentCategory.cs" />
     <Compile Include="Interfaces\IMedicationFollowUp.cs" />
     <Compile Include="Interfaces\IChargeCode.cs" />
     <Compile Include="Interfaces\ICleaningTask.cs" />

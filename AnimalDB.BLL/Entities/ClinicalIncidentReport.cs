@@ -9,10 +9,10 @@ namespace AnimalDB.Repo.Entities
     {
         public ClinicalIncidentReport()
         {
-            this.FollowupSignatureDate = DateTime.Now;
-            this.ReportedByDate = DateTime.Now;
-            this.TreatmentSignatureDate = DateTime.Now;
-            this.VetEvaluationDate = DateTime.Now;
+            FollowupSignatureDate = DateTime.Now;
+            ReportedByDate = DateTime.Now;
+            TreatmentSignatureDate = DateTime.Now;
+            VetEvaluationDate = DateTime.Now;
         }
 
         public int Id { get; set; }

@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class FeedRepo : IFeed, IDisposable
+    public class FeedRepo : IFeed
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public FeedRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.Feeds.Remove(feed);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Feed> GetFeedById(int id)

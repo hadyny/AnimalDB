@@ -21,5 +21,7 @@ namespace AnimalDB.Repo.Interfaces
         Task DeleteEthicsNumber(EthicsNumber ethicsNumber);
 
         Task ArchiveEthics(EthicsNumber ethicsNumber);
+
+        Task<EthicsNumber> GetEthicsNumberByName(string name);
     }
 }

@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class CageLocationRepo : ICageLocation, IDisposable
+    public class CageLocationRepo : ICageLocation
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public CageLocationRepo()
         {
@@ -37,11 +37,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.CageLocations.Remove(cageLocation);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<CageLocation> GetCageLocationById(int id)

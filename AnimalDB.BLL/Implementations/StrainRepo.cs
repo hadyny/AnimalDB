@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class StrainRepo : IStrain, IDisposable
+    public class StrainRepo : IStrain
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public StrainRepo()
         {
@@ -37,11 +37,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.Strains.Remove(Strain);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Strain> GetStrainById(int id)

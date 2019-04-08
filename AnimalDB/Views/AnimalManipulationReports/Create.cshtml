@@ -60,7 +60,7 @@
                     </thead>
                     <tr>
                         <td>
-                            @Html.ActionLink("Breeding Unit", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.BreedingUnit.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Breeding Unit", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.BreedingUnit.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.BreedingUnit, new { htmlAttributes = new { @class = "form-control" } })
@@ -69,7 +69,7 @@
                     </tr>
                     <tr>
                         <td>
-                            @Html.ActionLink("Commercial", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.Commercial.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Commercial", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.Commercial.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.Commercial, new { htmlAttributes = new { @class = "form-control" } })
@@ -78,7 +78,7 @@
                     </tr>
                     <tr>
                         <td>
-                            @Html.ActionLink("Farm", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.Farm.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Farm", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.Farm.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.Farm, new { htmlAttributes = new { @class = "form-control" } })
@@ -87,7 +87,7 @@
                     </tr>
                     <tr>
                         <td>
-                            @Html.ActionLink("Born During Project", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.BornDuringProject.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Born During Project", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.BornDuringProject.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.BornDuringProject, new { htmlAttributes = new { @class = "form-control" } })
@@ -96,7 +96,7 @@
                     </tr>
                     <tr>
                         <td>
-                            @Html.ActionLink("Captured", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.Captured.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Captured", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.Captured.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.Captured, new { htmlAttributes = new { @class = "form-control" } })
@@ -105,7 +105,7 @@
                     </tr>
                     <tr>
                         <td>
-                            @Html.ActionLink("Imported into New Zealand", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.ImportedIntoNZ.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Imported into New Zealand", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.ImportedIntoNZ.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.Imported, new { htmlAttributes = new { @class = "form-control" } })
@@ -114,7 +114,7 @@
                     </tr>
                     <tr>
                         <td>
-                            @Html.ActionLink("Public Sources", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.PublicSources.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Public Sources", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "sourceType", identifier = SourceType.PublicSources.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.PublicSources, new { htmlAttributes = new { @class = "form-control" } })
@@ -142,7 +142,7 @@
                     </thead>
                     <tr>
                         <td>
-                            @Html.ActionLink("Normal / Conventional", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.Normal_Conventional.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Normal / Conventional", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.Normal_Conventional.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.NormalConventional, new { htmlAttributes = new { @class = "form-control" } })
@@ -152,7 +152,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("SPF / Germ Free", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.SPF_GermFree.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("SPF / Germ Free", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.SPF_GermFree.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.SPFGermFree, new { htmlAttributes = new { @class = "form-control" } })
@@ -162,7 +162,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Diseased", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.Diseased.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Diseased", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.Diseased.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.Diseased, new { htmlAttributes = new { @class = "form-control" } })
@@ -172,7 +172,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Transgenic / Chimera", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.Transgenic_Chimera.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Transgenic / Chimera", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.Transgenic_Chimera.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.TransgenicChimera, new { htmlAttributes = new { @class = "form-control" } })
@@ -182,7 +182,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Protected Species", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.ProtectedSpecies.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Protected Species", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.ProtectedSpecies.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.ProtectedSpecies, new { htmlAttributes = new { @class = "form-control" } })
@@ -192,7 +192,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Unborn / Pre-hatched", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.Unborn_Prehatched.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Unborn / Pre-hatched", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.Unborn_Prehatched.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.UnbornPrehatched, new { htmlAttributes = new { @class = "form-control" } })
@@ -202,7 +202,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Other", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.Other.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Other", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "arrivalStatusType", identifier = ArrivalStatusType.Other.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.OtherStatus, new { htmlAttributes = new { @class = "form-control" } })
@@ -221,7 +221,7 @@
                     </thead>
                     <tr>
                         <td>
-                            @Html.ActionLink("Teaching", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.Teaching.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Teaching", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.Teaching.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.Teaching, new { htmlAttributes = new { @class = "form-control" } })
@@ -230,7 +230,7 @@
                     </tr>
                     <tr>
                         <td>
-                            @Html.ActionLink("Species Conservation", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.SpeciesConservation.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Species Conservation", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.SpeciesConservation.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.SpeciesConservation, new { htmlAttributes = new { @class = "form-control" } })
@@ -239,7 +239,7 @@
                     </tr>
                     <tr>
                         <td>
-                            @Html.ActionLink("Environmental Management", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.EnvironmentalManagement.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Environmental Management", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.EnvironmentalManagement.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.EnvironmentalManagement, new { htmlAttributes = new { @class = "form-control" } })
@@ -249,7 +249,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Animal Husbandry", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.AnimalHusbandry.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Animal Husbandry", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.AnimalHusbandry.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.AnimalHusbandry, new { htmlAttributes = new { @class = "form-control" } })
@@ -259,7 +259,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Basic Biological Research", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.BasicBiologicalResearch.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Basic Biological Research", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.BasicBiologicalResearch.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.BasicBiologicalResearch, new { htmlAttributes = new { @class = "form-control" } })
@@ -269,7 +269,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Medical Research", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.MedicalResearch.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Medical Research", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.MedicalResearch.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.MedicalResearch, new { htmlAttributes = new { @class = "form-control" } })
@@ -279,7 +279,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Veterinary Research", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.VeterinaryResearch.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Veterinary Research", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.VeterinaryResearch.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.VeterinaryResearch, new { htmlAttributes = new { @class = "form-control" } })
@@ -289,7 +289,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Testing", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.Testing.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Testing", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.Testing.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.Testing, new { htmlAttributes = new { @class = "form-control" } })
@@ -299,7 +299,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Production of Biological Agents", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.ProductionOfBiologicalAgents.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Production of Biological Agents", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.ProductionOfBiologicalAgents.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.ProductionOfBiologicalAgents, new { htmlAttributes = new { @class = "form-control" } })
@@ -309,7 +309,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Development of Alternatives", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.DevelopmentOfAlternatives.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Development of Alternatives", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.DevelopmentOfAlternatives.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.DevelopmentOfAlternatives, new { htmlAttributes = new { @class = "form-control" } })
@@ -319,7 +319,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Producing offspring with potential for compromised welfare", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.ProducingOffspringWithPotentialForCompromisedWelfare.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Producing offspring with potential for compromised welfare", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.ProducingOffspringWithPotentialForCompromisedWelfare.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.ProducingOffspringWithPotentialForCompromisedWelfare, new { htmlAttributes = new { @class = "form-control" } })
@@ -329,7 +329,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Other", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.Other.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Other", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "manipulation", identifier = Manipulation.Other.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.OtherManipulation, new { htmlAttributes = new { @class = "form-control" } })
@@ -350,7 +350,7 @@
                     </thead>
                     <tr>
                         <td>
-                            @Html.ActionLink("No Prior Use", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "priorUse", identifier = "no" }, new { target = "_blank" })
+                            @Html.ActionLink("No Prior Use", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "priorUse", identifier = "no" })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.NoPriorUse, new { htmlAttributes = new { @class = "form-control" } })
@@ -360,7 +360,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Previously Used", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "priorUse", identifier = "yes" }, new { target = "_blank" })
+                            @Html.ActionLink("Previously Used", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "priorUse", identifier = "yes" })
 
                         </td>
                         <td>
@@ -381,7 +381,7 @@
                     </thead>
                     <tr>
                         <td>
-                            @Html.ActionLink("No Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.NoSuffering.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("No Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.NoSuffering.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.NoSufferingApproved, new { htmlAttributes = new { @class = "form-control" } })
@@ -395,7 +395,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Little Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.LittleSuffering.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Little Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.LittleSuffering.ToString() })
 
                         </td>
                         <td>
@@ -410,7 +410,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Moderate Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.ModerateSuffering.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Moderate Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.ModerateSuffering.ToString() })
 
                         </td>
                         <td>
@@ -425,7 +425,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("High Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.SevereSuffering.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("High Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.SevereSuffering.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.SevereSufferingApproved, new { htmlAttributes = new { @class = "form-control" } })
@@ -439,7 +439,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Very High Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.VerySevereSuffering.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Very High Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.VerySevereSuffering.ToString() })
 
                         </td>
                         <td>
@@ -463,7 +463,7 @@
                     </thead>
                     <tr>
                         <td>
-                            @Html.ActionLink("Retained [by your institution]", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "aliveStatus", identifier = AliveStatus.Retained_ByYourInstitution.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Retained [by your institution]", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "aliveStatus", identifier = AliveStatus.Retained_ByYourInstitution.ToString() })
 
                         </td>
                         <td>
@@ -473,7 +473,7 @@
                     </tr>
                     <tr>
                         <td>
-                            @Html.ActionLink("Returned [to owner]", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "aliveStatus", identifier = AliveStatus.Returned_ToOwner.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Returned [to owner]", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "aliveStatus", identifier = AliveStatus.Returned_ToOwner.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.ReturnedToOwner, new { htmlAttributes = new { @class = "form-control" } })
@@ -483,7 +483,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Released [to the wild]", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "aliveStatus", identifier = AliveStatus.Released_ToTheWild.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Released [to the wild]", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "aliveStatus", identifier = AliveStatus.Released_ToTheWild.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.ReleasedToTheWild, new { htmlAttributes = new { @class = "form-control" } })
@@ -493,7 +493,7 @@
 
                     <tr>
                         <td>
-                            @Html.ActionLink("Disposed of [to others e.g. works]", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "aliveStatus", identifier = AliveStatus.DisposedOf_ToOthers.ToString() }, new { target = "_blank" })
+                            @Html.ActionLink("Disposed of [to others e.g. works]", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "aliveStatus", identifier = AliveStatus.DisposedOf_ToOthers.ToString() })
                         </td>
                         <td>
                             @Html.EditorFor(model => model.DisposedOf, new { htmlAttributes = new { @class = "form-control" } })

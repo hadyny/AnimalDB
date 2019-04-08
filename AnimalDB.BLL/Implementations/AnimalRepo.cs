@@ -7,10 +7,11 @@ using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Contexts;
 using System;
 using System.Text;
+using AnimalDB.Repo.Enums;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class AnimalRepo : IAnimal, IDisposable
+    public class AnimalRepo : IAnimal
     {
         private IAnimalDBContext db;
 
@@ -321,16 +322,40 @@ namespace AnimalDB.Repo.Implementations
             await db.SaveChangesAsync();
         }
 
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
-        }
-
         public async Task Resurrect(int id)
         {
             var animal = await db.Animals.FindAsync(id);
             animal.DeathDate = null;
             animal.CauseOfDeath = null;
+            await db.SaveChangesAsync();
+        }
+
+        public async Task BulkUpdateAnimals(List<Animal> animals, Grading? grading, Manipulation? manipulation, int? ArrivalStatus_Id)
+        {
+            if (grading != null)
+            {
+                foreach (var animal in animals)
+                {
+                    animal.Grading = grading.Value;
+                }
+            }
+
+            if (manipulation != null)
+            {
+                foreach (var animal in animals)
+                {
+                    animal.Manipulation = manipulation.Value;
+                }
+            }
+
+            if (ArrivalStatus_Id != null)
+            {
+                foreach (var animal in animals)
+                {
+                    animal.ArrivalStatus_Id = ArrivalStatus_Id;
+                }
+            }
+
             await db.SaveChangesAsync();
         }
     }

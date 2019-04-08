@@ -9,7 +9,8 @@
     public class Medication
     {
         public Medication() {
-            this.Reminders = new HashSet<Notification>();
+            Reminders = new HashSet<Notification>();
+            FollowUps = new HashSet<MedicationFollowUp>();
         }
 
         public int Id { get; set; }

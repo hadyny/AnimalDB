@@ -4,7 +4,6 @@
 
 <h2>Edit S.O.P.</h2>
 
-
 @using (Html.BeginForm("Edit", "SOPs", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
@@ -42,7 +41,7 @@
         </div>
         <hr />
         <div class="form-group">
-            <div class="offset-md-2 col-md-10">
+            <div>
                 <input type="submit" value="Save" class="btn btn-outline-dark " />
             </div>
         </div>

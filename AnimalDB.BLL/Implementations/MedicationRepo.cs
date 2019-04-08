@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class MedicationRepo : IMedication, IDisposable
+    public class MedicationRepo : IMedication
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public MedicationRepo()
         {
@@ -49,11 +49,6 @@ namespace AnimalDB.Repo.Implementations
             return db.Medications
                 .Where(m => m.Animal_Id == animalId)
                 .OrderByDescending(m => m.Timestamp).ToList();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Medication> GetMedicationById(int id)

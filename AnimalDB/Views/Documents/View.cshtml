@@ -1,0 +1,37 @@
+﻿@model AnimalDB.Repo.Entities.Document
+
+<h3>
+    @Html.ActionLink("Back", "Index", new { id=Model.Category_Id }, new { @class = "btn btn-primary" })
+</h3>
+
+<h2>@Html.DisplayFor(model => model.Description) @Html.ActionLink("Download", "GetDocument", new { id = Model.Id, download = 1 }, new { @class = "btn btn-outline-dark" })</h2>
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FileName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FileName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateUploaded)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateUploaded)
+        </dd>
+
+    </dl>
+</div>
+<hr />
+
+<div class="row">
+    <embed src="@Url.Action("GetDocument", "Documents", new { id=Model.Id })" class="offset-md-1 col-md-10" height="842" />
+</div>
+<hr />
+<h3>
+    @Html.ActionLink("Back", "Index", new { id = Model.Category_Id }, new { @class = "btn btn-primary" })
+</h3>

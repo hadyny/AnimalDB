@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class NotificationEmailRepo : INotificationEmail, IDisposable
+    public class NotificationEmailRepo : INotificationEmail
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public NotificationEmailRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.NotificationEmails.Remove(notificationEmail);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<NotificationEmail> GetNotificationEmailById(int id)

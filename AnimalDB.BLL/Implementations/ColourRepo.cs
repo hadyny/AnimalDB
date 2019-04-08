@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class ColourRepo : IColour, IDisposable
+    public class ColourRepo : IColour
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public ColourRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.Colours.Remove(colour);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Colour> GetColourById(int id)

@@ -12,9 +12,9 @@ using System.Web;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class VeterinarianRepo : IVeterinarian, IDisposable
+    public class VeterinarianRepo : IVeterinarian
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public VeterinarianRepo()
         {
@@ -30,7 +30,10 @@ namespace AnimalDB.Repo.Implementations
         {
             var usermanager = new UserManager<Veterinarian>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<Veterinarian>(db));
             var result = await usermanager.CreateAsync(veterinarian, "Password not required");
-            usermanager.AddToRole(veterinarian.Id, "Veterinarian");
+            if (result.Succeeded)
+            {
+                usermanager.AddToRole(veterinarian.Id, "Veterinarian");
+            }
         }
 
         public Veterinarian GetVeterinarianByUsername(string username)
@@ -67,11 +70,6 @@ namespace AnimalDB.Repo.Implementations
             var AdminManager = new UserManager<Veterinarian>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<Veterinarian>(db));
             var adminIdentity = await AdminManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
             HttpContext.Current.GetOwinContext().Authentication.SignIn(new AuthenticationProperties() { IsPersistent = false }, adminIdentity);
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
     }
 }

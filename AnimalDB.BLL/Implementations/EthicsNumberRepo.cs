@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class EthicsNumberRepo : IEthicsNumber, IDisposable
+    public class EthicsNumberRepo : IEthicsNumber
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public EthicsNumberRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.EthicsNumbers.Remove(ethicsNumber);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<EthicsNumber> GetEthicsNumberById(int id)
@@ -79,6 +74,11 @@ namespace AnimalDB.Repo.Implementations
         public IEnumerable<EthicsNumber> GetArchivedNumbers()
         {
             return db.EthicsNumbers.Where(m => m.Archived).ToList();
+        }
+
+        public async Task<EthicsNumber> GetEthicsNumberByName(string name)
+        {
+            return await db.EthicsNumbers.SingleOrDefaultAsync(m => m.Text == name);
         }
     }
 }

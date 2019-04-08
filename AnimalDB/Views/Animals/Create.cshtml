@@ -33,13 +33,13 @@
         </div>
     </div>
     @*
-    <div class="form-group">
-        @Html.LabelFor(model => model.ChargeCode, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownList("ChargeCode_Id", null, "", new { @class = "form-control" })
-            @Html.ValidationMessageFor(model => model.ChargeCode)
+        <div class="form-group">
+            @Html.LabelFor(model => model.ChargeCode, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("ChargeCode_Id", null, "", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.ChargeCode)
+            </div>
         </div>
-    </div>
     *@
     <div class="form-group">
         @Html.LabelFor(model => model.ArrivalDate, new { @class = "control-label col-md-2" })
@@ -180,19 +180,7 @@
     <div class="form-group">
         @Html.LabelFor(model => model.Manipulation, new { @class = "control-label col-md-2" })
         <div class="col-md-10">
-            <select id="Manipulation" name="Manipulation" class="form-control col-md-2">
-                <option value="@AnimalDB.Repo.Enums.Manipulation.Teaching">Teaching</option>
-                <option value="@AnimalDB.Repo.Enums.Manipulation.SpeciesConservation">Species conservation</option>
-                <option value="@AnimalDB.Repo.Enums.Manipulation.EnvironmentalManagement">Environmental management</option>
-                <option value="@AnimalDB.Repo.Enums.Manipulation.AnimalHusbandry">Animal husbandry</option>
-                <option value="@AnimalDB.Repo.Enums.Manipulation.BasicBiologicalResearch">Basic biological research</option>
-                <option value="@AnimalDB.Repo.Enums.Manipulation.MedicalResearch">Medical research</option>
-                <option value="@AnimalDB.Repo.Enums.Manipulation.VeterinaryResearch">Veterinary research</option>
-                <option value="@AnimalDB.Repo.Enums.Manipulation.Testing">Testing</option>
-                <option value="@AnimalDB.Repo.Enums.Manipulation.ProductionOfBiologicalAgents">Production of biological agents</option>
-                <option value="@AnimalDB.Repo.Enums.Manipulation.DevelopmentOfAlternatives">Development of alternatives</option>
-                <option value="@AnimalDB.Repo.Enums.Manipulation.Other">Other</option>
-            </select>
+            @Html.EnumDropDownListFor(model => model.Manipulation, "", new { @class = "form-control col-md-2" })
             @Html.ValidationMessageFor(model => model.Manipulation)
         </div>
     </div>
@@ -200,13 +188,7 @@
     <div class="form-group">
         @Html.LabelFor(model => model.Grading, new { @class = "control-label col-md-2" })
         <div class="col-md-10">
-            <select id="Grading" name="Grading" class="form-control col-md-2">
-                <option value="@AnimalDB.Repo.Enums.Grading.NoSuffering">A - No Impact</option>
-                <option value="@AnimalDB.Repo.Enums.Grading.LittleSuffering">B - Little Impact</option>
-                <option value="@AnimalDB.Repo.Enums.Grading.ModerateSuffering">C - Moderate Impact</option>
-                <option value="@AnimalDB.Repo.Enums.Grading.SevereSuffering">D - High Impact</option>
-                <option value="@AnimalDB.Repo.Enums.Grading.VerySevereSuffering">E - Very High Impact</option>
-            </select>
+            @Html.EnumDropDownListFor(model => model.Grading, "", new { @class = "form-control col-md-2" })
             @Html.ValidationMessageFor(model => model.Grading)
         </div>
     </div>
@@ -231,11 +213,9 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 <script>
-    $('#Manipulation').val('@Model.Manipulation');
-    $('#Grading').val('@Model.Grading');
+    
     $('#StockAnimal').val('@Model.StockAnimal.ToString().ToLower()');
-
-
+    
     $('form').find('input').keypress(function (e) {
         if (e.which === 13) 
         {

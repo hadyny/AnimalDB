@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class NotificationRepo : INotification, IDisposable
+    public class NotificationRepo : INotification
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public NotificationRepo()
         {
@@ -54,11 +54,6 @@ namespace AnimalDB.Repo.Implementations
         public IEnumerable<Notification> GetFutureNotifications()
         {
             return db.Notifications.Where(m => m.NotificationDate > DateTime.Now);
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Notification> GetNotificationById(int id)

@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class MedicationFollowUpRepo : IMedicationFollowUp, IDisposable
+    public class MedicationFollowUpRepo : IMedicationFollowUp
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public MedicationFollowUpRepo()
         {
@@ -38,11 +38,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.MedicationFollowUps.Remove(medicationFollowUp);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public IEnumerable<MedicationFollowUp> GetMedicationFollowUpByAnimalId(int animalId)

@@ -8,7 +8,7 @@ namespace AnimalDB.Repo.Entities
     {
         public Strain()
         {
-            this.Animals = new HashSet<Animal>();
+            Animals = new HashSet<Animal>();
         }
     
         public int Id { get; set; }

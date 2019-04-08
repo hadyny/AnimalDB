@@ -9,10 +9,10 @@ namespace AnimalDB.Repo.Entities
     {
         public Room()
         {
-            this.Animals = new HashSet<Animal>();
-            this.FeedingGroups = new HashSet<FeedingGroup>();
-            this.Roster = new HashSet<Roster>();
-            this.MissedChecks = new HashSet<NotCheckedRoom>();
+            Animals = new HashSet<Animal>();
+            FeedingGroups = new HashSet<FeedingGroup>();
+            Roster = new HashSet<Roster>();
+            MissedChecks = new HashSet<NotCheckedRoom>();
         }
 
         public int Id { get; set; }

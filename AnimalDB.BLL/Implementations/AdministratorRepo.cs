@@ -3,19 +3,17 @@ using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class AdministratorRepo : IAdministrator, IDisposable
+    public sealed class AdministratorRepo : IAdministrator
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public AdministratorRepo()
         {
@@ -31,7 +29,10 @@ namespace AnimalDB.Repo.Implementations
         {
             var usermanager = new UserManager<Administrator>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<Administrator>(db));
             var result = await usermanager.CreateAsync(administrator, "Password not required");
-            usermanager.AddToRole(administrator.Id, "Administrator");
+            if (result.Succeeded)
+            {
+                usermanager.AddToRole(administrator.Id, "Administrator");
+            }
         }
 
         public Administrator GetAdministratorByUsername(string userName)
@@ -73,11 +74,6 @@ namespace AnimalDB.Repo.Implementations
             var AdminManager = new UserManager<Administrator>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<Administrator>(db));
             var adminIdentity = await AdminManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
             HttpContext.Current.GetOwinContext().Authentication.SignIn(new AuthenticationProperties() { IsPersistent = false }, adminIdentity);
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
     }
 }

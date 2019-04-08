@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class NoteRepo : INote, IDisposable
+    public class NoteRepo : INote
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public NoteRepo()
         {
@@ -41,11 +41,6 @@ namespace AnimalDB.Repo.Implementations
         public IEnumerable<Note> GetNoteByAnimalId(int animalId)
         {
             return db.Notes.Where(m => m.Animal_Id == animalId).ToList();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Note> GetNoteById(int id)

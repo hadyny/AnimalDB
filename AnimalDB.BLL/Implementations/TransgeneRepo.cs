@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class TransgeneRepo : ITransgene, IDisposable
+    public class TransgeneRepo : ITransgene
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public TransgeneRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.Transgenes.Remove(Transgene);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Transgene> GetTransgeneById(int id)

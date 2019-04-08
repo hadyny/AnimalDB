@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class SourceRepo : ISource, IDisposable
+    public class SourceRepo : ISource
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public SourceRepo()
         {
@@ -37,11 +37,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.Sources.Remove(source);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Source> GetSourceById(int id)

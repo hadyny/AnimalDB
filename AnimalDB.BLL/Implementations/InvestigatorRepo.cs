@@ -12,9 +12,9 @@ using System.Web;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class InvestigatorRepo : IInvestigator, IDisposable
+    public class InvestigatorRepo : IInvestigator
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public InvestigatorRepo()
         {
@@ -71,11 +71,6 @@ namespace AnimalDB.Repo.Implementations
             var AdminManager = new UserManager<Investigator>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<Investigator>(db));
             var adminIdentity = await AdminManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
             HttpContext.Current.GetOwinContext().Authentication.SignIn(new AuthenticationProperties() { IsPersistent = false }, adminIdentity);
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
     }
 }

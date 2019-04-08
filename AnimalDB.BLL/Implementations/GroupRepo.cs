@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class GroupRepo : IGroup, IDisposable
+    public class GroupRepo : IGroup
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public GroupRepo()
         {
@@ -41,11 +41,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.Groups.Remove(group);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Group> GetGroupById(int id)

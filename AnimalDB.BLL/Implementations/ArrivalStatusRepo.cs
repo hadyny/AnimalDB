@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class ArrivalStatusRepo : IArrivalStatus, IDisposable
+    public class ArrivalStatusRepo : IArrivalStatus
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public ArrivalStatusRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.ArrivalStatus.Remove(arrivalStatus);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public IEnumerable<ArrivalStatus> GetArrivalStatus()

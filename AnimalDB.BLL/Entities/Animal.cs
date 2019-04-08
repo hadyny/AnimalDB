@@ -10,15 +10,15 @@ namespace AnimalDB.Repo.Entities
     {
         public Animal()
         {
-            this.Notes = new HashSet<Note>();
-            this.Parents = new HashSet<Animal>();
-            this.Offspring = new HashSet<Animal>();
-            this.EthicsNumbers = new HashSet<EthicsNumberHistory>();
-            this.CageLocations = new HashSet<CageLocationHistory>();
-            this.Feeds = new HashSet<Feed>();
-            this.Medications = new HashSet<Medication>();
-            this.IncidentReports = new HashSet<ClinicalIncidentReport>();
-            this.SurgicalNotes = new HashSet<SurgicalNote>();
+            Notes = new HashSet<Note>();
+            Parents = new HashSet<Animal>();
+            Offspring = new HashSet<Animal>();
+            EthicsNumbers = new HashSet<EthicsNumberHistory>();
+            CageLocations = new HashSet<CageLocationHistory>();
+            Feeds = new HashSet<Feed>();
+            Medications = new HashSet<Medication>();
+            IncidentReports = new HashSet<ClinicalIncidentReport>();
+            SurgicalNotes = new HashSet<SurgicalNote>();
         }
         
         public int Id { get; set; }
@@ -52,7 +52,7 @@ namespace AnimalDB.Repo.Entities
         [Display(Name = "Researcher")]
         public string Researcher_Id { get; set; }
         [ForeignKey("Researcher_Id")]
-        public virtual Student Researcher { get; set; }
+        public virtual AnimalUser Researcher { get; set; }
 
 
         [Display(Name = "Colour")]

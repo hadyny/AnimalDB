@@ -25,7 +25,7 @@ namespace AnimalDB.Repo.Entities
         [Display(Name = "Animal Type")]
         public int Species_Id { get; set; }
         [ForeignKey("Species_Id")]
-        public virtual Species Species { get; set; }
+        public Species Species { get; set; }
 
         /* Source of Animals */
 

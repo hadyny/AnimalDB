@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class CleaningTaskRepo : ICleaningTask, IDisposable
+    public class CleaningTaskRepo : ICleaningTask
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public CleaningTaskRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.CleaningTasks.Remove(cleaningTask);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<CleaningTask> GetCleaningTaskById(int id)

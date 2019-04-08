@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class SurgicalNoteRepo : ISurgicalNote, IDisposable
+    public class SurgicalNoteRepo : ISurgicalNote
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public SurgicalNoteRepo()
         {
@@ -37,12 +37,6 @@ namespace AnimalDB.Repo.Implementations
             db.SurgicalNotes.Remove(SurgicalNote);
             await db.SaveChangesAsync();
         }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
-        }
-
         public async Task<SurgicalNote> GetSurgicalNoteById(int id)
         {
             return await db.SurgicalNotes.FindAsync(id);

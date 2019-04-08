@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class VetScheduleRepo : IVetSchedule, IDisposable
+    public class VetScheduleRepo : IVetSchedule
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public VetScheduleRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.VetSchedules.Remove(VetSchedule);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<VetSchedule> GetVetScheduleById(int id)

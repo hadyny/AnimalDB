@@ -1,31 +1,98 @@
-﻿@model IEnumerable<AnimalDB.Repo.Entities.Animal>
+﻿@model IEnumerable<AnimalDB.Models.ViewAnimalManipulationReportViewModel>
 
+<h3>
+    @Html.ActionLink("Back to report", "Create", new { Ethics_Id = Request["Ethics_Id"] }, new { @class = "btn btn-primary" })
+</h3>
 
-<h2>View</h2>
 
 <table class="table table-striped">
+    @if (User.IsInRole("Administrator"))
+    {
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.UniqueAnimalId)
+            <th colspan="2" class="">
+                <button id="toggleAll" class="btn btn-default">Toggle All</button>
+                <button id="selectAll" class="btn btn-default">Select All</button>
+                <button id="selectNone" class="btn btn-default">Select None</button>
+                <button id="recategorizeSeleceted" class="btn btn-default">Recategorize Selected</button>
             </th>
             <th></th>
         </tr>
     </thead>
-
+    }
     <tbody>
-        @foreach (var item in Model.OrderBy(m => m.UniqueAnimalId))
+        @foreach (var item in Model.OrderBy(m => m.Animal.UniqueAnimalId))
         {
-            <tr>
-
-                <td>
-                    @Html.DisplayFor(modelItem => item.UniqueAnimalId)
-                </td>
-                <td>
-                    @Html.ActionLink("View", "Details", "Animals", new { id = item.Id }, null)
-                </td>
-            </tr>
+        <tr>
+            @if (User.IsInRole("Administrator"))
+            {
+            <td class="col-md-1">
+                @Html.CheckBoxFor(modelItem => item.Change, new { data_id = item.Animal.Id })
+            </td>
+            }
+            <td>
+                @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
+            </td>
+            <td>
+                @Html.ActionLink("View", "Details", "Animals", new { id = item.Animal.Id }, null)
+            </td>
+        </tr>
         }
     <tbody>
 
 </table>
+
+@section Scripts {
+    <script>
+        $('#toggleAll').click(function () {
+            $('input[type="checkbox"]').each(function (i, el) {
+                el.checked = !el.checked    ;
+            });
+        });
+        $('#selectAll').click(function () {
+            $('input[type="checkbox"]').each(function (i, el) {
+                el.checked = true;
+            });
+        });
+        $('#selectNone').click(function () {
+            $('input[type="checkbox"]').each(function (i, el) {
+                el.checked = false;
+            });
+        });
+        $('#recategorizeSeleceted').click(function () {
+            var selected = $('input[type="checkbox"]:checked');
+            if (selected.length == 0) {
+                return;
+            }
+
+            var form = document.createElement("form");
+            form.setAttribute('method', 'get');
+            form.setAttribute('action', '@Url.Action("BulkChange")');
+            var hiddenField, animalId, returnUrl, ethicsId;
+
+            returnUrl = document.createElement('input');
+            returnUrl.setAttribute('type', 'hidden');
+            returnUrl.setAttribute('name', 'returnUrl');
+            returnUrl.setAttribute('value', '@Url.Action()');
+            form.appendChild(returnUrl);
+
+            ethicsId = document.createElement('input');
+            ethicsId.setAttribute('type', 'hidden');
+            ethicsId.setAttribute('name', 'Ethics_Id');
+            ethicsId.setAttribute('value', '@Request["ethics_Id"]');
+            form.appendChild(ethicsId);
+
+            selected.each(function (i, el) {
+                animalId = el.getAttribute('data-id');
+                hiddenField = document.createElement('input');
+                hiddenField.setAttribute('type', 'hidden');
+                hiddenField.setAttribute('name', 'animalIds[' + i + ']');
+                hiddenField.setAttribute('value', animalId);
+                form.appendChild(hiddenField);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+        });
+    </script>
+}

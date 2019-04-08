@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class VirusTypeRepo : IVirusType, IDisposable
+    public class VirusTypeRepo : IVirusType
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public VirusTypeRepo()
         {
@@ -53,11 +53,6 @@ namespace AnimalDB.Repo.Implementations
         {
             db.Entry(VirusType).State = EntityState.Modified;
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
     }
 }

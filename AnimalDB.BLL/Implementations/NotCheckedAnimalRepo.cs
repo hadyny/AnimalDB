@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class NotCheckedAnimalRepo : INotCheckedAnimal, IDisposable
+    public class NotCheckedAnimalRepo : INotCheckedAnimal
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public NotCheckedAnimalRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.NotCheckedAnimals.Remove(notCheckedAnimal);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<NotCheckedAnimal> GetNotCheckedAnimalById(int id)

@@ -181,7 +181,7 @@ namespace AnimalDB.Controllers
             ViewBag.Source_Id = new SelectList(_sources.GetSources(), "Id", "Description");
             ViewBag.Strain_Id = new SelectList(_strains.GetStrains(), "Id", "Description");
             ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName");
-            ViewBag.Researcher_Id = new SelectList(_students.GetStudents(), "Id", "FullName");
+            ViewBag.Researcher_Id = new SelectList(_students.GetStudentsAndInvestigators(), "Id", "FullName");
             //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text");
             ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description");
             ViewBag.ApprovalNumber_Id = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description");
@@ -262,7 +262,7 @@ namespace AnimalDB.Controllers
             ViewBag.Source_Id = new SelectList(_sources.GetSources(), "Id", "Description", animal.Source_Id);
             ViewBag.Strain_Id = new SelectList(_strains.GetStrains(), "Id", "Description", animal.Strain_Id);
             ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
-            ViewBag.Researcher_Id = new SelectList(_students.GetStudents(), "Id", "FullName", animal.Researcher_Id);
+            ViewBag.Researcher_Id = new SelectList(_students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
             //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text", animal.ChargeCode_Id);
             ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", animal.Room_Id);
             ViewBag.ApprovalNumber_Id = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
@@ -299,7 +299,7 @@ namespace AnimalDB.Controllers
                 ViewBag.Source_Id = new SelectList(_sources.GetSources(), "Id", "Description", animal.Source_Id);
                 ViewBag.Strain_Id = new SelectList(_strains.GetStrains(), "Id", "Description", animal.Strain_Id);
                 ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
-                ViewBag.Researcher_Id = new SelectList(_students.GetStudents(), "Id", "FullName", animal.Researcher_Id);
+                ViewBag.Researcher_Id = new SelectList(_students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
                 //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text", animal.ChargeCode_Id);
                 ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", animal.Room_Id);
                 ViewBag.ApprovalNumber_Id = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
@@ -374,7 +374,7 @@ namespace AnimalDB.Controllers
                 ViewBag.Source_Id = new SelectList(_sources.GetSources(), "Id", "Description", animal.Source_Id);
                 ViewBag.Strain_Id = new SelectList(_strains.GetStrains(), "Id", "Description", animal.Strain_Id);
                 ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
-                ViewBag.Researcher_Id = new SelectList(_students.GetStudents(), "Id", "FullName", animal.Researcher_Id);
+                ViewBag.Researcher_Id = new SelectList(_students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
                 //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text", animal.ChargeCode_Id);
                 ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", animal.Room_Id);
                 ViewBag.ApprovalNumber_Id = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);

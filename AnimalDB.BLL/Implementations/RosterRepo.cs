@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class RosterRepo : IRoster, IDisposable
+    public class RosterRepo : IRoster
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public RosterRepo()
         {
@@ -37,11 +37,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.Rosters.Remove(roster);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Roster> GetRosterById(int id)

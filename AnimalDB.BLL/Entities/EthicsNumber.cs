@@ -8,7 +8,7 @@ namespace AnimalDB.Repo.Entities
     {
         public EthicsNumber()
         {
-            this.EthicsNumberHistory = new HashSet<EthicsNumberHistory>();
+            EthicsNumberHistory = new HashSet<EthicsNumberHistory>();
         }
     
         public int Id { get; set; }

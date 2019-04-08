@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class EthicsNumberHistoryRepo : IEthicsNumberHistory, IDisposable
+    public class EthicsNumberHistoryRepo : IEthicsNumberHistory
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public EthicsNumberHistoryRepo()
         {
@@ -57,11 +57,6 @@ namespace AnimalDB.Repo.Implementations
         public IEnumerable<EthicsNumberHistory> GetEthicsNumberHistoriesByAnimal(int animal_Id)
         {
             return db.EthicsNumberHistories.Where(m => m.Animal_Id == animal_Id).OrderByDescending(m => m.Timestamp).ToList();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
     }
 }

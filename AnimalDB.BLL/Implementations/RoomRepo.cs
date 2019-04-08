@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class RoomRepo : IRoom, IDisposable
+    public class RoomRepo : IRoom
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public RoomRepo()
         {
@@ -87,11 +87,6 @@ namespace AnimalDB.Repo.Implementations
                                 DbFunctions.TruncateTime(m.NoDBAnimalsLastCheck.Value) != DbFunctions.TruncateTime(DateTime.Now))))
                     .ToList();
             return r;
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task MarkAllAnimalsAsCheckedByRoomId(int roomId)

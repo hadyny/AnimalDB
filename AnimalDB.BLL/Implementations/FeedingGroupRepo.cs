@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class FeedingGroupRepo : IFeedingGroup, IDisposable
+    public class FeedingGroupRepo : IFeedingGroup
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public FeedingGroupRepo()
         {
@@ -46,11 +46,6 @@ namespace AnimalDB.Repo.Implementations
             db.FeedingGroups.Remove(feedingGroup);
             
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<FeedingGroup> GetFeedingGroupById(int id)

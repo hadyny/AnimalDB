@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class CageLocationHistoryRepo : ICageLocationHistory, IDisposable
+    public class CageLocationHistoryRepo : ICageLocationHistory
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public CageLocationHistoryRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.CageLocationHistories.Remove(cageLocationHistory);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public IEnumerable<CageLocationHistory> GetCageLocationHistories()

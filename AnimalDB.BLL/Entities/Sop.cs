@@ -29,7 +29,7 @@ namespace AnimalDB.Repo.Entities
     public class SopCategory
     {
         public SopCategory() {
-            this.Sops = new List<Sop>();
+            Sops = new List<Sop>();
         }
 
         public int Id { get; set; }

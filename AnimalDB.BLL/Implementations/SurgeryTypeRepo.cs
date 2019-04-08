@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class SurgeryTypeRepo : ISurgeryType, IDisposable
+    public class SurgeryTypeRepo : ISurgeryType
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public SurgeryTypeRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.SurgeryTypes.Remove(surgeryType);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<SurgeryType> GetSurgeryTypeById(int id)

@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class SopCategoryRepo : ISopCategory, IDisposable
+    public class SopCategoryRepo : ISopCategory
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public SopCategoryRepo()
         {
@@ -37,11 +37,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.SopCategories.Remove(sopCategory);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<SopCategory> GetSopCategoryById(int id)

@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class GDTimelineRepo : IGDTimeline, IDisposable
+    public class GDTimelineRepo : IGDTimeline
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public GDTimelineRepo()
         {
@@ -44,11 +44,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.GDTimelines.Remove(gDTimeline);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<GDTimeline> GetGDTimelineById(int id)

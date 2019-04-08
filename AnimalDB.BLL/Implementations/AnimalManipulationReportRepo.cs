@@ -1,7 +1,6 @@
 ﻿using AnimalDB.Repo.Contexts;
 using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -9,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class AnimalManipulationReportRepo : IAnimalManipulationReport, IDisposable
+    public class AnimalManipulationReportRepo : IAnimalManipulationReport
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public AnimalManipulationReportRepo()
         {
@@ -36,11 +35,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.AnimalManipulationReports.Remove(animalManipulationReport);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<AnimalManipulationReport> GetAnimalManipulationReportById(int id)

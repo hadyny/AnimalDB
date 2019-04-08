@@ -12,9 +12,9 @@ using Microsoft.Owin.Security;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class TechnicianRepo : ITechnician, IDisposable
+    public class TechnicianRepo : ITechnician
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public TechnicianRepo()
         {
@@ -35,7 +35,10 @@ namespace AnimalDB.Repo.Implementations
         {
             var usermanager = new UserManager<Technician>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<Technician>(db));
             var result = await usermanager.CreateAsync(technician, "Password not required");
-            usermanager.AddToRole(technician.Id, "Technician");
+            if (result.Succeeded)
+            {
+                usermanager.AddToRole(technician.Id, "Technician");
+            }
         }
 
         public async Task DeleteTechnician(Technician technician)
@@ -67,11 +70,6 @@ namespace AnimalDB.Repo.Implementations
             var AdminManager = new UserManager<Technician>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<Technician>(db));
             var adminIdentity = await AdminManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
             HttpContext.Current.GetOwinContext().Authentication.SignIn(new AuthenticationProperties() { IsPersistent = false }, adminIdentity);
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
     }
 }

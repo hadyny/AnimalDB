@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class ChargeCodeRepo : IChargeCode, IDisposable
+    public class ChargeCodeRepo : IChargeCode
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public ChargeCodeRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.ChargeCode.Remove(chargeCode);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<ChargeCode> GetChargeCodeById(int id)

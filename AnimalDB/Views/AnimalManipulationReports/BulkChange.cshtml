@@ -1,0 +1,61 @@
+﻿@model AnimalDB.Web.Models.BulkChangeAnimalViewModel
+
+<h3>
+    <a href="@Html.Raw(ViewBag.returnUrl)" class="btn btn-primary">Back</a>
+</h3>
+
+<h2>Bulk Change Attributes</h2>
+
+<div class="row">
+    <div class="col-md-7">
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Purpose, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EnumDropDownListFor(model => model.Purpose, new { @class = "form-control col-md-2" })
+                        @Html.ValidationMessageFor(model => model.Purpose, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Grading, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EnumDropDownListFor(model => model.Grading, new { @class = "form-control col-md-2" })
+                        @Html.ValidationMessageFor(model => model.Grading, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Status, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownList("ArrivalStatus_Id", null, "", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Change" class="btn btn-danger" />
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+    <div class="col-md-5">
+        <h3>Animals to be changed:</h3>
+        <ul>
+            @foreach (var animal in Model.Animals)
+            {
+                <li>@animal.UniqueAnimalId</li>
+            }
+        </ul>
+    </div>
+</div>

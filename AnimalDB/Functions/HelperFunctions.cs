@@ -67,6 +67,10 @@ namespace AnimalDB.Functions
                 case "clinicalincidentreports":
                     model.a = cl;
                     break;
+                case "documents":
+                case "documentcategories":
+                    model.d = cl;
+                    break;
                 case "feedinggroup":
                     model.f = cl;
                     break;

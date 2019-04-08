@@ -29,7 +29,7 @@
     <ApplicationInsightsResourceId>/subscriptions/42e748dc-9704-4f1d-b029-97e5b73cbbb2/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/AnimalDB</ApplicationInsightsResourceId>
     <Use64BitIISExpress />
     <TargetFrameworkProfile />
-    <TypeScriptToolsVersion>2.5</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +39,19 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>React</TypeScriptJSXEmit>
+    <TypeScriptModuleKind />
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -191,10 +204,16 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\DocumentCategoriesController.cs" />
+    <Compile Include="Controllers\DocumentsController.cs" />
     <Compile Include="Controllers\GDTimelinesController.cs" />
     <Compile Include="Controllers\NavController.cs" />
     <Compile Include="Functions\HelperFunctions.cs" />
     <Compile Include="Functions\UserManagement.cs" />
+    <Compile Include="Migrations\201904032055424_initial.cs" />
+    <Compile Include="Migrations\201904032055424_initial.Designer.cs">
+      <DependentUpon>201904032055424_initial.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AddInvestigatorViewModel.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AdministratorsController.cs" />
@@ -247,6 +266,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AnimalViewModel.cs" />
+    <Compile Include="Models\BulkChangeAnimalViewModel.cs" />
     <Compile Include="Models\CageLocationHistoryViewModel.cs" />
     <Compile Include="Models\MenuViewModel.cs" />
     <Compile Include="Models\PupsByEthicsViewModel.cs" />
@@ -307,6 +327,7 @@
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
     <Content Include="Content\laa.pdf" />
+    <Compile Include="Models\ViewAnimalManipulationReportViewModel.cs" />
     <None Include="Properties\PublishProfiles\default.pubxml" />
     <Content Include="Scripts\bootstrap-datetimepicker.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -626,7 +647,6 @@
     <Content Include="Views\Racks\AnimalGrid.cshtml" />
     <Content Include="Views\SopCategories\Create.cshtml" />
     <Content Include="Views\SopCategories\Delete.cshtml" />
-    <Content Include="Views\SopCategories\Details.cshtml" />
     <Content Include="Views\SopCategories\Edit.cshtml" />
     <Content Include="Views\SopCategories\Index.cshtml" />
     <Content Include="Views\Sops\Delete.cshtml" />
@@ -685,6 +705,17 @@
     <Content Include="Views\Nav\Menu.cshtml" />
     <Content Include="Views\Home\AllergyInfo.cshtml" />
     <Content Include="Views\Animals\Resurrect.cshtml" />
+    <Content Include="Views\AnimalManipulationReports\BulkChange.cshtml" />
+    <Content Include="Views\Documents\Create.cshtml" />
+    <Content Include="Views\Documents\Delete.cshtml" />
+    <Content Include="Views\Documents\Edit.cshtml" />
+    <Content Include="Views\Documents\Index.cshtml" />
+    <Content Include="Views\DocumentCategories\Create.cshtml" />
+    <Content Include="Views\DocumentCategories\Delete.cshtml" />
+    <Content Include="Views\DocumentCategories\Edit.cshtml" />
+    <Content Include="Views\DocumentCategories\Index.cshtml" />
+    <Content Include="Views\Documents\Upload.cshtml" />
+    <Content Include="Views\Documents\View.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -708,6 +739,11 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201904032055424_initial.resx">
+      <DependentUpon>201904032055424_initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

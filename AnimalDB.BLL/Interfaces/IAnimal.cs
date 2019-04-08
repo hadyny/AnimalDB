@@ -1,4 +1,5 @@
 ﻿using AnimalDB.Repo.Entities;
+using AnimalDB.Repo.Enums;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -76,5 +77,7 @@ namespace AnimalDB.Repo.Interfaces
         Task Resurrect(int id);
 
         Task ReturnAnimalToStock(int id);
+
+        Task BulkUpdateAnimals(List<Animal> animals, Grading? grading, Manipulation? manipulation, int? ArrivalStatus_Id);
     }
 }

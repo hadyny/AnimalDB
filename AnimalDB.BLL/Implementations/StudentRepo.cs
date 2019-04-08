@@ -1,21 +1,21 @@
 ﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using AnimalDB.Repo.Entities;
-using Microsoft.AspNet.Identity;
-using System;
 using System.Web;
-using Microsoft.Owin.Security;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class StudentRepo : IStudent, IDisposable
+    public class StudentRepo : IStudent
     {
 
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public StudentRepo()
         {
@@ -31,7 +31,7 @@ namespace AnimalDB.Repo.Implementations
         {
             var usermanager = new UserManager<Student>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<Student>(db));
             var result = await usermanager.CreateAsync(student, "Password not required");
-            usermanager.AddToRole(student.Id, "Student");
+            if (result.Succeeded) usermanager.AddToRole(student.Id, "Student");
         }
 
         public async Task DeleteStudent(Student student)
@@ -69,6 +69,23 @@ namespace AnimalDB.Repo.Implementations
             return db.Students.ToList();
         }
 
+        public IEnumerable<AnimalUser> GetStudentsAndInvestigators()
+        {
+            List<AnimalUser> animalUsers = new List<AnimalUser>();
+
+            foreach (var student in db.Students)
+            {
+                animalUsers.Add(student);
+            }
+
+            foreach (var investigator in db.Investigators)
+            {
+                animalUsers.Add(investigator);
+            }
+
+            return animalUsers;
+        }
+
         public async Task UpdateStudent(Student student)
         {
             db.Entry(student).State = EntityState.Modified;
@@ -99,11 +116,6 @@ namespace AnimalDB.Repo.Implementations
             if (student == null || investigator == null) return;
             student.Investigators.Remove(investigator);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
     }
 }

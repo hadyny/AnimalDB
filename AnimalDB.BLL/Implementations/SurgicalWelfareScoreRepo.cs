@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class SurgicalWelfareScoreRepo : ISurgicalWelfareScore, IDisposable
+    public class SurgicalWelfareScoreRepo : ISurgicalWelfareScore
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public SurgicalWelfareScoreRepo()
         {
@@ -37,12 +37,6 @@ namespace AnimalDB.Repo.Implementations
             db.SurgicalWelfareScores.Remove(surgicalWelfareScore);
             await db.SaveChangesAsync();
         }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
-        }
-
         public async Task<SurgicalWelfareScore> GetSurgicalWelfareScoreById(int id)
         {
             return await db.SurgicalWelfareScores.FindAsync(id);

@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class SopRepo : ISop, IDisposable
+    public class SopRepo : ISop
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public SopRepo()
         {
@@ -42,11 +42,6 @@ namespace AnimalDB.Repo.Implementations
         public IEnumerable<Sop> GetSopsByCategoryId(int categoryId)
         {
             return db.Sops.Where(m => m.Category_Id == categoryId).ToList();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<Sop> GetSopById(int id)

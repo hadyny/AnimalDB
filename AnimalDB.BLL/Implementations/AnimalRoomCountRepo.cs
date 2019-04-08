@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class AnimalRoomCountRepo : IAnimalRoomCount, IDisposable
+    public class AnimalRoomCountRepo : IAnimalRoomCount
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public AnimalRoomCountRepo()
         {
@@ -46,11 +46,6 @@ namespace AnimalDB.Repo.Implementations
                     .OrderByDescending(m => m.Timestamp)
                     .Take(amount)
                     .ToList();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<AnimalRoomCount> GetAnimalRoomCountById(int id)

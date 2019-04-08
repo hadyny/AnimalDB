@@ -9,7 +9,7 @@
     {
         public AddToFeedingGroupViewModel()
         {
-            this.ExistingAnimals = new HashSet<Repo.Entities.Animal>();
+            ExistingAnimals = new HashSet<Animal>();
         }
 
         public int Id { get; set; }
@@ -20,15 +20,15 @@
         public virtual Animal Animal { get; set; }
 
         [NotMapped]
-        public virtual ICollection<Repo.Entities.Animal> ExistingAnimals { get; set; }
+        public virtual ICollection<Animal> ExistingAnimals { get; set; }
     }
 
     public class CreateGroupViewModel
     {
         public CreateGroupViewModel()
         {
-            this.AnimalGroups = new HashSet<AnimalGroup>();
-            this.Groups = new HashSet<Group>();
+            AnimalGroups = new HashSet<AnimalGroup>();
+            Groups = new HashSet<Group>();
         }
 
         public int? Id { get; set; }

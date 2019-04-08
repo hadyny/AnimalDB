@@ -9,7 +9,7 @@ namespace AnimalDB.Repo.Entities
     {
         public SurgicalNote()
         {
-            this.WellfareScores = new HashSet<SurgicalWelfareScore>();
+            WellfareScores = new HashSet<SurgicalWelfareScore>();
         }
 
         public int Id { get; set; }

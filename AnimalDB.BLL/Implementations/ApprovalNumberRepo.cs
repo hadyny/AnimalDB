@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class ApprovalNumberRepo : IApprovalNumber, IDisposable
+    public class ApprovalNumberRepo : IApprovalNumber
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public ApprovalNumberRepo()
         {
@@ -36,11 +36,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.ApprovalNumbers.Remove(approvalNumber);
             await db.SaveChangesAsync(); ;
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<ApprovalNumber> GetApprovalNumberById(int id)

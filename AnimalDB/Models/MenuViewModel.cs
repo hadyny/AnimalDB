@@ -8,6 +8,8 @@ namespace AnimalDB.Models
 
         public string f { get; set; }
 
+        public string d { get; set; }
+
         public string w { get; set; }
 
         public string ad { get; set; }

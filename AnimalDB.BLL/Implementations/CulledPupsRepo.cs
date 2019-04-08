@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class CulledPupsRepo : ICulledPups, IDisposable
+    public class CulledPupsRepo : ICulledPups
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public CulledPupsRepo()
         {
@@ -53,11 +53,6 @@ namespace AnimalDB.Repo.Implementations
         {
             db.Entry(culledPups).State = EntityState.Modified;
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public IEnumerable<CulledPups> GetCulledPupsByAnimalId(int animalId)

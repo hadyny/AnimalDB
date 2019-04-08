@@ -8,6 +8,8 @@ namespace AnimalDB.Repo.Interfaces
     {
         IEnumerable<Student> GetStudents();
 
+        IEnumerable<AnimalUser> GetStudentsAndInvestigators();
+
         Student GetStudentByUsername(string username);
 
         Task CreateStudent(Student student);

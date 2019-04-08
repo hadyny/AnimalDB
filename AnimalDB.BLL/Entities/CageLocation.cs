@@ -8,7 +8,7 @@ namespace AnimalDB.Repo.Entities
     {
         public CageLocation()
         {
-            this.CageLocationHistories = new HashSet<CageLocationHistory>();
+            CageLocationHistories = new HashSet<CageLocationHistory>();
         }
 
         public int Id { get; set; }

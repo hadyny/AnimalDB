@@ -7,7 +7,7 @@ namespace AnimalDB.Repo.Entities
     {
         public MedicationType()
         {
-            this.Medication = new HashSet<Medication>();
+            Medication = new HashSet<Medication>();
         }
     
         public int Id { get; set; }

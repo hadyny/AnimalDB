@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class SpeciesRepo : ISpecies, IDisposable
+    public class SpeciesRepo : ISpecies
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public SpeciesRepo()
         {
@@ -55,9 +55,5 @@ namespace AnimalDB.Repo.Implementations
             await db.SaveChangesAsync();
         }
 
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
-        }
     }
 }

@@ -41,6 +41,7 @@ namespace AnimalDB.Controllers
             ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description");
             return View();
         }
+
         [Authorize(Roles = "Administrator,Technician,Investigator")]
         // POST: /FeedingGroup/Create
         [HttpPost]
@@ -62,6 +63,7 @@ namespace AnimalDB.Controllers
             ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", feedinggroup.Room_Id);
             return View(feedinggroup);
         }
+
         [Authorize(Roles = "Administrator,Technician,Investigator")]
         // GET: /FeedingGroup/Edit/5
         public async Task<ActionResult> Edit(int? id)
@@ -79,6 +81,7 @@ namespace AnimalDB.Controllers
             ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", feedinggroup.Room_Id);
             return View(feedinggroup);
         }
+
         [Authorize(Roles = "Administrator,Technician,Investigator")]
         // POST: /FeedingGroup/Edit/5
         [HttpPost]
@@ -100,8 +103,7 @@ namespace AnimalDB.Controllers
             ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", feedinggroup.Room_Id);
             return View(feedinggroup);
         }
-
-        [Authorize(Roles = "Administrator,Technician,Investigator")]
+        
         // GET: /FeedingGroup/Group/5
         public async Task<ActionResult> Group(int? id)
         {
@@ -115,7 +117,6 @@ namespace AnimalDB.Controllers
                 return HttpNotFound();
             }
             
-
             ViewBag.Group_Id = new SelectList(_groups.GetGroupsByFeedingGroupId(id.Value),
                                             "Id", "Description");
 
@@ -136,12 +137,10 @@ namespace AnimalDB.Controllers
             var tmp = new SelectList(_groups.GetGroupsByFeedingGroupId(id.Value), "Id", "Description");
 
             ViewBag.Groups = tmp;
-                
 
             return View(model);
         }
-
-        [Authorize(Roles = "Administrator,Technician,Investigator")]
+        
         // POST: /FeedingGroup/Group/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -176,6 +175,7 @@ namespace AnimalDB.Controllers
             }
             return View(feedinggroup);
         }
+
         [Authorize(Roles = "Administrator,Technician,Investigator")]
         // POST: /FeedingGroup/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -189,7 +189,6 @@ namespace AnimalDB.Controllers
         }
 
         // GET: /FeedingGroup/Add/5
-
         public async Task<ActionResult> Add(int? id)
         {
             if (id == null)

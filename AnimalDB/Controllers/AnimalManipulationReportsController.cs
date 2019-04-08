@@ -8,6 +8,8 @@ using System.Web.Mvc;
 using System.Linq;
 using System.Collections.Generic;
 using AnimalDB.Repo.Implementations;
+using AnimalDB.Models;
+using AnimalDB.Web.Models;
 
 namespace AnimalDB.Controllers
 {
@@ -19,6 +21,7 @@ namespace AnimalDB.Controllers
         private IEthicsNumber _ethicsNumbers;
         private IEthicsNumberHistory _ethicsNumberHistories;
         private IAnimal _animals;
+        private IArrivalStatus _arrivalStatus;
 
         public AnimalManipulationReportsController()
         {
@@ -26,6 +29,7 @@ namespace AnimalDB.Controllers
             this._ethicsNumbers = new EthicsNumberRepo();
             this._ethicsNumberHistories = new EthicsNumberHistoryRepo();
             this._animals = new AnimalRepo();
+            this._arrivalStatus = new ArrivalStatusRepo();
         }
 
         // GET: AnimalManipulationReports
@@ -156,6 +160,9 @@ namespace AnimalDB.Controllers
                 return HttpNotFound();
             }
 
+            var ethicsNumber = await _ethicsNumbers.GetEthicsNumberByName(animalManipulationReport.ProtocolNumber);
+            ViewBag.Ethics_Id = ethicsNumber.Id;
+
             return View(animalManipulationReport);
         }
 
@@ -169,7 +176,8 @@ namespace AnimalDB.Controllers
                 await _animalManipulationReports.UpdateAnimalManipulationReport(animalManipulationReport);
                 return RedirectToAction("Index");
             }
-
+            var ethicsNumber = await _ethicsNumbers.GetEthicsNumberByName(animalManipulationReport.ProtocolNumber);
+            ViewBag.Ethics_Id = ethicsNumber.Id;
             return View(animalManipulationReport);
         }
 
@@ -201,41 +209,93 @@ namespace AnimalDB.Controllers
         // GET: AnimalManipulationReports/View/?category=SourceType&identifier=BreedingUnit
         public ActionResult ViewAnimals(int ethics_Id, string category, string identifier)
         {
-            var model = _animals.GetAllAnimals().Where(m => m.EthicsNumbers.Count(n => n.Ethics_Id == ethics_Id) != 0);
+            var model = _animals
+                .GetAllAnimals()
+                .Where(m => m.EthicsNumbers.Count(n => n.Ethics_Id == ethics_Id) != 0)
+                .Select(m => new ViewAnimalManipulationReportViewModel() { Animal = m, Change = false });
 
             switch (category)
             {
                 case "sourceType":
                     if (identifier == SourceType.BornDuringProject.ToString())
                     {
-                        model = model.Where(m => m.BornHere || m.Source.Type.ToString() == identifier);
+                        model = model.Where(m => m.Animal.BornHere || m.Animal.Source.Type.ToString() == identifier);
                     }
                     else
                     {
-                        model = model.Where(m => !m.BornHere && m.Source.Type.ToString() == identifier);
+                        model = model.Where(m => !m.Animal.BornHere && m.Animal.Source.Type.ToString() == identifier);
                     }
 
                     break;
                 case "arrivalStatusType":
-                    model = model.Where(m => m.ArrivalStatus.Type.ToString() == identifier);
+                    ArrivalStatusType arrivalStatusType;
+                    Enum.TryParse(identifier, out arrivalStatusType);
+                    model = model.Where(m => m.Animal.ArrivalStatus.Type == arrivalStatusType);
                     break;
                 case "manipulation":
-                    model = model.Where(m => m.Manipulation.ToString() == identifier);
+                    Manipulation manipulation;
+                    Enum.TryParse(identifier, out manipulation);
+                    model = model.Where(m => m.Animal.Manipulation == manipulation);
                     break;
                 case "priorUse":
                     int _identifier = identifier == "yes" ? 2 : 1;
-                    model = model.Where(m => m.EthicsNumbers.Count() == _identifier);
+                    model = model.Where(m => m.Animal.EthicsNumbers.Count() == _identifier);
                     break;
                 case "grading":
-                    model = model.Where(m => m.Grading.ToString() == identifier);
+                    Grading grading;
+                    Enum.TryParse(identifier, out grading);
+                    model = model.Where(m => m.Animal.Grading == grading);
                     break;
                 case "aliveStatus":
-                    //model = model.Where(m => m.AliveStatus.ToString() == identifier);
-                    model = model.Where(m => _animals.GetAnimalsEthicsNumber(m.Id).Result.AliveStatus.ToString() == identifier);
+                    AliveStatus aliveStatus;
+                    Enum.TryParse(identifier, out aliveStatus);
+                    model = model.Where(m => _animals.GetAnimalsEthicsNumber(m.Animal.Id).Result.AliveStatus == aliveStatus);
                     break;
             }
 
             return View(model);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<ViewResult> BulkChange(string[] animalIds, string returnUrl, string ethics_Id)
+        {
+            List<Animal> animals = new List<Animal>();
+
+            foreach (var id in animalIds)
+            {
+                int _id = Convert.ToInt32(id);
+                animals.Add(
+                    await _animals.GetAnimalById(_id)
+                    );
+            }
+
+            var model = new BulkChangeAnimalViewModel()
+            {
+                Animals = animals
+            };
+
+            ViewBag.returnUrl = returnUrl;
+            ViewBag.ArrivalStatus_Id = new SelectList(_arrivalStatus.GetArrivalStatus(), "Id", "Description");
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> BulkChange(BulkChangeAnimalViewModel model, string[] animalIds, string returnUrl, string ethics_Id)
+        {
+            List<Animal> animals = new List<Animal>();
+
+            foreach (var id in animalIds)
+            {
+                int _id = Convert.ToInt32(id);
+                animals.Add(
+                    await _animals.GetAnimalById(_id)
+                    );
+            }
+
+            await _animals.BulkUpdateAnimals(animals, model.Grading, model.Purpose, model.ArrivalStatus_Id);
+
+            return RedirectToAction("Create", new { ethics_Id });
         }
     }
 }

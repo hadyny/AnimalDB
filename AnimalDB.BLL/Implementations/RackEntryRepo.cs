@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace AnimalDB.Repo.Implementations
 {
-    public class RackEntryRepo : IRackEntry, IDisposable
+    public class RackEntryRepo : IRackEntry
     {
-        private AnimalDBContext db;
+        private readonly AnimalDBContext db;
 
         public RackEntryRepo()
         {
@@ -38,11 +38,6 @@ namespace AnimalDB.Repo.Implementations
             }
             db.RackEntries.Remove(rackEntry);
             await db.SaveChangesAsync();
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)db).Dispose();
         }
 
         public async Task<RackEntry> GetRackEntryById(int id)
