@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,18 +9,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class ColourController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IColour _colours;
+        private IColourService _colours;
 
-        public ColourController()
+        public ColourController(IColourService colours)
         {
-            this._colours = new ColourRepo();
+            this._colours = colours;
         }
 
         // GET: /Colour/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_colours.GetColours());
+            return View(await _colours.GetColours());
         }
 
 

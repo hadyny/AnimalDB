@@ -1,6 +1,5 @@
-﻿using AnimalDB.Functions;
-using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
+﻿using AnimalDB.Repo.Entities;
+using AnimalDB.Repo.Services;
 using AnimalDB.Repo.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,25 +14,27 @@ namespace AnimalDB.Controllers
     {
         //private AnimalDBContext db = new AnimalDBContext();
 
-        private IStudent _students;
-        private IInvestigator _investigators;
+        private readonly IStudentService _students;
+        private readonly IInvestigatorService _investigators;
+        private readonly IUserManagementService _users;
 
-        public StudentsController()
+        public StudentsController(IStudentService students, IInvestigatorService investigators, IUserManagementService users)
         {
-            _students = new StudentRepo();
-            _investigators = new InvestigatorRepo();
+            _students = students;
+            _investigators = investigators;
+            _users = users;
         }
 
         // GET: Students
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_students.GetStudents());
+            return View(await _students.GetStudents());
         }
 
         // GET: Students/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName");
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName");
             return View();
         }
 
@@ -42,7 +43,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Investigator_Id,UserName,Email,FirstName,LastName")] Student student)
         {
-            string error = await UserManagement.CreateAnimalUser(student, Repo.Enums.UserType.Student);
+            string error = await _users.CreateAnimalUser(student, Repo.Enums.UserType.Student);
 
             if (string.IsNullOrEmpty(error))
             {
@@ -75,7 +76,8 @@ namespace AnimalDB.Controllers
                 Investigators = student.Investigators
             };
             ViewBag.StudentName = student.FullName;
-            List<Investigator> investigators = _investigators.GetInvestigators().Where(m => !m.Students.Contains(student)).ToList();
+            var inv = await _investigators.GetInvestigators();
+            List <Investigator> investigators = inv.Where(m => !m.Students.Contains(student)).ToList();
             ViewBag.Selected_Investigator_Id = new SelectList(investigators, "Id", "FullName");
 
             return View(model);
@@ -98,7 +100,8 @@ namespace AnimalDB.Controllers
             }
 
             ViewBag.StudentName = student.FullName;
-            ViewBag.Selected_Investigator_Id = new SelectList(_investigators.GetInvestigators().Where(m => !m.Students.Contains(student)), "Id", "FullName");
+            var inv = await _investigators.GetInvestigators();
+            ViewBag.Selected_Investigator_Id = new SelectList(inv.Where(m => !m.Students.Contains(student)), "Id", "FullName");
             model.Investigators = student.Investigators;
             return View(model);
         }

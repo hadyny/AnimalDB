@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net;
-using System.Web;
-using System.Web.Mvc;
-using AnimalDB.Repo.Contexts;
-using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
-using AnimalDB.Repo.Implementations;
+using System.Net;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace AnimalDB.Web.Controllers
 {
@@ -18,17 +10,17 @@ namespace AnimalDB.Web.Controllers
     public class DocumentCategoriesController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IDocumentCategory _categories;
+        private readonly IDocumentCategoryService _categories;
 
-        public DocumentCategoriesController()
+        public DocumentCategoriesController(IDocumentCategoryService categories)
         {
-            this._categories = new DocumentCategoryRepo();
+            this._categories = categories;
         }
 
         // GET: DocumentCategories
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_categories.GetDocumentCategories());
+            return View(await _categories.GetDocumentCategories());
         }
 
         // GET: DocumentCategories/Create

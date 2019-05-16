@@ -1,6 +1,5 @@
-﻿using AnimalDB.Functions;
-using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
+﻿using AnimalDB.Repo.Entities;
+using AnimalDB.Repo.Services;
 using AnimalDB.Repo.Interfaces;
 using System.Linq;
 using System.Net;
@@ -12,17 +11,19 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Administrator")]
     public class AdministratorsController : Controller
     {
-        private IAdministrator _administrators;
+        private readonly IAdministratorService _administrators;
+        private readonly IUserManagementService _users;
 
-        public AdministratorsController()
+        public AdministratorsController(IAdministratorService administrators, IUserManagementService users)
         {
-            this._administrators = new AdministratorRepo();
+            this._administrators = administrators;
+            this._users = users;
         }
 
         // GET: Administrators
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_administrators.GetAdministrators());
+            return View(await _administrators.GetAdministrators());
         }
         
         // GET: Administrators/Create
@@ -36,7 +37,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Id,FirstName,LastName,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName")] Administrator administrator)
         {
-            string error = await UserManagement.CreateAnimalUser(administrator, Repo.Enums.UserType.Administrator);
+            string error = await _users.CreateAnimalUser(administrator, Repo.Enums.UserType.Administrator);
 
             if (string.IsNullOrEmpty(error))
             {
@@ -72,8 +73,9 @@ namespace AnimalDB.Controllers
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
             Administrator administrator = await _administrators.GetAdministratorById(id);
+            var administrators = await _administrators.GetAdministrators();
 
-            if (_administrators.GetAdministrators().Count() == 1)
+            if (administrators.Count() == 1)
             {
                 ModelState.AddModelError("", "Deletion of administrator failed: There must be at least one administrator");
             }

@@ -1,6 +1,5 @@
-﻿using AnimalDB.Repo.Interfaces;
-using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
+﻿using AnimalDB.Repo.Entities;
+using AnimalDB.Repo.Interfaces;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,18 +10,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Administrator")]
     public class ChargeCodesController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        IChargeCode _chargeCodes;
+        IChargeCodeService _chargeCodes;
 
-        public ChargeCodesController()
+        public ChargeCodesController(IChargeCodeService chargeCodes)
         {
-            this._chargeCodes = new ChargeCodeRepo();
+            this._chargeCodes = chargeCodes;
         }
 
         // GET: ChargeCodes
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_chargeCodes.GetChargeCodes());
+            return View(await _chargeCodes.GetChargeCodes());
         }
 
         // GET: ChargeCodes/Animals
@@ -54,7 +52,8 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Id,Text")] ChargeCode chargeCode)
         {
-            if (_chargeCodes.GetChargeCodes().Count(m => m.Text == chargeCode.Text) != 0)
+            var codes = await _chargeCodes.GetChargeCodes();
+            if (codes.Count(m => m.Text == chargeCode.Text) != 0)
             {
                 ModelState.AddModelError("", "Charge code already in use");
             }
@@ -88,7 +87,8 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Text")] ChargeCode chargeCode)
         {
-            if (_chargeCodes.GetChargeCodes().Count(m => m.Text == chargeCode.Text) != 0)
+            var codes = await _chargeCodes.GetChargeCodes();
+            if (codes.Count(m => m.Text == chargeCode.Text) != 0)
             {
                 ModelState.AddModelError("", "Charge code already in use");
             }

@@ -25,7 +25,7 @@
         </td>
         <td>
             @Html.ActionLink("Add/View Animals", "Add", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-            @Html.ActionLink("Create Groups", "Group", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+            @Html.ActionLink("Create Sub-Groups", "Group", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
             @if (!User.IsInRole("Student"))
             {
                 @Html.ActionLink("Edit Group", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })

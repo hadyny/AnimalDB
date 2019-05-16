@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,17 +10,17 @@ namespace AnimalDB.Controllers
     public class ArrivalStatusController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IArrivalStatus _arrivalStatus;
+        private IArrivalStatusService _arrivalStatus;
 
-        public ArrivalStatusController()
+        public ArrivalStatusController(IArrivalStatusService arrivalStatus)
         {
-            this._arrivalStatus = new ArrivalStatusRepo();
+            this._arrivalStatus = arrivalStatus;
         }
 
         // GET: /ArrivalStatus/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_arrivalStatus.GetArrivalStatus());
+            return View(await _arrivalStatus.GetArrivalStatus());
         }
 
         // GET: /ArrivalStatus/Details/5

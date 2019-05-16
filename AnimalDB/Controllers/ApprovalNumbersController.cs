@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,20 +9,18 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class ApprovalNumbersController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IApprovalNumber _approvalNumbers;
+        private IApprovalNumberService _approvalNumbers;
 
-        public ApprovalNumbersController()
+        public ApprovalNumbersController(IApprovalNumberService approvalNumbers)
         {
-            this._approvalNumbers = new ApprovalNumberRepo();
+            this._approvalNumbers = approvalNumbers;
         }
 
         // GET: ApprovalNumbers
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_approvalNumbers.GetApprovalNumbers());
+            return View(await _approvalNumbers.GetApprovalNumbers());
         }
-
 
         // GET: ApprovalNumbers/Create
         public ActionResult Create()

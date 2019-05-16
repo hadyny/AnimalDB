@@ -1,9 +1,7 @@
 ﻿using AnimalDB.Models;
 using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -13,39 +11,42 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Student, Investigator, Veterinarian, Technician, Administrator")]
     public class EthicsNumberController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IEthicsNumber _ethicsNumbers;
-        private ISpecies _species;
-        private IInvestigator _investigators;
-        private IAnimal _animals;
-        private IEthicsNumberHistory _ethicsNumberHistories;
+        private readonly IEthicsNumberService _ethicsNumbers;
+        private readonly ISpeciesService _species;
+        private readonly IInvestigatorService _investigators;
+        private readonly IAnimalService _animals;
+        private readonly IEthicsNumberHistoryService _ethicsNumberHistories;
 
-        public EthicsNumberController()
+        public EthicsNumberController(IEthicsNumberService ethicsNumbers,
+                                      ISpeciesService species,
+                                      IInvestigatorService investigators,
+                                      IAnimalService animals,
+                                      IEthicsNumberHistoryService ethicsNumberHistories)
         {
-            this._ethicsNumbers = new EthicsNumberRepo();
-            this._ethicsNumberHistories = new EthicsNumberHistoryRepo();
-            this._species = new SpeciesRepo();
-            this._investigators = new InvestigatorRepo();
-            this._animals = new AnimalRepo();
+            this._ethicsNumbers = ethicsNumbers;
+            this._ethicsNumberHistories = ethicsNumberHistories;
+            this._species = species;
+            this._investigators = investigators;
+            this._animals = animals;
         }
 
         // GET: /EthicsNumber/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_ethicsNumbers.GetEthicsNumbers());
+            return View(await _ethicsNumbers.GetEthicsNumbers());
         }
 
         // GET: /EthicsNumber/Archived
-        public ActionResult Archived()
+        public async Task<ActionResult> Archived()
         {
-            return View(_ethicsNumbers.GetArchivedNumbers());
+            return View(await _ethicsNumbers.GetArchivedNumbers());
         }
 
         // GET: /EthicsNumber/Create
-        public ActionResult Create(string returnUrl)
+        public async Task<ActionResult> Create()
         {
-            ViewBag.Species_Id = new SelectList(_species.GetSpecies(), "Id", "Description");
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName");
+            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description");
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName");
             return View();
         }
 
@@ -65,8 +66,8 @@ namespace AnimalDB.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Species_Id = new SelectList(_species.GetSpecies(), "Id", "Description", ethicsnumber.Species_Id);
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", ethicsnumber.Investigator_Id);
+            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description", ethicsnumber.Species_Id);
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", ethicsnumber.Investigator_Id);
 
             return View(ethicsnumber);
         }
@@ -83,8 +84,8 @@ namespace AnimalDB.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.Species_Id = new SelectList(_species.GetSpecies(), "Id", "Description", ethicsnumber.Species_Id);
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", ethicsnumber.Investigator_Id);
+            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description", ethicsnumber.Species_Id);
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", ethicsnumber.Investigator_Id);
 
             return View(ethicsnumber);
         }
@@ -99,8 +100,8 @@ namespace AnimalDB.Controllers
                 await _ethicsNumbers.UpdateEthicsNumber(ethicsnumber);
                 return RedirectToAction("Index");
             }
-            ViewBag.Species_Id = new SelectList(_species.GetSpecies(), "Id", "Description", ethicsnumber.Species_Id);
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", ethicsnumber.Investigator_Id);
+            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description", ethicsnumber.Species_Id);
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", ethicsnumber.Investigator_Id);
             return View(ethicsnumber);
         }
 
@@ -114,7 +115,7 @@ namespace AnimalDB.Controllers
             
             Animal animal = await _animals.GetAnimalById(Convert.ToInt32(animalId));
             EthicsNumber ethics = await _ethicsNumbers.GetEthicsNumberById(id.Value);
-            if (ethics == null || (!string.IsNullOrEmpty(animalId) && animalId == null))
+            if (ethics == null || (!string.IsNullOrEmpty(animalId) && animal == null))
             {
                 return HttpNotFound();
             }
@@ -124,9 +125,9 @@ namespace AnimalDB.Controllers
                 EthicsId = ethics.Id,
                 AnimalId = animalId
             };
-
-            ViewBag.EthicsNumberHistoryList = _ethicsNumbers.GetEthicsNumberHistoryByEthicsId(ethics.Id).ToList();
-            ViewBag.AnimalId = new SelectList(_animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
+            var animals = await _animals.GetLivingAnimals();
+            ViewBag.EthicsNumberHistoryList = await _ethicsNumbers.GetEthicsNumberHistoryByEthicsId(ethics.Id);
+            ViewBag.AnimalId = new SelectList(animals, "Id", "UniqueAnimalId");
 
             return View(model);
         }
@@ -139,7 +140,7 @@ namespace AnimalDB.Controllers
             if (ModelState.IsValid)
             {
                 int animalId = Convert.ToInt32(ethics.AnimalId);
-                var existingEthics = await _animals.GetAnimalsEthicsNumber(animalId);
+                EthicsNumberHistory existingEthics = await _animals.GetAnimalsEthicsNumber(animalId);
                 if (existingEthics?.Ethics_Id != ethics.EthicsId)
                 {
                     await _animals.AddAnimalToEthicsNumber(animalId, ethics.EthicsId);
@@ -147,12 +148,13 @@ namespace AnimalDB.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("AnimalId", "Animal \"" + _animals.GetAnimalById(animalId).Result.UniqueAnimalId + "\" is already assigned to this ethics number");
+                    Animal animal = await _animals.GetAnimalById(animalId);
+                    ModelState.AddModelError("AnimalId", "Animal \"" + animal.UniqueAnimalId + "\" is already assigned to this ethics number");
                 }
             }
-
-            ViewBag.EthicsNumberHistoryList = _ethicsNumbers.GetEthicsNumberHistoryByEthicsId(ethics.EthicsId);
-            ViewBag.AnimalId = new SelectList(_animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
+            var animals = await _animals.GetLivingAnimals();
+            ViewBag.EthicsNumberHistoryList = await _ethicsNumbers.GetEthicsNumberHistoryByEthicsId(ethics.EthicsId);
+            ViewBag.AnimalId = new SelectList(animals, "Id", "UniqueAnimalId");
 
             return View(ethics);
         }

@@ -3,7 +3,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace AnimalDB.Repo.Contexts
 {
-    public class AnimalDBContext : IdentityDbContext<AnimalUser>, IAnimalDBContext
+    public class AnimalDBContext : IdentityDbContext<AnimalUser>
     {
         public AnimalDBContext() : base("DefaultConnection", throwIfV1Schema: false) { }
 

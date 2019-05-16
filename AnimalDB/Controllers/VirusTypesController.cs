@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,18 +9,17 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class VirusTypesController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IVirusType _virusTypes;
+        private IVirusTypeService _virusTypes;
 
-        public VirusTypesController()
+        public VirusTypesController(IVirusTypeService virusTypes)
         {
-            this._virusTypes = new VirusTypeRepo();
+            this._virusTypes = virusTypes;
         }
 
         // GET: VirusTypes
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_virusTypes.GetVirusTypes());
+            return View(await _virusTypes.GetVirusTypes());
         }
 
         // GET: VirusTypes/Create

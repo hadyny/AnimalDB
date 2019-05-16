@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,23 +12,23 @@ namespace AnimalDB.Controllers
     public class CulledController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IAnimal _animals;
-        private IInvestigator _investigators;
+        private readonly IAnimalService _animals;
+        private readonly IInvestigatorService _investigators;
 
-        public CulledController()
+        public CulledController(IAnimalService animals, IInvestigatorService investigators)
         {
-            this._animals = new AnimalRepo();
-            this._investigators = new InvestigatorRepo();
+            this._animals = animals;
+            this._investigators = investigators;
         }
 
         // GET: /Culled/
-        public ActionResult Index(int? id)
+        public async Task<ActionResult> Index(int? id)
         {
-            var animals = _animals.GetDeceasedAnimals();
+            var animals = await _animals.GetDeceasedAnimals();
 
             if (User.IsInRole("Investigator"))
             {
-                var investigator = _investigators.GetInvestigatorByUsername(User.Identity.Name);
+                var investigator = await _investigators.GetInvestigatorByUsername(User.Identity.Name);
                 animals.Where(m => m.Investigator_Id == investigator.Id);
             }
 

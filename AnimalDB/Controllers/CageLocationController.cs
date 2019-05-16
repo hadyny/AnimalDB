@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,25 +10,25 @@ namespace AnimalDB.Controllers
     public class CageLocationController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IRoom _rooms;
-        private ICageLocation _cageLocations;
+        private readonly IRoomService _rooms;
+        private readonly ICageLocationService _cageLocations;
 
-        public CageLocationController()
+        public CageLocationController(IRoomService rooms, ICageLocationService cageLocations)
         {
-            this._rooms = new RoomRepo();
-            this._cageLocations = new CageLocationRepo();
+            this._rooms = rooms;
+            this._cageLocations = cageLocations;
         }
 
         // GET: /CageLocation/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_cageLocations.GetCageLocations());
+            return View(await _cageLocations.GetCageLocations());
         }
 
         // GET: /CageLocation/Create
-        public ActionResult Create(string returnUrl)
+        public async Task<ActionResult> Create()
         {
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description");
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description");
             return View();
         }
 
@@ -48,7 +47,7 @@ namespace AnimalDB.Controllers
                     }
                 return RedirectToAction("Index");
             }
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description");
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description");
             return View(cagelocation);
         }
 
@@ -64,7 +63,7 @@ namespace AnimalDB.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", cagelocation.Room_Id);
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", cagelocation.Room_Id);
             return View(cagelocation);
         }
 
@@ -78,7 +77,7 @@ namespace AnimalDB.Controllers
                 await _cageLocations.UpdateCageLocation(cagelocation);
                 return RedirectToAction("Index");
             }
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", cagelocation.Room_Id);
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", cagelocation.Room_Id);
             return View(cagelocation);
         }
 

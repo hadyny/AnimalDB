@@ -1,6 +1,6 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
+using AnimalDB.Web.Models;
 using System;
 using System.Data.Entity;
 using System.Linq;
@@ -14,45 +14,101 @@ namespace AnimalDB.Controllers
     public class FeedController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IRoom _rooms;
-        private IAnimalRoomCount _animalRoomCounts;
-        private IFeedingGroup _feedingGroups;
-        private IAnimal _animals;
+        private readonly IRoomService _rooms;
+        private readonly IAnimalRoomCountService _animalRoomCounts;
+        private readonly IFeedingGroupService _feedingGroups;
+        private readonly IAnimalService _animals;
 
-        public FeedController()
+        public FeedController(IRoomService rooms,
+                              IAnimalRoomCountService animalRoomCounts,
+                              IFeedingGroupService feedingGroups,
+                              IAnimalService animals)
         {
-            this._rooms = new RoomRepo();
-            this._animalRoomCounts = new AnimalRoomCountRepo();
-            this._feedingGroups = new FeedingGroupRepo();
-            this._animals = new AnimalRepo();
+            this._rooms = rooms;
+            this._animalRoomCounts = animalRoomCounts;
+            this._feedingGroups = feedingGroups;
+            this._animals = animals;
         }
 
-        // GET: /Feed/
-        public ActionResult Index()
-        {
-            ViewBag.Num_Animals = _animals.GetLivingAnimals().Count();
+        //// GET: /Feed/
+        //public async Task<ActionResult> Index()
+        //{
+        //    var animals = await _animals.GetLivingAnimals();
+        //    ViewBag.Num_Animals = animals.Count();
 
-            return View(_rooms.GetRooms());
+        //    return View(await _rooms.GetRooms());
+        //}
+        // GET: /Feed/
+        public async Task<ActionResult> Index()
+        {
+            var rooms = await _rooms.GetRooms();
+            var model = new FeedViewModel();
+            var animals = await _animals.GetLivingAnimalsNotCheckedToday();
+            var allAnimals = await _animals.GetLivingAnimals();
+            model.TotalAnimals = allAnimals.Count();
+
+            foreach (var item in rooms.OrderBy(m => m.Description))
+            {
+                var row = new FeedRow();
+
+                int animalsNotChecked = animals.Count(m => m.Room_Id == item.Id);
+                string _class = "";
+
+                if (!item.NoDBAnimals)
+                {
+                    if (item.Animals.Count(m => m.DeathDate == null) == 0)
+                    {
+                        _class = "btn-outline-dark";
+                    }
+                    else if (animalsNotChecked == item.Animals.Count(m => m.DeathDate == null))
+                    {
+                        _class = "btn-warning";
+                    }
+                    else if (animalsNotChecked < item.Animals.Count(m => m.DeathDate == null) && animalsNotChecked > 0)
+                    {
+                        _class = "btn-info";
+                    }
+                    else
+                    {
+                        _class = "btn-navy";
+                    }
+                }
+                else
+                {
+                    if (item.NoDBAnimalsLastCheck.HasValue && item.NoDBAnimalsLastCheck.Value.Date == DateTime.Now.Date)
+                    {
+                        _class = "btn-navy";
+                    }
+                    else
+                    {
+                        _class = "btn-warning";
+                    }
+                }
+
+                model.Rooms.Add(new FeedRow() {
+                    ClassList = _class,
+                    GMOAnimals = item.Animals.Where(m => m.DeathDate == null && m.ApprovalNumber_Id != null).Count(),
+                    RoomId = item.Id,
+                    RoomName = item.Description,
+                    StockAnimals = item.Animals.Where(m => m.DeathDate == null && m.StockAnimal).Count(),
+                    TotalAnimals = item.Animals.Where(m => m.DeathDate == null).Count()
+                });
+            }
+            return View(model);
         }
 
         // GET: /Feed/Groups
-        public async Task<ActionResult> Groups(int id)
+
+        public async Task<ActionResult> Groups(int? id)
         {
-            ViewBag.NumAppAnimals = _rooms.GetCountOfLivingAnimalsByRoomId(id);
-            ViewBag.GMOCount = _rooms.GetCountOfGMOAnimalsByRoomId(id);
-
-
-            var room = await _rooms.GetRoomById(id);
-
-            ViewBag.RoomName = room.Description;
-            ViewBag.Room = room;
-            ViewBag.RoomId = id;
-            var CountHistory = _animalRoomCounts.GetLastNRoomCountsByRoomId(id);
-                
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
 
             bool allChecked = true;
-            
-            foreach (var animal in _rooms.GetLivingAnimalsByRoomId(id))
+
+            foreach (var animal in await _rooms.GetLivingAnimalsByRoomId(id.Value))
             {
                 if (animal.LastChecked.Date != DateTime.Now.Date)
                 {
@@ -60,8 +116,6 @@ namespace AnimalDB.Controllers
                 }
             }
 
-            ViewBag.AllChecked = allChecked;
-
             DateTime startDay = DateTime.Now;
 
             while (startDay.DayOfWeek != DayOfWeek.Monday)
@@ -69,29 +123,37 @@ namespace AnimalDB.Controllers
                 startDay = startDay.AddDays(-1);
             }
 
-            ViewBag.DoneToday = CountHistory.Count(m => m.Timestamp.Date == startDay.Date) == 1 ? "1" : "0";
+            var CountHistory = await _animalRoomCounts.GetLastNRoomCountsByRoomId(id.Value);
 
-            ViewBag.startDay = startDay;
-            ViewBag.CountHistory = CountHistory;
-            ViewBag.AnimalsNotInDB = room.NoDBAnimals;
-            ViewBag.LastRoomCheckToday = room.NoDBAnimalsLastCheck.HasValue && room.NoDBAnimalsLastCheck.Value.Date == DateTime.Now.Date;
+            var room = await _rooms.GetRoomById(id.Value);
 
-            return View(_feedingGroups.GetFeedingGroupsByRoomId(id));
+            var model = new FeedGroupsViewModel()
+            {
+                NumAppAnimals = await _rooms.GetCountOfLivingAnimalsByRoomId(id.Value),
+                GMOCount = await _rooms.GetCountOfGMOAnimalsByRoomId(id.Value),
+                Room = room,
+                CountHistory = CountHistory,
+                AllChecked = allChecked,
+                startDay = startDay,
+                DoneToday = CountHistory.Count(m => m.Timestamp.Date == startDay.Date) == 1 ? true : false,
+                AnimalsNotInDB = room.NoDBAnimals,
+                LastRoomCheckToday = room.NoDBAnimalsLastCheck.HasValue && room.NoDBAnimalsLastCheck.Value.Date == DateTime.Now.Date,
+                groups = await _feedingGroups.GetFeedingGroupsByRoomId(id.Value)
+            };
+
+            return View(model);
         }
 
         // POST: /Feed/Groups/5
         [HttpPost]
-        public async Task<ActionResult> Groups(FormCollection values, int id)
+        public async Task<ActionResult> Groups(int id)
         {
-            int count = _rooms.GetCountOfLivingAnimalsByRoomId(id);
-            int gmocount = _rooms.GetCountOfGMOAnimalsByRoomId(id);
+            int count = await _rooms.GetCountOfLivingAnimalsByRoomId(id);
+            int gmocount = await _rooms.GetCountOfGMOAnimalsByRoomId(id);
 
             DateTime startDay = DateTime.Now;
 
-            while (startDay.DayOfWeek != DayOfWeek.Monday)
-            {
-                startDay = startDay.AddDays(-1);
-            }
+            while (startDay.DayOfWeek != DayOfWeek.Monday) { startDay = startDay.AddDays(-1); }
 
             var history = new AnimalRoomCount()
             {
@@ -103,7 +165,7 @@ namespace AnimalDB.Controllers
 
             await _animalRoomCounts.CreateAnimalRoomCount(history);
 
-            return RedirectToAction("Groups", new { id = id });
+            return RedirectToAction("Groups", new { id });
         }
 
         // GET: /Feed/Add/
@@ -195,7 +257,7 @@ namespace AnimalDB.Controllers
             ViewBag.AnimalId = id.Value;
             ViewBag.AnimalName = animal.UniqueAnimalId;
 
-            ViewBag.CurrentWeight = _animals.GetAnimalsCurrentWeight(id.Value);
+            ViewBag.CurrentWeight = await _animals.GetAnimalsCurrentWeight(id.Value);
                 
 
             return View(animal);

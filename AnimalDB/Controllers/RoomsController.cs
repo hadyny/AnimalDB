@@ -1,5 +1,5 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
+using AnimalDB.Repo.Services;
 using AnimalDB.Repo.Interfaces;
 using System.Data;
 using System.Linq;
@@ -12,20 +12,19 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Administrator,Technician")]
     public class RoomsController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IRoom _rooms;
-        private ITechnician _technicians;
+        private IRoomService _rooms;
+        private ITechnicianService _technicians;
 
-        public RoomsController()
+        public RoomsController(IRoomService rooms, ITechnicianService technicians)
         {
-            this._rooms = new RoomRepo();
-            this._technicians = new TechnicianRepo();
+            this._rooms = rooms;
+            this._technicians = technicians;
         }
 
         // GET: Rooms
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_rooms.GetRooms());
+            return View(await _rooms.GetRooms());
         }
 
         // GET: Rooms/Details/5
@@ -44,9 +43,9 @@ namespace AnimalDB.Controllers
         }
 
         // GET: Rooms/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            ViewBag.Technician_Id = new SelectList(_technicians.GetTechnicians(), "Id", "FullName");
+            ViewBag.Technician_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName");
             return View();
         }
 
@@ -61,7 +60,7 @@ namespace AnimalDB.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Technician_Id = new SelectList(_technicians.GetTechnicians(), "Id", "FullName", room.Technician_Id);
+            ViewBag.Technician_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", room.Technician_Id);
             return View(room);
         }
 
@@ -77,7 +76,7 @@ namespace AnimalDB.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.Technician_Id = new SelectList(_technicians.GetTechnicians(), "Id", "FullName", room.Technician_Id);
+            ViewBag.Technician_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", room.Technician_Id);
             return View(room);
         }
 
@@ -91,7 +90,7 @@ namespace AnimalDB.Controllers
                 await _rooms.UpdateRoom(room);
                 return RedirectToAction("Index");
             }
-            ViewBag.Technician_Id = new SelectList(_technicians.GetTechnicians(), "Id", "FullName", room.Technician_Id);
+            ViewBag.Technician_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", room.Technician_Id);
             return View(room);
         }
 

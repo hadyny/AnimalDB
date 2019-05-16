@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Configuration;
@@ -17,15 +16,17 @@ namespace AnimalDB.Controllers
     {
         //private AnimalDBContext db = new AnimalDBContext();
 
-        private IAnimal _animals;
-        private INote _notes;
-        private ITechnician _technicians;
+        private readonly IAnimalService _animals;
+        private readonly INoteService _notes;
+        private readonly ITechnicianService _technicians;
 
-        public NoteController()
+        public NoteController(IAnimalService animals, 
+                              INoteService notes,
+                              ITechnicianService technicians)
         {
-            this._animals = new AnimalRepo();
-            this._notes = new NoteRepo();
-            this._technicians = new TechnicianRepo();
+            this._animals = animals;
+            this._notes = notes;
+            this._technicians = technicians;
         }
 
         // GET: /Note/
@@ -45,7 +46,7 @@ namespace AnimalDB.Controllers
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
 
-            return View(_notes.GetNoteByAnimalId(id.Value));
+            return View(await _notes.GetNotesByAnimalId(id.Value));
         }
 
         // GET: /Note/Create
@@ -64,7 +65,7 @@ namespace AnimalDB.Controllers
             }
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
-            ViewBag.TechnicianNotified_Id = new SelectList(_technicians.GetTechnicians(), "Id", "FullName");
+            ViewBag.TechnicianNotified_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName");
             return View();
         }
 
@@ -92,12 +93,12 @@ namespace AnimalDB.Controllers
             {
                 await AlertTechnicians(await _technicians.GetTechnicianById(note.TechnicianNotified_Id), note);
                 await _notes.CreateNote(note);
-                return RedirectToAction("Index", new { id = id });
+                return RedirectToAction("Index", new { id });
             }
 
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
-            ViewBag.TechnicianNotified_Id = new SelectList(_technicians.GetTechnicians(), "Id", "FullName", note.TechnicianNotified_Id);
+            ViewBag.TechnicianNotified_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", note.TechnicianNotified_Id);
             note.Type = null;
             return View(note);
         }
@@ -114,14 +115,14 @@ namespace AnimalDB.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.TechnicianNotified_Id = new SelectList(_technicians.GetTechnicians(), "Id", "FullName", note.TechnicianNotified_Id);
+            ViewBag.TechnicianNotified_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", note.TechnicianNotified_Id);
             return View(note);
         }
 
         // POST: /Note/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(Note note, int? id)
+        public async Task<ActionResult> Edit(Note note)
         {
             note.Timestamp = DateTime.Now;
 
@@ -131,7 +132,7 @@ namespace AnimalDB.Controllers
                 await _notes.UpdateNote(note);
                 return RedirectToAction("Index", new { id = note.Animal_Id });
             }
-            ViewBag.TechnicianNotified_Id = new SelectList(_technicians.GetTechnicians(), "Id", "FullName", note.TechnicianNotified_Id);
+            ViewBag.TechnicianNotified_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", note.TechnicianNotified_Id);
             return View(note);
         }
 

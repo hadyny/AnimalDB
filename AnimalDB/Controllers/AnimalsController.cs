@@ -1,8 +1,8 @@
 ﻿using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Enums;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -17,39 +17,52 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class AnimalsController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IAnimal _animals;
-        private IArrivalStatus _arrivalStatus;
-        private IColour _colours;
-        private ISource _sources;
-        private IStrain _strains;
-        private IInvestigator _investigators;
-        private IStudent _students;
-        private IChargeCode _chargeCodes;
-        private IRoom _rooms;
-        private IApprovalNumber _approvalNumbers;
-        private IEthicsNumber _ethicsNumbers;
-        private IEthicsNumberHistory _ethicsNumberHistories;
-        private ITransgene _transgenes;
-        private IGDTimeline _gDTimelines;
+        private readonly IAnimalService _animals;
+        private readonly IArrivalStatusService _arrivalStatus;
+        private readonly IColourService _colours;
+        private readonly ISourceService _sources;
+        private readonly IStrainService _strains;
+        private readonly IInvestigatorService _investigators;
+        private readonly IStudentService _students;
+        private readonly IChargeCodeService _chargeCodes;
+        private readonly IRoomService _rooms;
+        private readonly IApprovalNumberService _approvalNumbers;
+        private readonly IEthicsNumberService _ethicsNumbers;
+        private readonly IEthicsNumberHistoryService _ethicsNumberHistories;
+        private readonly ITransgeneService _transgenes;
+        private readonly IGDTimelineService _gDTimelines;
 
 
-        public AnimalsController()
+        public AnimalsController(IAnimalService animals,
+                                 IArrivalStatusService arrivalStatus,
+                                 IColourService colours,
+                                 ISourceService sources,
+                                 IStrainService strains,
+                                 IInvestigatorService investigators,
+                                 IStudentService students,
+                                 IChargeCodeService chargeCodes,
+                                 IRoomService rooms,
+                                 IApprovalNumberService approvalNumbers,
+                                 IEthicsNumberService ethicsNumbers,
+                                 IEthicsNumberHistoryService ethicsNumberHistories,
+                                 ITransgeneService transgenes,
+                                 IGDTimelineService gDTimelines
+            )
         {
-            this._animals = new AnimalRepo();
-            this._arrivalStatus = new ArrivalStatusRepo();
-            this._colours = new ColourRepo();
-            this._sources = new SourceRepo();
-            this._strains = new StrainRepo();
-            this._investigators = new InvestigatorRepo();
-            this._students = new StudentRepo();
-            this._chargeCodes = new ChargeCodeRepo();
-            this._rooms = new RoomRepo();
-            this._approvalNumbers = new ApprovalNumberRepo();
-            this._ethicsNumbers = new EthicsNumberRepo();
-            this._ethicsNumberHistories = new EthicsNumberHistoryRepo();
-            this._transgenes = new TransgeneRepo();
-            this._gDTimelines = new GDTimelineRepo();
+            this._animals = animals;
+            this._arrivalStatus = arrivalStatus;
+            this._colours = colours;
+            this._sources = sources;
+            this._strains = strains;
+            this._investigators = investigators;
+            this._students = students;
+            this._chargeCodes = chargeCodes;
+            this._rooms = rooms;
+            this._approvalNumbers = approvalNumbers;
+            this._ethicsNumbers = ethicsNumbers;
+            this._ethicsNumberHistories = ethicsNumberHistories;
+            this._transgenes = transgenes;
+            this._gDTimelines = gDTimelines;
         }
 
         // GET: /Animals/Details/5
@@ -66,22 +79,27 @@ namespace AnimalDB.Controllers
                 return HttpNotFound();
             }
 
+            DateTime? _surgeryDate = await _animals.GetAnimalsSurgeryDate(id.Value);
+            DateTime? _gDDate = await _animals.GetAnimalsGDDate(id.Value);
+            DateTime? _injectionDate = await _animals.GetAnimalsInjectionDate(id.Value);
+            DateTime? _plugDate = await _animals.GetAnimalsPlugDate(id.Value);
+            IEnumerable<Animal> _keptOffspring = await _animals.GetAnimalsLivingOffspring(id.Value);
+
             ViewBag.AnimalId = id.Value;
             ViewBag.CageLocation = await _animals.GetAnimalsCageLocationDescription(id.Value);
             ViewBag.EthicsNumber = await _animals.GetAnimalsEthicsNumberDescription(id.Value);
-            ViewBag.OffspringKept = _animals.GetAnimalsLivingOffspring(id.Value).Count();
-            ViewBag.PlugDate = _animals.GetAnimalsPlugDate(id.Value).ToString();
+            ViewBag.OffspringKept = _keptOffspring.Count();
+            ViewBag.PlugDate = _plugDate.ToString();
             ViewBag.GDDescription = await _animals.GetAnimalsGDDescription(id.Value);
-            ViewBag.GDDate = _animals.GetAnimalsGDDate(id.Value).ToString();
-            ViewBag.InjectionDate = _animals.GetAnimalsInjectionDate(id.Value).ToString();
+            ViewBag.GDDate = _gDDate.ToString();
+            ViewBag.InjectionDate = _injectionDate.ToString();
             ViewBag.InjectionBy = await _animals.GetAnimalsInjectionSurgeon(id.Value);
-            ViewBag.SurgeryDate = _animals.GetAnimalsSurgeryDate(id.Value).ToString();
+            ViewBag.SurgeryDate = _surgeryDate.ToString();
             ViewBag.Surgeon = await _animals.GetAnimalsSurgeon(id.Value);
             ViewBag.SurgeryType = await _animals.GetAnimalsListOfSurgeries(id.Value);
 
             return View(animal);
         }
-   
 
         // GET: /Animals/Barcode
         [Authorize]
@@ -130,7 +148,7 @@ namespace AnimalDB.Controllers
                 return false;
             }
 
-            _animals.AddPhotoToAnimal(animal.Id);
+            await _animals.AddPhotoToAnimal(animal.Id);
 
             if (file.ContentLength > 0)
             {
@@ -162,7 +180,7 @@ namespace AnimalDB.Controllers
                 return false;
             }
 
-            _animals.RemovePhotoFromAnimal(id.Value);
+            await _animals.RemovePhotoFromAnimal(id.Value);
 
             var path = Path.Combine(Server.MapPath("~/Content/AnimalImages"), id.ToString() + ".jpg");
             if (System.IO.File.Exists(path))
@@ -174,20 +192,20 @@ namespace AnimalDB.Controllers
 
         // GET: /Animals/Create
         [Authorize(Roles = "Administrator, Technician")]
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            ViewBag.ArrivalStatus_Id = new SelectList(_arrivalStatus.GetArrivalStatus(), "Id", "Description");
-            ViewBag.Colour_Id = new SelectList(_colours.GetColours(), "Id", "Description");
-            ViewBag.Source_Id = new SelectList(_sources.GetSources(), "Id", "Description");
-            ViewBag.Strain_Id = new SelectList(_strains.GetStrains(), "Id", "Description");
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName");
-            ViewBag.Researcher_Id = new SelectList(_students.GetStudentsAndInvestigators(), "Id", "FullName");
+            ViewBag.ArrivalStatus_Id = new SelectList(await _arrivalStatus.GetArrivalStatus(), "Id", "Description");
+            ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description");
+            ViewBag.Source_Id = new SelectList(await _sources.GetSources(), "Id", "Description");
+            ViewBag.Strain_Id = new SelectList(await _strains.GetStrains(), "Id", "Description");
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName");
+            ViewBag.Researcher_Id = new SelectList(await _students.GetStudentsAndInvestigators(), "Id", "FullName");
             //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text");
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description");
-            ViewBag.ApprovalNumber_Id = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description");
-            ViewBag.Ethics_Id = new SelectList(_ethicsNumbers.GetEthicsNumbers(), "Id", "Text");
-            ViewBag.Transgene_Id = new SelectList(_transgenes.GetTransgenes(), "Id", "Description");
-            ViewBag.GDTimeline_Id = new SelectList(_gDTimelines.GetGDTimelines(), "Id", "Description");
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description");
+            ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description");
+            ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text");
+            ViewBag.Transgene_Id = new SelectList(await _transgenes.GetTransgenes(), "Id", "Description");
+            ViewBag.GDTimeline_Id = new SelectList(await _gDTimelines.GetGDTimelines(), "Id", "Description");
 
             var model = new Animal()
             {
@@ -204,7 +222,7 @@ namespace AnimalDB.Controllers
         [Authorize(Roles = "Administrator, Technician")]
         public async Task<ActionResult> Create(Animal animal, int? Ethics_Id, string next)
         {
-            if (_animals.GetAnimalByUniqueId(animal.UniqueAnimalId) != null)
+            if (await _animals.GetAnimalByUniqueId(animal.UniqueAnimalId) != null)
             {
                 ModelState.AddModelError("UniqueAnimalId", "Unique Animal Id is already in use.");
             }
@@ -257,17 +275,17 @@ namespace AnimalDB.Controllers
                 }
             }
 
-            ViewBag.ArrivalStatus_Id = new SelectList(_arrivalStatus.GetArrivalStatus(), "Id", "Description", animal.ArrivalStatus_Id);
-            ViewBag.Colour_Id = new SelectList(_colours.GetColours(), "Id", "Description", animal.Colour_Id);
-            ViewBag.Source_Id = new SelectList(_sources.GetSources(), "Id", "Description", animal.Source_Id);
-            ViewBag.Strain_Id = new SelectList(_strains.GetStrains(), "Id", "Description", animal.Strain_Id);
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
-            ViewBag.Researcher_Id = new SelectList(_students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
+            ViewBag.ArrivalStatus_Id = new SelectList(await _arrivalStatus.GetArrivalStatus(), "Id", "Description", animal.ArrivalStatus_Id);
+            ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description", animal.Colour_Id);
+            ViewBag.Source_Id = new SelectList(await _sources.GetSources(), "Id", "Description", animal.Source_Id);
+            ViewBag.Strain_Id = new SelectList(await _strains.GetStrains(), "Id", "Description", animal.Strain_Id);
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
+            ViewBag.Researcher_Id = new SelectList(await _students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
             //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text", animal.ChargeCode_Id);
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", animal.Room_Id);
-            ViewBag.ApprovalNumber_Id = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
-            ViewBag.Ethics_Id = new SelectList(_ethicsNumbers.GetEthicsNumbers(), "Id", "Text", Ethics_Id);
-            ViewBag.Transgene_Id = new SelectList(_transgenes.GetTransgenes(), "Id", "Description", animal.Transgene_Id);
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", animal.Room_Id);
+            ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
+            ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text", Ethics_Id);
+            ViewBag.Transgene_Id = new SelectList(await _transgenes.GetTransgenes(), "Id", "Description", animal.Transgene_Id);
             return View(animal);
         }
 
@@ -287,25 +305,25 @@ namespace AnimalDB.Controllers
 
             if (User.IsInRole("Student"))
             {
-                ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", animal.Room_Id);
-                ViewBag.ApprovalNumber_Id = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
-                ViewBag.Colour_Id = new SelectList(_colours.GetColours(), "Id", "Description", animal.Colour_Id);
+                ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", animal.Room_Id);
+                ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
+                ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description", animal.Colour_Id);
                 return View("StudentEdit", animal);
             }
             else 
             {
-                ViewBag.ArrivalStatus_Id = new SelectList(_arrivalStatus.GetArrivalStatus(), "Id", "Description", animal.ArrivalStatus_Id);
-                ViewBag.Colour_Id = new SelectList(_colours.GetColours(), "Id", "Description", animal.Colour_Id);
-                ViewBag.Source_Id = new SelectList(_sources.GetSources(), "Id", "Description", animal.Source_Id);
-                ViewBag.Strain_Id = new SelectList(_strains.GetStrains(), "Id", "Description", animal.Strain_Id);
-                ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
-                ViewBag.Researcher_Id = new SelectList(_students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
+                ViewBag.ArrivalStatus_Id = new SelectList(await _arrivalStatus.GetArrivalStatus(), "Id", "Description", animal.ArrivalStatus_Id);
+                ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description", animal.Colour_Id);
+                ViewBag.Source_Id = new SelectList(await _sources.GetSources(), "Id", "Description", animal.Source_Id);
+                ViewBag.Strain_Id = new SelectList(await _strains.GetStrains(), "Id", "Description", animal.Strain_Id);
+                ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
+                ViewBag.Researcher_Id = new SelectList(await _students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
                 //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text", animal.ChargeCode_Id);
-                ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", animal.Room_Id);
-                ViewBag.ApprovalNumber_Id = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
-                ViewBag.Transgene_Id = new SelectList(_transgenes.GetTransgenes(), "Id", "Description", animal.Transgene_Id);
+                ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", animal.Room_Id);
+                ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
+                ViewBag.Transgene_Id = new SelectList(await _transgenes.GetTransgenes(), "Id", "Description", animal.Transgene_Id);
                 var ethics = await _animals.GetAnimalsEthicsNumber(animal.Id);
-                ViewBag.Ethics_Id = new SelectList(_ethicsNumbers.GetEthicsNumbers(), "Id", "Text", ethics?.Ethics_Id);
+                ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text", ethics?.Ethics_Id);
                 return View(animal);
             }
         }
@@ -316,7 +334,7 @@ namespace AnimalDB.Controllers
         [Authorize(Roles = "Student, Administrator, Technician, Investigator")]
         public async Task<ActionResult> Edit(Animal animal, int? Ethics_Id)
         {
-            if (_animals.GetAnimalByUniqueId(animal.UniqueAnimalId) != null && _animals.GetAnimalByUniqueId(animal.UniqueAnimalId).Id != animal.Id)
+            if (await _animals.GetAnimalByUniqueId(animal.UniqueAnimalId) != null && _animals.GetAnimalByUniqueId(animal.UniqueAnimalId).Id != animal.Id)
             {
                 ModelState.AddModelError("UniqueAnimalId", "Unique Animal Id is already in use.");
             }
@@ -362,25 +380,25 @@ namespace AnimalDB.Controllers
 
             if (User.IsInRole("Student"))
             {
-                ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", animal.Room_Id);
-                ViewBag.ApprovalNumber_Id = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
-                ViewBag.Colour_Id = new SelectList(_colours.GetColours(), "Id", "Description", animal.Colour_Id);
+                ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", animal.Room_Id);
+                ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
+                ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description", animal.Colour_Id);
                 return View("StudentEdit", animal);
             }
             else
             {
-                ViewBag.ArrivalStatus_Id = new SelectList(_arrivalStatus.GetArrivalStatus(), "Id", "Description", animal.ArrivalStatus_Id);
-                ViewBag.Colour_Id = new SelectList(_colours.GetColours(), "Id", "Description", animal.Colour_Id);
-                ViewBag.Source_Id = new SelectList(_sources.GetSources(), "Id", "Description", animal.Source_Id);
-                ViewBag.Strain_Id = new SelectList(_strains.GetStrains(), "Id", "Description", animal.Strain_Id);
-                ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
-                ViewBag.Researcher_Id = new SelectList(_students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
+                ViewBag.ArrivalStatus_Id = new SelectList(await _arrivalStatus.GetArrivalStatus(), "Id", "Description", animal.ArrivalStatus_Id);
+                ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description", animal.Colour_Id);
+                ViewBag.Source_Id = new SelectList(await _sources.GetSources(), "Id", "Description", animal.Source_Id);
+                ViewBag.Strain_Id = new SelectList(await _strains.GetStrains(), "Id", "Description", animal.Strain_Id);
+                ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
+                ViewBag.Researcher_Id = new SelectList(await _students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
                 //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text", animal.ChargeCode_Id);
-                ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", animal.Room_Id);
-                ViewBag.ApprovalNumber_Id = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
-                ViewBag.Transgene_Id = new SelectList(_transgenes.GetTransgenes(), "Id", "Description", animal.Transgene_Id);
+                ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", animal.Room_Id);
+                ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
+                ViewBag.Transgene_Id = new SelectList(await _transgenes.GetTransgenes(), "Id", "Description", animal.Transgene_Id);
                 var ethics = await _animals.GetAnimalsEthicsNumber(animal.Id);
-                ViewBag.Ethics_Id = new SelectList(_ethicsNumbers.GetEthicsNumbers(), "Id", "Text", ethics?.Ethics_Id);
+                ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text", ethics?.Ethics_Id);
                 return View(animal);
             }
         }
@@ -436,7 +454,7 @@ namespace AnimalDB.Controllers
         public async Task<ActionResult> Resurrect(int id)
         {
             await _animals.Resurrect(id);
-            return RedirectToAction("Details", "Animals", new { id = id });
+            return RedirectToAction("Details", "Animals", new { id });
         }
     }
 }

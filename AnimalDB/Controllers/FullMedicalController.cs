@@ -1,4 +1,4 @@
-﻿using AnimalDB.Repo.Implementations;
+﻿using AnimalDB.Repo.Services;
 using AnimalDB.Repo.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +12,20 @@ namespace AnimalDB.Controllers
     public class FullMedicalController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IAnimal _animals;
-        private INote _notes;
-        private IMedicationFollowUp _medicationFollowUps;
-        private ISurgicalNote _sugicalNotes;
+        private readonly IAnimalService _animals;
+        private readonly INoteService _notes;
+        private readonly IMedicationFollowUpService _medicationFollowUps;
+        private readonly ISurgicalNoteService _surgicalNotes;
 
-        public FullMedicalController()
+        public FullMedicalController(IAnimalService animals, 
+                                     INoteService notes, 
+                                     IMedicationFollowUpService medicationFollowUps, 
+                                     ISurgicalNoteService surgicalNotes)
         {
-            this._animals = new AnimalRepo();
-            this._notes = new NoteRepo();
-            this._medicationFollowUps = new MedicationFollowUpRepo();
-            this._sugicalNotes = new SurgicalNoteRepo();
+            this._animals = animals;
+            this._notes = notes;
+            this._medicationFollowUps = medicationFollowUps;
+            this._surgicalNotes = surgicalNotes;
 
         }
         //
@@ -43,7 +46,8 @@ namespace AnimalDB.Controllers
 
             IEnumerable<Models.MedicalReportItem> items;
 
-            items = _notes.GetNoteByAnimalId(animal.Id)
+            var notes = await _notes.GetNotesByAnimalId(animal.Id);
+            items = notes
                         .Select(m => new Models.MedicalReportItem()
                         {
                                 Description = m.Text,
@@ -52,9 +56,10 @@ namespace AnimalDB.Controllers
                                 Timestamp = m.Timestamp,
                                 Css = "note"
                         });
-            
+
+            var followUps = await _medicationFollowUps.GetMedicationFollowsUpByAnimalId(animal.Id);
             items = items
-                        .Concat(_medicationFollowUps.GetMedicationFollowUpByAnimalId(animal.Id)
+                        .Concat(followUps
                         .Select(m => new Models.MedicalReportItem()
                         {
                             Description = m.Medication.Dosage,
@@ -64,8 +69,9 @@ namespace AnimalDB.Controllers
                             Css = "med"
                         }));
 
+            var surgicalNotes = await _surgicalNotes.GetSurgicalNotesByAnimalId(animal.Id);
             items = items
-                        .Concat(_sugicalNotes.GetSurgicalNoteByAnimalId(animal.Id)
+                        .Concat(surgicalNotes
                         .Select(m => new Models.MedicalReportItem()
                         {
                             Description = m.SurgeryType.Description,

@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Net;
@@ -13,20 +12,20 @@ namespace AnimalDB.Controllers
     public class EthicsDocumentsController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IInvestigator _investigators;
-        private IEthicsDocument _ethicsDocuments;
+        private IInvestigatorService _investigators;
+        private IEthicsDocumentService _ethicsDocuments;
 
-        public EthicsDocumentsController()
+        public EthicsDocumentsController(IInvestigatorService investigators, IEthicsDocumentService ethicsDocuments)
         {
-            this._investigators = new InvestigatorRepo();
-            this._ethicsDocuments = new EthicsDocumentRepo();
+            this._investigators = investigators;
+            this._ethicsDocuments = ethicsDocuments;
         }
 
         // GET: EthicsDocuments/Investigators
 
-        public ActionResult Investigators()
+        public async Task<ActionResult> Investigators()
         {
-            return View(_investigators.GetInvestigators());
+            return View(await _investigators.GetInvestigators());
         }
 
         // GET: EthicsDocuments
@@ -46,7 +45,7 @@ namespace AnimalDB.Controllers
             ViewBag.Investigator = inv.FullName;
             ViewBag.Investigator_Id = inv.Id;
 
-            return View(_ethicsDocuments.GetEthicsDocumentsByInvestigatorId(id));
+            return View(await _ethicsDocuments.GetEthicsDocumentsByInvestigatorId(id));
         }
 
         // GET: EthicsDocuments/Upload
@@ -86,7 +85,7 @@ namespace AnimalDB.Controllers
                 ModelState.AddModelError("file", "A pdf file is required");
             }
 
-            if (_ethicsDocuments.CheckIfDocumentExists(upload.FileName))
+            if (await _ethicsDocuments.CheckIfDocumentExists(upload.FileName))
             {
                 ModelState.AddModelError("file", "\"" + upload.FileName + "\" already exists in the database. If you want to update the file, locate the entry and click \"Edit\".");
             }

@@ -1,6 +1,6 @@
 ﻿using AnimalDB.Repo.Interfaces;
 using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
+using AnimalDB.Repo.Services;
 using System;
 using System.Configuration;
 using System.Linq;
@@ -14,18 +14,20 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Student, Investigator, Veterinarian, Technician, Administrator")]
     public class ClinicalIncidentReportsController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IAnimal _animals;
-        private IClinicalIncidentReport _clinicalIncidentReports;
-        private IMedicationType _medicationTypes;
-        private IVeterinarian _veterinarians;
+        private IAnimalService _animals;
+        private IClinicalIncidentReportService _clinicalIncidentReports;
+        private IMedicationTypeService _medicationTypes;
+        private IVeterinarianService _veterinarians;
 
-        public ClinicalIncidentReportsController()
+        public ClinicalIncidentReportsController(IAnimalService animals,
+                                                 IClinicalIncidentReportService clinicalIncidentReports,
+                                                 IMedicationTypeService medicationTypes,
+                                                 IVeterinarianService veterinarians)
         {
-            this._animals = new AnimalRepo();
-            this._clinicalIncidentReports = new ClinicalIncidentReportRepo();
-            this._medicationTypes = new MedicationTypeRepo();
-            this._veterinarians = new VeterinarianRepo();
+            this._animals = animals;
+            this._clinicalIncidentReports = clinicalIncidentReports;
+            this._medicationTypes = medicationTypes;
+            this._veterinarians = veterinarians;
         }
 
         // GET: ClinicalIncidentReports
@@ -43,7 +45,8 @@ namespace AnimalDB.Controllers
 
             ViewBag.AnimalId = id.Value;
             ViewBag.AnimalName = animal.UniqueAnimalId;
-            return View(_clinicalIncidentReports.GetClinicalIncidentReports().OrderByDescending(m => m.Timestamp));
+            var reports = await _clinicalIncidentReports.GetClinicalIncidentReports();
+            return View(reports.OrderByDescending(m => m.Timestamp));
         }
 
         // GET: ClinicalIncidentReports/Create
@@ -85,12 +88,12 @@ namespace AnimalDB.Controllers
             {
                 await _clinicalIncidentReports.CreateClinicalIncidentReport(clinicalIncidentReport);
 
-                SendEmailToVets(update: false, report: clinicalIncidentReport);
+                await SendEmailToVets(update: false, report: clinicalIncidentReport);
                 return RedirectToAction("Index", new { id = clinicalIncidentReport.Animal_Id });
                 
             }
 
-            ViewBag.MedicationType_Id = new SelectList(_medicationTypes.GetMedicationTypes(), "Id", "Description");
+            ViewBag.MedicationType_Id = new SelectList(await _medicationTypes.GetMedicationTypes(), "Id", "Description");
             return View(clinicalIncidentReport);
         }
 
@@ -124,7 +127,7 @@ namespace AnimalDB.Controllers
             if (ModelState.IsValid)
             {
                 await _clinicalIncidentReports.UpdateClinicalIncidentReport(clinicalIncidentReport);
-                SendEmailToVets(update: false, report: clinicalIncidentReport);
+                await SendEmailToVets(update: false, report: clinicalIncidentReport);
                 return RedirectToAction("Index", new { id = clinicalIncidentReport.Animal_Id });
                 
             }
@@ -156,7 +159,7 @@ namespace AnimalDB.Controllers
             return RedirectToAction("Index", new { id = clinicalIncidentReport.Animal_Id });
         }
 
-        public void SendEmailToVets(bool update, ClinicalIncidentReport report)
+        public async Task SendEmailToVets(bool update, ClinicalIncidentReport report)
         {
             MailMessage msg = new MailMessage
             {
@@ -177,7 +180,8 @@ namespace AnimalDB.Controllers
             body += "Go here to view the report: https://web.psy.otago.ac.nz/adb/ClinicalIncidentReports/Edit/" + report.Id;
 
             msg.Body = body;
-            foreach (var vet in _veterinarians.GetVeterinarians().Where(m => m.Email != ""))
+            var vets = await _veterinarians.GetVeterinarians();
+            foreach (var vet in vets.Where(m => m.Email != ""))
             {
                 msg.To.Add(vet.Email);
             }

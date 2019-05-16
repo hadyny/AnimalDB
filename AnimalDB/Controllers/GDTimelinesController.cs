@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,20 +9,19 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class GDTimelinesController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IGDTimeline _gDTimelines;
+        private readonly IGDTimelineService _gDTimelines;
 
-        public GDTimelinesController()
+        public GDTimelinesController(IGDTimelineService gDTimelines)
         {
-            this._gDTimelines = new GDTimelineRepo();
+            this._gDTimelines = gDTimelines;
         }
 
         // GET: GDTimelines
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            ViewBag.unused = _gDTimelines.GetUnusedTimelineList();
+            ViewBag.unused = await _gDTimelines.GetUnusedTimelineList();
             
-            return View(_gDTimelines.GetGDTimelines());
+            return View(await _gDTimelines.GetGDTimelines());
         }
 
         // GET: GDTimelines/Details/5
@@ -54,7 +52,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Id,Description,Offset")] GDTimeline gDTimeline)
         {
-            if (_gDTimelines.CheckIfTimeLineExists(gDTimeline))
+            if (await _gDTimelines.CheckIfTimeLineExists(gDTimeline))
             {
                 ModelState.AddModelError("Description", "GD Timeline already exists");
             }
@@ -90,7 +88,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Description,Offset")] GDTimeline gDTimeline)
         {
-            if (_gDTimelines.CheckIfTimeLineExists(gDTimeline))
+            if (await _gDTimelines.CheckIfTimeLineExists(gDTimeline))
             {
                 ModelState.AddModelError("Description", "GD Timeline already exists");
             }

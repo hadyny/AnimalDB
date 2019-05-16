@@ -1,10 +1,8 @@
-﻿@model IEnumerable<AnimalDB.Repo.Entities.FeedingGroup>
+﻿@model AnimalDB.Web.Models.FeedGroupsViewModel
 
 <h3>@Html.ActionLink("Back to Rooms", "Index", null, new { @class = "btn btn-primary" })</h3>
 
-
-
-@if (Model.Count() != 0)
+@if (Model.groups.Count() != 0)
 {
     <h3>
         KEY: <span class="btn btn-success ">All animals fed today</span>&nbsp;<span class="btn btn-orange ">Some animals fed today</span>&nbsp;<span class="btn btn-danger ">No animals fed today</span>
@@ -12,9 +10,9 @@
 }
 <hr />
 
-<h1>@ViewBag.RoomName</h1>
+<h1>@Model.Room.Description</h1>
 
-@if ((ViewBag.NumAppAnimals != 0 || (bool)ViewBag.AnimalsNotInDB) &&
+@if ((Model.NumAppAnimals != 0 || Model.AnimalsNotInDB) &&
     (User.IsInRole("Technician") ||
     User.IsInRole("Administrator") ||
     DateTime.Now.DayOfWeek == DayOfWeek.Saturday ||
@@ -23,11 +21,11 @@
 
 
 
-    if (!(bool)ViewBag.AnimalsNotInDB)
+    if (!Model.AnimalsNotInDB)
     {
-        if (!(bool)ViewBag.AllChecked)
+        if (!Model.AllChecked)
         {
-            @Html.ActionLink("Mark all animals in the room as checked today", "MarkAllAnimalsChecked", new { roomId = ViewBag.RoomId }, new { @class = "btn  btn-success" })
+            @Html.ActionLink("Mark all animals in the room as checked today", "MarkAllAnimalsChecked", new { roomId = Model.Room.Id }, new { @class = "btn  btn-success" })
         }
         else
         {
@@ -36,9 +34,9 @@
     }
     else
     {
-        if (!(bool)ViewBag.LastRoomCheckToday)
+        if (!Model.LastRoomCheckToday)
         {
-            @Html.ActionLink("Mark the room as checked today", "MarkRoomChecked", new { roomId = ViewBag.RoomId }, new { @class = "btn  btn-success" })
+            @Html.ActionLink("Mark the room as checked today", "MarkRoomChecked", new { roomId = Model.Room.Id }, new { @class = "btn  btn-success" })
         }
         else
         {
@@ -50,14 +48,14 @@
 <hr />
 <div class="row">
 
-    @if (Model.Count() != 0)
+    @if (Model.groups.Count() != 0)
     {
         <div class="col-md-6">
 
             <h2>Select Feeding Group:</h2>
 
             <ul>
-                @foreach (var item in Model.Where(m => m.Animals.Count() != 0).OrderBy(m => m.Description))
+                @foreach (var item in Model.groups.Where(m => m.Animals.Count() != 0).OrderBy(m => m.Description))
                 {
                     string _class = "";
                     int fed = item.Animals.Where(m => m.Feeds.Count(n => n.Date == DateTime.Now.Date && n.FeedAmount != null) != 0 || (m.Feeds.Count() != 0 && m.Feeds.OrderBy(p => p.Date).Last().FeedAmount == -1)).Count();
@@ -94,11 +92,10 @@
             <hr />
             <table class="table table-striped">
                 <thead><tr><th>Day</th><th>Checked</th></tr></thead>
-                @if (!(bool)ViewBag.AnimalsNotInDB)
+                @if (!Model.AnimalsNotInDB)
                 {
                     for (DateTime date = DateTime.Now.Date; date > DateTime.Now.Date.AddDays(-7); date = date.AddDays(-1))
                     {
-                        AnimalDB.Repo.Entities.Room room = ViewBag.Room;
                     <tr>
                         <td>
                             @date.ToShortDateString()
@@ -107,14 +104,14 @@
                             <div class="btn-group dropdown">
                                 @if (date.Date == DateTime.Now.Date)
                                 {
-                                    if (room.Animals.Count(m => m.LastChecked.Date == DateTime.Today.Date && m.DeathDate == null) == room.Animals.Count(m => m.DeathDate == null))
+                                    if (Model.Room.Animals.Count(m => m.LastChecked.Date == DateTime.Today.Date && m.DeathDate == null) == Model.Room.Animals.Count(m => m.DeathDate == null))
                                     {
                                         <button title="All animals checked" type="button" class="btn btn-sm btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <span class="fas fa-check-circle"></span>
                                         </button>
 
                                     }
-                                    else if (room.Animals.Count(m => m.LastChecked.Date == DateTime.Today.Date && m.DeathDate == null) == 0)
+                                    else if (Model.Room.Animals.Count(m => m.LastChecked.Date == DateTime.Today.Date && m.DeathDate == null) == 0)
                                     {
                                         <button title="Animals not checked" type="button" class="btn btn-sm btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <span class="fas fa-times-circle"></span>
@@ -127,13 +124,13 @@
                                         </button>
                                     }
                                 }
-                                else if (room.Animals.Count(m => m.DeathDate == null && m.MissedChecks.Count(n => n.Timestamp.Date == date.Date) != 0) == 0)
+                                else if (Model.Room.Animals.Count(m => m.DeathDate == null && m.MissedChecks.Count(n => n.Timestamp.Date == date.Date) != 0) == 0)
                                 {
                                     <button title="All animals checked" type="button" class="btn btn-sm btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <span class="fas fa-check-circle"></span>
                                     </button>
                                 }
-                                else if (room.Animals.Count(m => m.DeathDate == null && m.MissedChecks.Count(n => n.Timestamp.Date == date.Date) != 0) == room.Animals.Count(m => m.DeathDate == null))
+                                else if (Model.Room.Animals.Count(m => m.DeathDate == null && m.MissedChecks.Count(n => n.Timestamp.Date == date.Date) != 0) == Model.Room.Animals.Count(m => m.DeathDate == null))
                                 {
                                     <button title="Animals not checked" type="button" class="btn btn-sm btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <span class="fas fa-times-circle"></span>
@@ -146,7 +143,7 @@
                                     </button>
                                 }
                                 <ul class="dropdown-menu">
-                                    @foreach (var animal in room.Animals.Where(m => m.DeathDate == null))
+                                    @foreach (var animal in Model.Room.Animals.Where(m => m.DeathDate == null))
                                     {
                                         if (animal.MissedChecks.Count(m => m.Timestamp.Date == date.Date) != 0 || (date.Date == DateTime.Now.Date && animal.LastChecked.Date != DateTime.Now.Date))
                                         {
@@ -167,7 +164,6 @@
                 {
                     for (DateTime date = DateTime.Now.Date; date > DateTime.Now.Date.AddDays(-7); date = date.AddDays(-1))
                     {
-                        AnimalDB.Repo.Entities.Room room = ViewBag.Room;
                         <tr>
                             <td>
                                 @date.ToShortDateString()
@@ -176,7 +172,7 @@
                                 <div class="btn-group">
                                     @if (date.Date == DateTime.Now.Date)
                                     {
-                                        if (room.NoDBAnimalsLastCheck.HasValue && room.NoDBAnimalsLastCheck.Value.Date == DateTime.Now.Date)
+                                        if (Model.Room.NoDBAnimalsLastCheck.HasValue && Model.Room.NoDBAnimalsLastCheck.Value.Date == DateTime.Now.Date)
                                         {
                                             <button title="Room checked" type="button" class="btn btn-success" aria-haspopup="true" aria-expanded="false">
                                                 <span class="fas fa-check-circle"></span>
@@ -190,7 +186,7 @@
                                             </button>
                                         }
                                     }
-                                    else if (room.MissedChecks.Count(m => m.Timestamp.Date == date.Date) == 0)
+                                    else if (Model.Room.MissedChecks.Count(m => m.Timestamp.Date == date.Date) == 0)
                                     {
                                         <button title="Room checked" type="button" class="btn btn-success" aria-haspopup="true" aria-expanded="false">
                                             <span class="fas fa-check-circle"></span>
@@ -210,29 +206,27 @@
                     }
                 }
             </table>
-
-
         </div>
     }
 
 
 
 
-    @if (ViewBag.NumAppAnimals != 0)
+    @if (Model.NumAppAnimals != 0)
             {
         <div class="col-md-6">
 
-            @if (ViewBag.DoneToday == "0" && (User.IsInRole("Technician") || User.IsInRole("Administrator")))
+            @if (!Model.DoneToday && (User.IsInRole("Technician") || User.IsInRole("Administrator")))
             {
                 <h4>
-                    There should be @ViewBag.NumAppAnimals @if (ViewBag.NumAppAnimals == 1)
+                    There should be @Model.NumAppAnimals @if (Model.NumAppAnimals == 1)
                     { <text>animal</text> }
                     else
-                    { <text>animals</text> } (including @ViewBag.GMOCount GMO) in this room.
-                    @Html.ActionLink("View All", "Animals", "Rooms", new { id = ViewBag.RoomId, grps = "1" }, new { @class = "btn btn-sm btn-outline-dark" })
-                    @if (ViewBag.GMOCount != 0)
+                    { <text>animals</text> } (including @Model.GMOCount GMO) in this room.
+                    @Html.ActionLink("View All", "Animals", "Rooms", new { id = Model.Room.Id, grps = "1" }, new { @class = "btn btn-sm btn-outline-dark" })
+                    @if (Model.GMOCount != 0)
                     {
-                    @Html.ActionLink("View GMO", "Animals", "Rooms", new { id = ViewBag.RoomId, grps = "1", gmo = "1" }, new { @class = "btn btn-sm btn-outline-dark" })
+                    @Html.ActionLink("View GMO", "Animals", "Rooms", new { id = Model.Room.Id, grps = "1", gmo = "1" }, new { @class = "btn btn-sm btn-outline-dark" })
                     }
                 </h4>
                         <form method="post"><button type="submit" class="btn  btn-success">This is correct</button></form>
@@ -240,14 +234,14 @@
             else if (User.IsInRole("Technician") || User.IsInRole("Administrator"))
             {
                 <h4>
-                    This week there @if (ViewBag.NumAppAnimals == 1)
+                    This week there @if (Model.NumAppAnimals == 1)
                     { <text>is 1 animal</text> }
                     else
-                    { <text>are @ViewBag.NumAppAnimals animals</text> } (including @ViewBag.GMOCount GMO) in this room.
-                    @Html.ActionLink("View All", "Animals", "Rooms", new { id = ViewBag.RoomId, grps = "1" }, new { @class = "btn btn-sm btn-outline-dark" })
-                    @if (ViewBag.GMOCount != 0)
+                    { <text>are @Model.NumAppAnimals animals</text> } (including @Model.GMOCount GMO) in this room.
+                    @Html.ActionLink("View All", "Animals", "Rooms", new { id = Model.Room.Id, grps = "1" }, new { @class = "btn btn-sm btn-outline-dark" })
+                    @if (Model.GMOCount != 0)
                     {
-                    @Html.ActionLink("View GMO", "Animals", "Rooms", new { id = ViewBag.RoomId, grps = "1", gmo = "1" }, new { @class = "btn btn-sm btn-outline-dark" })
+                    @Html.ActionLink("View GMO", "Animals", "Rooms", new { id = Model.Room.Id, grps = "1", gmo = "1" }, new { @class = "btn btn-sm btn-outline-dark" })
                     }
                 </h4>
             }
@@ -255,14 +249,15 @@
             <table class="table table-striped">
                 <thead><tr><th>Week of</th><th>Count</th></tr></thead>
 
-                @for (DateTime date = ViewBag.startDay; date > DateTime.Now.AddDays(-140); date = date.AddDays(-7))
+                @for (DateTime date = Model.startDay; date > DateTime.Now.AddDays(-140); date = date.AddDays(-7))
                 {
-                    var history = (ViewBag.CountHistory as List<AnimalDB.Repo.Entities.AnimalRoomCount>).SingleOrDefault(m => m.Timestamp.Date == date.Date);
+                    var history = Model.CountHistory.SingleOrDefault(m => m.Timestamp.Date == date.Date);
+
                     if (history != null)
                     {
                         <tr>
                             <td>
-                                @history.Timestamp.Date.ToShortDateString() @if (date.Date == ViewBag.startDay.Date)
+                                @history.Timestamp.Date.ToShortDateString() @if (date.Date == Model.startDay.Date)
                                 { <text>(This week)</text> }
                             </td>
                             <td>@history.Count (including @history.GMOCount GMO)</td>

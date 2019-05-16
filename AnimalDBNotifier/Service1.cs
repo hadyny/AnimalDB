@@ -17,9 +17,9 @@ namespace AnimalDB.Notifier
         {
             InitializeComponent();
             eventLog1 = new EventLog();
-            if (!System.Diagnostics.EventLog.SourceExists("Animal Database Notifier"))
+            if (!EventLog.SourceExists("Animal Database Notifier"))
             {
-                System.Diagnostics.EventLog.CreateEventSource(
+               EventLog.CreateEventSource(
                     "Animal Database Notifier", "Animal Database Notifier Log");
             }
             eventLog1.Source = "Animal Database Notifier";
@@ -49,7 +49,7 @@ namespace AnimalDB.Notifier
                     var notifications = from n in db.Notifications
                                         where n.NotificationDate >= DateTime.Now && n.NotificationDate < DateTime.Now.AddMinutes(5)
                                         select n;
-                    SmtpClient smtp = new SmtpClient("ps-dl180a.psy.otago.ac.nz");
+                    SmtpClient smtp = new SmtpClient(ConfigurationManager.AppSettings["EmailServer"]);
                     smtp.UseDefaultCredentials = false;
                     smtp.Credentials = new NetworkCredential(ConfigurationManager.AppSettings["SystemUsername"], ConfigurationManager.AppSettings["SystemPassword"]);
 

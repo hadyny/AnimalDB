@@ -1,6 +1,5 @@
-﻿using AnimalDB.Functions;
-using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
+﻿using AnimalDB.Repo.Entities;
+using AnimalDB.Repo.Services;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,18 +11,19 @@ namespace AnimalDB.Controllers
     public class TechnicianController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private ITechnician _technicians;
+        private readonly ITechnicianService _technicians;
+        private readonly IUserManagementService _users;
 
-
-        public TechnicianController()
+        public TechnicianController(ITechnicianService technicians, IUserManagementService users)
         {
-            this._technicians = new TechnicianRepo();
+            this._technicians = technicians;
+            this._users = users;
         }
 
         // GET: /Technician/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_technicians.GetTechnicians());
+            return View(await _technicians.GetTechnicians());
         }
 
         // GET: /Technician/Create
@@ -36,7 +36,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include="UserName,Email,FirstName,LastName")] Technician technician)
         {
-            string error = await UserManagement.CreateAnimalUser(technician, Repo.Enums.UserType.Technician);
+            string error = await _users.CreateAnimalUser(technician, Repo.Enums.UserType.Technician);
 
             if (string.IsNullOrEmpty(error))
             {

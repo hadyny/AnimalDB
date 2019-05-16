@@ -1,6 +1,5 @@
-﻿using AnimalDB.Functions;
-using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
+﻿using AnimalDB.Repo.Entities;
+using AnimalDB.Repo.Services;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,17 +11,19 @@ namespace AnimalDB.Controllers
     public class InvestigatorController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IInvestigator _investigators;
+        private readonly IInvestigatorService _investigators;
+        private readonly IUserManagementService _users;
 
-        public InvestigatorController()
+        public InvestigatorController(IInvestigatorService investigators, IUserManagementService users)
         {
-            this._investigators = new InvestigatorRepo();
+            this._investigators = investigators;
+            this._users = users;
         }
 
         // GET: /Investigator/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_investigators.GetInvestigators());
+            return View(await _investigators.GetInvestigators());
         }
 
         // GET: /Investigator/Create
@@ -35,7 +36,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include="UserName,Email,FirstName,LastName")] Investigator investigator)
         {
-            string error = await UserManagement.CreateAnimalUser(investigator, Repo.Enums.UserType.Investigator);
+            string error = await _users.CreateAnimalUser(investigator, Repo.Enums.UserType.Investigator);
 
             if (string.IsNullOrEmpty(error))
             {

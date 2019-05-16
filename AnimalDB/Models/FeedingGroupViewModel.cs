@@ -20,7 +20,7 @@
         public virtual Animal Animal { get; set; }
 
         [NotMapped]
-        public virtual ICollection<Animal> ExistingAnimals { get; set; }
+        public virtual IEnumerable<Animal> ExistingAnimals { get; set; }
     }
 
     public class CreateGroupViewModel

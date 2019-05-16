@@ -1,10 +1,6 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -16,25 +12,25 @@ namespace AnimalDB.Controllers
     {
         //private AnimalDBContext db = new AnimalDBContext();
 
-        private INotification _notifications;
+        private INotificationService _notifications;
 
-        public NotificationsController()
+        public NotificationsController(INotificationService notifications)
         {
-            this._notifications = new NotificationRepo();
+            this._notifications = notifications;
         }
 
         // GET: Notifications
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             IEnumerable<Notification> notifications;
 
             if (User.IsInRole("Investigator"))
             {
-                notifications = _notifications.GetNotificationByInvestigatorUsername(User.Identity.Name);
+                notifications = await _notifications.GetNotificationByInvestigatorUsername(User.Identity.Name);
             }
             else
             {
-                notifications = _notifications.GetNotifications();
+                notifications = await _notifications.GetNotifications();
             }
 
             return View(notifications);
@@ -49,7 +45,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DismissAllConfirmed()
         {
-            foreach (var notification in _notifications.GetPastNotifications())
+            foreach (var notification in await _notifications.GetPastNotifications())
             {
                 await _notifications.DeleteNotification(notification);
             }

@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -14,11 +13,11 @@ namespace AnimalDB.Controllers
     public class IdentityCardController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IAnimal _animals;
+        private readonly IAnimalService _animals;
 
-        public IdentityCardController()
+        public IdentityCardController(IAnimalService animals)
         {
-            this._animals = new AnimalRepo();
+            this._animals = animals;
         }
 
         //
@@ -112,9 +111,9 @@ namespace AnimalDB.Controllers
         //
         // GET: /IdentityCard/SelectMultiple
         [Authorize(Roles = "Technician, Administrator")]
-        public ActionResult SelectMultiple()
+        public async Task<ActionResult> SelectMultiple()
         {
-            return View(_animals.GetLivingAnimals());
+            return View(await _animals.GetLivingAnimals());
         }
 
         ////
@@ -293,9 +292,12 @@ namespace AnimalDB.Controllers
 
                 model.Add(tmp);
 
+                
+
                 if (offspring.HasValue)
                 {
-                    foreach (var _offspring in _animals.GetLivingAnimals().Where(m => m.UniqueAnimalId.StartsWith(tmpAnimal.UniqueAnimalId + "-")))
+                    var livingAnimals = await _animals.GetLivingAnimals();
+                    foreach (var _offspring in livingAnimals.Where(m => m.UniqueAnimalId.StartsWith(tmpAnimal.UniqueAnimalId + "-")))
                     {
                         InjectionDate = _offspring
                                     .SurgicalNotes
@@ -378,9 +380,9 @@ namespace AnimalDB.Controllers
         //
         // GET: /IdentityCard/SelectSmallCard
         [Authorize(Roles = "Technician, Administrator")]
-        public ActionResult SelectSmallCard()
+        public async Task<ActionResult> SelectSmallCard()
         {
-            return View(_animals.GetLivingAnimals());
+            return View(await _animals.GetLivingAnimals());
         }
 
         //
@@ -407,7 +409,8 @@ namespace AnimalDB.Controllers
 
                 if (offspring.HasValue)
                 {
-                    foreach (var _offspring in _animals.GetLivingAnimals().Where(m => m.UniqueAnimalId.StartsWith(tmpAnimal.UniqueAnimalId + "-")))
+                    var livingAnimals = await _animals.GetLivingAnimals();
+                    foreach (var _offspring in livingAnimals.Where(m => m.UniqueAnimalId.StartsWith(tmpAnimal.UniqueAnimalId + "-")))
                     {
                         offspringToAdd.Add(new Models.SmallIdentityCardViewModel()
                         {

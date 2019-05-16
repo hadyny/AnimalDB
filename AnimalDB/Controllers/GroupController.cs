@@ -1,6 +1,5 @@
 ﻿using AnimalDB.Models;
 using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Linq;
@@ -14,15 +13,17 @@ namespace AnimalDB.Controllers
     public class GroupController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IAnimal _animals;
-        private IFeedingGroup _feedingGroups;
-        private IGroup _groups;
+        private readonly IAnimalService _animals;
+        private readonly IFeedingGroupService _feedingGroups;
+        private readonly IGroupService _groups;
 
-        public GroupController()
+        public GroupController(IAnimalService animals,
+                               IFeedingGroupService feedingGroups,
+                               IGroupService groups)
         {
-            this._animals = new AnimalRepo();
-            this._feedingGroups = new FeedingGroupRepo();
-            this._groups = new GroupRepo();
+            this._animals = animals;
+            this._feedingGroups = feedingGroups;
+            this._groups = groups;
         }
 
         // GET: /Group/
@@ -41,7 +42,7 @@ namespace AnimalDB.Controllers
             ViewBag.FeedingGroupId = id.Value;
             ViewBag.FeedingGroupName = group.Description;
 
-            return View(_groups.GetGroupsByFeedingGroupId(id.Value));
+            return View(await _groups.GetGroupsByFeedingGroupId(id.Value));
         }
 
         // GET: /Group/Create
@@ -61,7 +62,7 @@ namespace AnimalDB.Controllers
             if (ModelState.IsValid)
             {
                 await _groups.CreateGroup(group);
-                return RedirectToAction("Index", new { id = id });
+                return RedirectToAction("Index", new { id });
             }
             ViewBag.FeedingGroupId = id;
             return View(group);
@@ -105,7 +106,8 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Animal animal = _animals.GetAnimalByUniqueId(animalId);
+
+            //Animal animal = await _animals.GetAnimalByUniqueId(animalId);
             Group group = await _groups.GetGroupById(id.Value);
             if (group == null || (!string.IsNullOrEmpty(animalId) && animalId == null))
             {
@@ -120,7 +122,7 @@ namespace AnimalDB.Controllers
 
             ViewBag.FeedingGroupId = group.FeedingGroup_Id;
             ViewBag.AnimalList = group.Animals;
-            ViewBag.AnimalId = new SelectList(_animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
+            ViewBag.AnimalId = new SelectList(await _animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
             return View(model);
         }
 
@@ -142,13 +144,14 @@ namespace AnimalDB.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("AnimalId", "Animal \"" + _animals.GetAnimalById(animalId).Result.UniqueAnimalId + "\" is already in this group");
+                    Animal animal = await _animals.GetAnimalById(animalId);
+                    ModelState.AddModelError("AnimalId", "Animal \"" + animal.UniqueAnimalId + "\" is already in this group");
                 }
             }
 
             ViewBag.FeedingGroupId = _group.FeedingGroup_Id;
             ViewBag.AnimalList = _group.Animals;
-            ViewBag.AnimalId = new SelectList(_animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
+            ViewBag.AnimalId = new SelectList(await _animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
 
             return View(group);
         }

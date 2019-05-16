@@ -1,29 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AnimalDB.Repo.Entities;
+using AnimalDB.Repo.Interfaces;
+using System;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using AnimalDB.Repo.Contexts;
-using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Interfaces;
-using AnimalDB.Repo.Implementations;
 
 namespace AnimalDB.Web.Controllers
 {
     [Authorize]
     public class DocumentsController : Controller
     {
-        private IDocument _docs;
-        private IDocumentCategory _categories;
+        private IDocumentService _docs;
+        private IDocumentCategoryService _categories;
 
-        public DocumentsController()
+        public DocumentsController(IDocumentService docs, IDocumentCategoryService categories)
         {
-            this._docs = new DocumentRepo();
-            this._categories = new DocumentCategoryRepo();
+            this._docs = docs;
+            this._categories = categories;
         }
 
         //private AnimalDBContext db = new AnimalDBContext();
@@ -45,14 +39,14 @@ namespace AnimalDB.Web.Controllers
             ViewBag.Id = category.Id;
             ViewBag.Category = category.Description;
 
-            return View(_docs.GetDocumentsByCategoryId(category.Id));
+            return View(await _docs.GetDocumentsByCategoryId(category.Id));
         }
 
 
         // GET: Documents/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            ViewBag.Category_Id = new SelectList(_categories.GetDocumentCategories(), "Id", "Description");
+            ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description");
             return View();
         }
 
@@ -69,7 +63,7 @@ namespace AnimalDB.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Category_Id = new SelectList(_categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
             return View(document);
         }
 
@@ -85,7 +79,7 @@ namespace AnimalDB.Web.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.Category_Id = new SelectList(_categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
             return View(document);
         }
 
@@ -120,21 +114,21 @@ namespace AnimalDB.Web.Controllers
 
                 return RedirectToAction("Index", new { id = document.Category_Id });
             }
-            ViewBag.Category_Id = new SelectList(_categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
             return View(document);
         }
 
         [Authorize(Roles = "Administrator,Technician")]
         // GET: Documents/Upload
-        public ActionResult Upload(int? id)
+        public async Task<ActionResult> Upload(int? id)
         {
             if (id.HasValue)
             {
-                ViewBag.Category_Id = new SelectList(_categories.GetDocumentCategories(), "Id", "Description", id.Value);
+                ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", id.Value);
             }
             else
             {
-                ViewBag.Category_Id = new SelectList(_categories.GetDocumentCategories(), "Id", "Description");
+                ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description");
             }
 
             ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "DocumentCategories");
@@ -154,7 +148,7 @@ namespace AnimalDB.Web.Controllers
                 ModelState.AddModelError("file", "A pdf file is required");
             }
 
-            if (_docs.DoesDocumentFileNameExist(upload.FileName))
+            if (await _docs.DoesDocumentFileNameExist(upload.FileName))
             {
                 ModelState.AddModelError("file", "\"" + upload.FileName + "\" already exists in the database. If you want to update the file, locate the entry and click \"Edit\".");
             }
@@ -172,7 +166,7 @@ namespace AnimalDB.Web.Controllers
                 return RedirectToAction("Index", new { id = document.Category_Id });
             }
             ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "DocumentCategories");
-            ViewBag.Category_Id = new SelectList(_categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
             return View(document);
         }
 

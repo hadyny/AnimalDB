@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,17 +10,17 @@ namespace AnimalDB.Controllers
     public class SpeciesController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        ISpecies _species;
+        ISpeciesService _species;
 
-        public SpeciesController()
+        public SpeciesController(ISpeciesService species)
         {
-            this._species = new SpeciesRepo();
+            this._species = species;
         }
 
         // GET: /Species/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_species.GetSpecies());
+            return View(await _species.GetSpecies());
         }
 
         // GET: /Species/Create

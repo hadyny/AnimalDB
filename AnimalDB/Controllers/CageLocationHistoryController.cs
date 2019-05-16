@@ -1,12 +1,11 @@
-﻿using AnimalDB.Repo.Interfaces;
+﻿using AnimalDB.Models;
 using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
+using AnimalDB.Repo.Interfaces;
 using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using AnimalDB.Models;
 
 namespace AnimalDB.Controllers
 {
@@ -14,19 +13,23 @@ namespace AnimalDB.Controllers
     public class CageLocationHistoryController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IAnimal _animals;
-        private ICageLocationHistory _cageLocationHistories;
-        private ICageLocation _cageLocations;
-        private IRack _racks;
-        private IRackEntry _rackEntries;
+        private readonly IAnimalService _animals;
+        private readonly ICageLocationHistoryService _cageLocationHistories;
+        private readonly ICageLocationService _cageLocations;
+        private readonly IRackService _racks;
+        private readonly IRackEntryService _rackEntries;
 
-        public CageLocationHistoryController()
+        public CageLocationHistoryController(IAnimalService animals,
+                                             ICageLocationHistoryService cageLocationHistories,
+                                             ICageLocationService cageLocations,
+                                             IRackService racks,
+                                             IRackEntryService rackEntries)
         {
-            this._animals = new AnimalRepo();
-            this._cageLocationHistories = new CageLocationHistoryRepo();
-            this._cageLocations = new CageLocationRepo();
-            this._racks = new RackRepo();
-            this._rackEntries = new RackEntryRepo();
+            this._animals = animals;
+            this._cageLocationHistories = cageLocationHistories;
+            this._cageLocations = cageLocations;
+            this._racks = racks;
+            this._rackEntries = rackEntries;
         }
 
         // GET: /CageLocationHistory/
@@ -46,7 +49,7 @@ namespace AnimalDB.Controllers
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
 
-            return View(_cageLocationHistories.GetCageLocationHistoryByAnimalId(animal.Id));
+            return View(await _cageLocationHistories.GetCageLocationHistoryByAnimalId(animal.Id));
         }
 
         // GET: /CageLocationHistory/Create
@@ -64,10 +67,10 @@ namespace AnimalDB.Controllers
                 return HttpNotFound();
             }
 
-            var thisRoomsRacks = _racks.GetRacksByRoomId(animal.Room_Id.Value);
+            var thisRoomsRacks = await _racks.GetRacksByRoomId(animal.Room_Id.Value);
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
-            ViewBag.CageLocation_Id = new SelectList(_cageLocations.GetCageLocations(), "Id", "Description");
+            ViewBag.CageLocation_Id = new SelectList(await _cageLocations.GetCageLocations(), "Id", "Description");
             ViewBag.Rack_Id = new SelectList(thisRoomsRacks, "Id", "Reference_Id");
 
             var model = new Models.CageLocationHistoryViewModel
@@ -113,7 +116,7 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                foreach (var entry in _rackEntries.GetRackEntriesByAnimalId(id.Value))
+                foreach (var entry in await _rackEntries.GetRackEntriesByAnimalId(id.Value))
                 {
                     entry.IsCurrent = false;
                 }
@@ -153,12 +156,12 @@ namespace AnimalDB.Controllers
                     await _cageLocationHistories.CreateCageLocationHistory(newCageLocationHistory);
                 }
 
-                return RedirectToAction("Index", new { id = id });
+                return RedirectToAction("Index", new { id });
             }
             var animal = _animals.GetAnimalById(id.Value);
             ViewBag.AnimalName = animal.Result.UniqueAnimalId;
             ViewBag.AnimalId = animal.Result.Id;
-            ViewBag.CageLocation_Id = new SelectList(_cageLocations.GetCageLocations(), "Id", "Description");
+            ViewBag.CageLocation_Id = new SelectList(await _cageLocations.GetCageLocations(), "Id", "Description");
             return View(cagelocationhistory);
         }
 
@@ -169,16 +172,16 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var cagelocationhistory = await new CageLocationHistoryRepo().GetCageLocationHistoryById(id.Value);
+            var cagelocationhistory = await _cageLocationHistories.GetCageLocationHistoryById(id.Value);
             if (cagelocationhistory == null)
             {
                 return HttpNotFound();
             }
 
-            var roomsRacks = _racks.GetRacksByRoomId(cagelocationhistory.Animal.Room_Id.Value).ToList();
+            var roomsRacks = await _racks.GetRacksByRoomId(cagelocationhistory.Animal.Room_Id.Value);
             ViewBag.AnimalName = cagelocationhistory.Animal.UniqueAnimalId;
             ViewBag.AnimalId = cagelocationhistory.Animal.Id;
-            ViewBag.CageLocation_Id = new SelectList(_cageLocations.GetCageLocations(), "Id", "Description", cagelocationhistory.CageLocation_Id);
+            ViewBag.CageLocation_Id = new SelectList(await _cageLocations.GetCageLocations(), "Id", "Description", cagelocationhistory.CageLocation_Id);
             ViewBag.Rack_Id = new SelectList(roomsRacks, 
                                                         "Id", 
                                                         "Reference_Id", 
@@ -266,10 +269,10 @@ namespace AnimalDB.Controllers
                 return HttpNotFound();
             }
 
-            var rackRooms = _racks.GetRacksByRoomId(cagelocation.Animal.Room_Id.Value);
+            var rackRooms = await _racks.GetRacksByRoomId(cagelocation.Animal.Room_Id.Value);
             ViewBag.AnimalName = cagelocation.Animal.UniqueAnimalId;
             ViewBag.AnimalId = cagelocation.Animal.Id;
-            ViewBag.CageLocation_Id = new SelectList(_cageLocations.GetCageLocations(), "Id", "Description", cagelocation.CageLocation_Id);
+            ViewBag.CageLocation_Id = new SelectList(await _cageLocations.GetCageLocations(), "Id", "Description", cagelocation.CageLocation_Id);
             ViewBag.Rack_Id = new SelectList(rackRooms, "Id", "Reference_Id");
             var model = new CageLocationHistoryViewModel
             {

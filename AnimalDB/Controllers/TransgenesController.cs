@@ -1,5 +1,5 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
+using AnimalDB.Repo.Services;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,17 +11,17 @@ namespace AnimalDB.Controllers
     public class TransgenesController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private ITransgene _transgenes;
+        private ITransgeneService _transgenes;
 
-        public TransgenesController()
+        public TransgenesController(ITransgeneService transgenes)
         {
-            this._transgenes = new TransgeneRepo();
+            this._transgenes = transgenes;
         }
 
         // GET: Transgenes
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_transgenes.GetTransgenes());
+            return View(await _transgenes.GetTransgenes());
         }
 
         // GET: Transgenes/Create

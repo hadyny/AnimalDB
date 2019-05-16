@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -13,19 +12,19 @@ namespace AnimalDB.Controllers
     {
         //private AnimalDBContext db = new AnimalDBContext();
 
-        private IRack _racks;
-        private IRoom _rooms;
+        private IRackService _racks;
+        private IRoomService _rooms;
 
-        public RacksController()
+        public RacksController(IRackService racks, IRoomService rooms)
         {
-            this._racks = new RackRepo();
-            this._rooms = new RoomRepo();
+            this._racks = racks;
+            this._rooms = rooms;
         }
 
         // GET: Racks
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_racks.GetRacks());
+            return View(await _racks.GetRacks());
         }
 
         // GET: Racks/Details/5
@@ -59,9 +58,9 @@ namespace AnimalDB.Controllers
         }
 
         // GET: Racks/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description");
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description");
             return View();
         }
 
@@ -76,7 +75,7 @@ namespace AnimalDB.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", rack.Room_Id);
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", rack.Room_Id);
             return View(rack);
         }
 
@@ -92,7 +91,7 @@ namespace AnimalDB.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", rack.Room_Id);
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", rack.Room_Id);
             return View(rack);
         }
 
@@ -108,7 +107,7 @@ namespace AnimalDB.Controllers
                 await _racks.UpdateRack(rack);
                 return RedirectToAction("Index");
             }
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", rack.Room_Id);
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", rack.Room_Id);
             return View(rack);
         }
 

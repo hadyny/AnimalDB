@@ -4,7 +4,7 @@
     @Html.ActionLink("Back", "Index", new { id = ViewBag.FeedingGroupId }, new { @class = "btn btn-primary" })
 </h3>
 
-<h2>Add Animals to Group</h2>
+<h2>Add Animals to Sub-Group</h2>
 
 
 
@@ -36,7 +36,7 @@
 
 
         <div class="groupanimalslist">
-            <h4>Animals in Group</h4>
+            <h4>Animals in Sub-Group</h4>
             <ul>
                 @foreach (AnimalDB.Repo.Entities.Animal animal in ViewBag.AnimalList)
                 {

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net;
-using System.Web;
-using System.Web.Mvc;
-using AnimalDB.Repo.Implementations;
-using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace AnimalDB.Controllers
 {
@@ -17,21 +13,23 @@ namespace AnimalDB.Controllers
     public class RostersController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IRoster _rosters;
-        private IRoom _rooms;
-        private IInvestigator _investigators;
+        private readonly IRosterService _rosters;
+        private readonly IRoomService _rooms;
+        private readonly IInvestigatorService _investigators;
 
-        public RostersController()
+        public RostersController(IRosterService rosters,
+                                 IRoomService rooms,
+                                 IInvestigatorService investigators)
         {
-            this._rosters = new RosterRepo();
-            this._rooms = new RoomRepo();
-            this._investigators = new InvestigatorRepo();
+            this._rosters = rosters;
+            this._rooms = rooms;
+            this._investigators = investigators;
         }
 
         // GET: RosterRooms
-        public ActionResult RosterRooms()
+        public async Task<ActionResult> RosterRooms()
         {
-            return View(_rooms.GetRooms());
+            return View(await _rooms.GetRooms());
         }
 
         // GET: Rosters
@@ -48,7 +46,7 @@ namespace AnimalDB.Controllers
             }
             ViewBag.Room = room.Description;
             ViewBag.Room_Id = room.Id;
-            return View(_rosters.GetRostersByRoomId(room.Id));
+            return View(await _rosters.GetRostersByRoomId(room.Id));
         }
 
         // GET: Rosters/Create
@@ -71,7 +69,7 @@ namespace AnimalDB.Controllers
 
             ICollection<Student> students = new List<Student>();
 
-            foreach (var investigator in _investigators.GetInvestigators())
+            foreach (var investigator in await _investigators.GetInvestigators())
             {
                 if (investigator.Animals.Count(m => m.Room_Id == room.Id) != 0)
                 {
@@ -93,7 +91,7 @@ namespace AnimalDB.Controllers
                 roster.Date = roster.Date.AddDays(-1);
             }
 
-            if (_rosters.GetRosters().Count(m => m.Date == roster.Date) != 0)
+            if (await _rosters.CheckIfThereIsARosterThisWeekend(roster.Date))
             {
                 ModelState.AddModelError("Date", "There is already a roster for this weekend");
             }
@@ -105,7 +103,7 @@ namespace AnimalDB.Controllers
             }
             ICollection<Student> students = new List<Student>();
 
-            foreach (var investigator in _investigators.GetInvestigators())
+            foreach (var investigator in await _investigators.GetInvestigators())
             {
                 if (investigator.Animals.Count(m => m.Room_Id == roster.Room_Id) != 0)
                 {
@@ -131,7 +129,7 @@ namespace AnimalDB.Controllers
 
             ICollection<Student> students = new List<Student>();
 
-            foreach (var investigator in _investigators.GetInvestigators())
+            foreach (var investigator in await _investigators.GetInvestigators())
             {
                 if (investigator.Animals.Count(m => m.Room_Id == roster.Room_Id) != 0)
                 {
@@ -152,7 +150,7 @@ namespace AnimalDB.Controllers
                 roster.Date = roster.Date.AddDays(-1);
             }
 
-            if (_rosters.GetRosters().Count(m => m.Date == roster.Date && m.Id != roster.Id) != 0)
+            if (await _rosters.CheckIfThereIsARosterThisWeekend(roster.Date, roster.Id))
             {
                 ModelState.AddModelError("Date", "There is already a roster for this weekend");
             }
@@ -164,7 +162,7 @@ namespace AnimalDB.Controllers
             }
             ICollection<Student> students = new List<Student>();
 
-            foreach (var investigator in _investigators.GetInvestigators())
+            foreach (var investigator in await _investigators.GetInvestigators())
             {
                 if (investigator.Animals.Count(m => m.Room_Id == roster.Room_Id) != 0)
                 {

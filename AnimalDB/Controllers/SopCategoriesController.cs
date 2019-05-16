@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,17 +10,17 @@ namespace AnimalDB.Controllers
     public class SopCategoriesController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        ISopCategory _sopCategories;
+        ISopCategoryService _sopCategories;
 
-        public SopCategoriesController()
+        public SopCategoriesController(ISopCategoryService sopCategories)
         {
-            this._sopCategories = new SopCategoryRepo();
+            this._sopCategories = sopCategories;
         }
 
         // GET: SopCategories
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_sopCategories.GetSopCategories());
+            return View(await _sopCategories.GetSopCategories());
         }
 
         // GET: SopCategories/Details/5

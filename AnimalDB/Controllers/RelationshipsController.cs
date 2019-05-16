@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Linq;
 using System.Net;
@@ -13,24 +12,24 @@ namespace AnimalDB.Controllers
     {
         //private AnimalDBContext db = new AnimalDBContext();
 
-        private IAnimal _animals;
-        private ICulledPups _culledPups;
+        private readonly IAnimalService _animals;
+        private readonly ICulledPupsService _culledPups;
 
-        public RelationshipsController()
+        public RelationshipsController(IAnimalService animals, ICulledPupsService culledPups)
         {
-            this._animals = new AnimalRepo();
-            this._culledPups = new CulledPupsRepo();
+            this._animals = animals;
+            this._culledPups = culledPups;
         }
 
         // GET: /Relationships/
-        public ActionResult Index(string id)
+        public async Task<ActionResult> Index(string id)
         {
             if (id == null)
             {
                 return View();
             }
 
-            var model = _animals.GetAnimalByUniqueId(id);
+            var model = await _animals.GetAnimalByUniqueId(id);
 
             if (model == null)
             {
@@ -60,7 +59,7 @@ namespace AnimalDB.Controllers
             int NumMale = 0;
             int NumFemale = 0;
 
-            foreach (var culledPups in _culledPups.GetCulledPupsByAnimalId(animal.Id))
+            foreach (var culledPups in await _culledPups.GetCulledPupsByAnimalId(animal.Id))
             {
                 AmountCulled += culledPups.AmountCulled;
                 NumMale += culledPups.NumMale ?? 0;
@@ -88,8 +87,10 @@ namespace AnimalDB.Controllers
                 return HttpNotFound();
             }
 
-            ViewBag.Parent_Id = new SelectList(_animals.GetLivingAnimals().Where(m => m.Id != id.Value), "Id", "UniqueAnimalId");
-            ViewBag.Child_Id = new SelectList(_animals.GetLivingAnimals().Where(m => m.Id != id.Value), "Id", "UniqueAnimalId");
+            var animals = await _animals.GetLivingAnimals();
+
+            ViewBag.Parent_Id = new SelectList(animals.Where(m => m.Id != id.Value), "Id", "UniqueAnimalId");
+            ViewBag.Child_Id = new SelectList(animals.Where(m => m.Id != id.Value), "Id", "UniqueAnimalId");
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
             return View();
@@ -147,8 +148,11 @@ namespace AnimalDB.Controllers
                 return RedirectToAction("Details", new { id = animal.Id });
             }
 
-            ViewBag.Parent_Id = new SelectList(_animals.GetLivingAnimals().Where(m => m.Id != id.Value), "Id", "UniqueAnimalId", relationship.Parent_Id);
-            ViewBag.Child_Id = new SelectList(_animals.GetLivingAnimals().Where(m => m.Id != id.Value), "Id", "UniqueAnimalId", relationship.Child_Id);
+            var animals = await _animals.GetLivingAnimals();
+            var parentList = animals.Where(m => m.Id != id.Value);
+            var childList = parentList;
+            ViewBag.Parent_Id = new SelectList(parentList, "Id", "UniqueAnimalId", relationship.Parent_Id);
+            ViewBag.Child_Id = new SelectList(childList, "Id", "UniqueAnimalId", relationship.Child_Id);
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
             return View(relationship);

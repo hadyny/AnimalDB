@@ -12,7 +12,7 @@ namespace AnimalDB.Repo.Entities
         }
 
         public int Id { get; set; }
-        [Required, Display(Name = "Group")]
+        [Required, Display(Name = "Sub-Group")]
         public string Description { get; set; }
 
         public int? FeedingGroup_Id { get; set; }

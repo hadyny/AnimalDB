@@ -21,7 +21,8 @@
     <meta name="description" content="Animal Database" />
 </head>
 <body>
-    @Html.Action("Menu", "Nav")
+
+    @{Html.RenderAction("Menu", "Nav");}
     <div class="container-fluid body-content">
         @RenderBody()
     </div>

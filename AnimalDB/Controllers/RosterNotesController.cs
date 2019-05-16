@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Net;
@@ -12,13 +11,13 @@ namespace AnimalDB.Controllers
     public class RosterNotesController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IRosterNote _rosterNotes;
-        private IRoster _rosters;
+        private IRosterNoteService _rosterNotes;
+        private IRosterService _rosters;
 
-        public RosterNotesController()
+        public RosterNotesController(IRosterNoteService rosterNotes, IRosterService rosters)
         {
-            this._rosterNotes = new RosterNoteRepo();
-            this._rosters = new RosterRepo();
+            this._rosterNotes = rosterNotes;
+            this._rosters = rosters;
         }
 
         // GET: RosterNotes
@@ -45,7 +44,7 @@ namespace AnimalDB.Controllers
 
             ViewBag.Id = roster.Id;
             ViewBag.Room_Id = roster.Room_Id;
-            return View(_rosterNotes.GetRosterNotesByRosterId(id.Value));
+            return View(await _rosterNotes.GetRosterNotesByRosterId(id.Value));
         }
 
         // GET: RosterNotes/Details/5

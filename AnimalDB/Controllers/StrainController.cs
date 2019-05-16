@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,26 +10,26 @@ namespace AnimalDB.Controllers
     public class StrainController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IStrain _strains;
-        private ISpecies _species;
+        private IStrainService _strains;
+        private ISpeciesService _species;
 
-        public StrainController()
+        public StrainController(IStrainService strains, ISpeciesService species)
         {
-            this._strains = new StrainRepo();
-            this._species = new SpeciesRepo();
+            this._strains = strains;
+            this._species = species;
         }
 
         // GET: /Strain/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_strains.GetStrains());
+            return View(await _strains.GetStrains());
         }
 
 
         // GET: /Strain/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            ViewBag.Species_Id = new SelectList(_species.GetSpecies(), "Id", "Description");
+            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description");
             return View();
         }
 
@@ -45,7 +44,7 @@ namespace AnimalDB.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Species_Id = new SelectList(_species.GetSpecies(), "Id", "Description", strain.Species_Id);
+            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description", strain.Species_Id);
             return View(strain);
         }
 
@@ -61,7 +60,7 @@ namespace AnimalDB.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.Species_Id = new SelectList(_species.GetSpecies(), "Id", "Description", strain.Species_Id);
+            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description", strain.Species_Id);
             return View(strain);
         }
 
@@ -75,7 +74,7 @@ namespace AnimalDB.Controllers
                 await _strains.UpdateStrain(strain);
                 return RedirectToAction("Index");
             }
-            ViewBag.Species_Id = new SelectList(_species.GetSpecies(), "Id", "Description", strain.Species_Id);
+            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description", strain.Species_Id);
             return View(strain);
         }
 

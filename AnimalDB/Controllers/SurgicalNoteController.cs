@@ -1,10 +1,8 @@
 ﻿using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Enums;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -17,28 +15,36 @@ namespace AnimalDB.Controllers
     {
         //private AnimalDBContext db = new AnimalDBContext();
 
-        private IAnimal _animals;
-        private ISurgicalNote _surgicalNotes;
-        private IInvestigator _investigators;
-        private IStudent _students;
-        private ISurgeryType _surgeryTypes;
-        private IVirusType _virusTypes;
-        private IGDTimeline _gDTimelines;
-        private IApprovalNumber _approvalNumbers;
-        private ISurgicalWelfareScore _surgicalWelfareScores;
+        private readonly IAnimalService _animals;
+        private readonly ISurgicalNoteService _surgicalNotes;
+        private readonly IInvestigatorService _investigators;
+        private readonly IStudentService _students;
+        private readonly ISurgeryTypeService _surgeryTypes;
+        private readonly IVirusTypeService _virusTypes;
+        private readonly IGDTimelineService _gDTimelines;
+        private readonly IApprovalNumberService _approvalNumbers;
+        private readonly ISurgicalWelfareScoreService _surgicalWelfareScores;
 
 
-        public SurgicalNoteController()
+        public SurgicalNoteController(IAnimalService animals,
+                                      ISurgicalNoteService surgicalNotes,
+                                      IInvestigatorService investigators,
+                                      IStudentService students,
+                                      ISurgeryTypeService surgeryTypes,
+                                      IVirusTypeService virusTypes,
+                                      IGDTimelineService gDTimelines,
+                                      IApprovalNumberService approvalNumbers,
+                                      ISurgicalWelfareScoreService surgicalWelfareScores)
         {
-            this._animals = new AnimalRepo();
-            this._surgicalNotes = new SurgicalNoteRepo();
-            this._investigators = new InvestigatorRepo();
-            this._students = new StudentRepo();
-            this._surgeryTypes = new SurgeryTypeRepo();
-            this._virusTypes = new VirusTypeRepo();
-            this._gDTimelines = new GDTimelineRepo();
-            this._approvalNumbers = new ApprovalNumberRepo();
-            this._surgicalWelfareScores = new SurgicalWelfareScoreRepo();
+            this._animals = animals;
+            this._surgicalNotes = surgicalNotes;
+            this._investigators = investigators;
+            this._students = students;
+            this._surgeryTypes = surgeryTypes;
+            this._virusTypes = virusTypes;
+            this._gDTimelines = gDTimelines;
+            this._approvalNumbers = approvalNumbers;
+            this._surgicalWelfareScores = surgicalWelfareScores;
         }
 
         // GET: /SurgicalNote/
@@ -55,7 +61,7 @@ namespace AnimalDB.Controllers
             }
             ViewBag.AnimalId = animal.Id;
             ViewBag.AnimalName = animal.UniqueAnimalId;
-            return View(_surgicalNotes.GetSurgicalNoteByAnimalId(animal.Id));
+            return View(await _surgicalNotes.GetSurgicalNotesByAnimalId(animal.Id));
         }
 
         // GET: /SurgicalNote/Create
@@ -85,28 +91,28 @@ namespace AnimalDB.Controllers
                 "HTRU"
             };
 
-            foreach (var user in _investigators.GetInvestigators())
+            foreach (var user in await _investigators.GetInvestigators())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
-            foreach (var user in _students.GetStudents())
+            foreach (var user in await _students.GetStudents())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
             ViewBag.Surgeon = new SelectList(surgeons);
-            ViewBag.SurgeryType_Id = new SelectList(_surgeryTypes.GetSurgeryTypes(), "Id", "Description");
-            ViewBag.VirusType_Id = new SelectList(_virusTypes.GetVirusTypes(), "Id", "Description");
-            ViewBag.GDTimeline_Id = new SelectList(_gDTimelines.GetGDTimelines(), "Id", "Description");
+            ViewBag.SurgeryType_Id = new SelectList(await _surgeryTypes.GetSurgeryTypes(), "Id", "Description");
+            ViewBag.VirusType_Id = new SelectList(await _virusTypes.GetVirusTypes(), "Id", "Description");
+            ViewBag.GDTimeline_Id = new SelectList(await _gDTimelines.GetGDTimelines(), "Id", "Description");
 
             if (animal.ApprovalNumber_Id != null)
             {
-                ViewBag.hsno = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
+                ViewBag.hsno = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
             }
             else
             {
-                ViewBag.hsno = new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description");
+                ViewBag.hsno = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description");
             }
 
             return View(model);
@@ -159,21 +165,21 @@ namespace AnimalDB.Controllers
                 "HTRU"
             };
 
-            foreach (var user in _investigators.GetInvestigators())
+            foreach (var user in await _investigators.GetInvestigators())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
-            foreach (var user in _students.GetStudents())
+            foreach (var user in await _students.GetStudents())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
             ViewBag.Surgeon = new SelectList(surgeons, surgicalnote.Surgeon);
-            ViewBag.SurgeryType_Id = new SelectList(_surgeryTypes.GetSurgeryTypes(), "Id", "Description", surgicalnote.SurgeryType_Id);
-            ViewBag.VirusType_Id = new SelectList(_virusTypes.GetVirusTypes(), "Id", "Description", surgicalnote.VirusType_Id);
-            ViewBag.GDTimeline_Id = new SelectList(_gDTimelines.GetGDTimelines(), "Id", "Description", surgicalnote.GDTimeline_Id);
-            ViewBag.hsno= new SelectList(_approvalNumbers.GetApprovalNumbers(), "Id", "Description", hsno);
+            ViewBag.SurgeryType_Id = new SelectList(await _surgeryTypes.GetSurgeryTypes(), "Id", "Description", surgicalnote.SurgeryType_Id);
+            ViewBag.VirusType_Id = new SelectList(await _virusTypes.GetVirusTypes(), "Id", "Description", surgicalnote.VirusType_Id);
+            ViewBag.GDTimeline_Id = new SelectList(await _gDTimelines.GetGDTimelines(), "Id", "Description", surgicalnote.GDTimeline_Id);
+            ViewBag.hsno= new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", hsno);
             return View(surgicalnote);
         }
 
@@ -297,20 +303,20 @@ namespace AnimalDB.Controllers
                 "HTRU"
             };
 
-            foreach (var user in _investigators.GetInvestigators())
+            foreach (var user in await _investigators.GetInvestigators())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
-            foreach (var user in _students.GetStudents())
+            foreach (var user in await _students.GetStudents())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
             ViewBag.Surgeon = new SelectList(surgeons, surgicalnote.Surgeon);
-            ViewBag.SurgeryType_Id = new SelectList(_surgeryTypes.GetSurgeryTypes(), "Id", "Description", surgicalnote.SurgeryType_Id);
-            ViewBag.VirusType_Id = new SelectList(_virusTypes.GetVirusTypes(), "Id", "Description", surgicalnote.VirusType_Id);
-            ViewBag.GDTimeline_Id = new SelectList(_gDTimelines.GetGDTimelines(), "Id", "Description", surgicalnote.GDTimeline_Id);
+            ViewBag.SurgeryType_Id = new SelectList(await _surgeryTypes.GetSurgeryTypes(), "Id", "Description", surgicalnote.SurgeryType_Id);
+            ViewBag.VirusType_Id = new SelectList(await _virusTypes.GetVirusTypes(), "Id", "Description", surgicalnote.VirusType_Id);
+            ViewBag.GDTimeline_Id = new SelectList(await _gDTimelines.GetGDTimelines(), "Id", "Description", surgicalnote.GDTimeline_Id);
             return View(surgicalnote);
         }
 
@@ -342,12 +348,12 @@ namespace AnimalDB.Controllers
                 "HTRU"
             };
 
-            foreach (var user in _investigators.GetInvestigators())
+            foreach (var user in await _investigators.GetInvestigators())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
-            foreach (var user in _students.GetStudents())
+            foreach (var user in await _students.GetStudents())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
@@ -355,9 +361,9 @@ namespace AnimalDB.Controllers
             ViewBag.Surgeon = new SelectList(surgeons, surgicalnote.Surgeon);
 
             surgicalnote.Animal = animal;
-            ViewBag.SurgeryType_Id = new SelectList(_surgeryTypes.GetSurgeryTypes(), "Id", "Description", surgicalnote.SurgeryType_Id);
-            ViewBag.VirusType_Id = new SelectList(_virusTypes.GetVirusTypes(), "Id", "Description", surgicalnote.VirusType_Id);
-            ViewBag.GDTimeline_Id = new SelectList(_gDTimelines.GetGDTimelines(), "Id", "Description", surgicalnote.GDTimeline_Id);
+            ViewBag.SurgeryType_Id = new SelectList(await _surgeryTypes.GetSurgeryTypes(), "Id", "Description", surgicalnote.SurgeryType_Id);
+            ViewBag.VirusType_Id = new SelectList(await _virusTypes.GetVirusTypes(), "Id", "Description", surgicalnote.VirusType_Id);
+            ViewBag.GDTimeline_Id = new SelectList(await _gDTimelines.GetGDTimelines(), "Id", "Description", surgicalnote.GDTimeline_Id);
             return View(surgicalnote);
         }
 

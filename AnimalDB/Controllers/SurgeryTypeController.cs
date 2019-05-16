@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,17 +11,17 @@ namespace AnimalDB.Controllers
     {
         //private AnimalDBContext db = new AnimalDBContext();
 
-        private ISurgeryType _surgeryTypes;
+        private ISurgeryTypeService _surgeryTypes;
 
-        public SurgeryTypeController()
+        public SurgeryTypeController(ISurgeryTypeService surgeryTypes)
         {
-            this._surgeryTypes = new SurgeryTypeRepo();
+            this._surgeryTypes = surgeryTypes;
         }
 
         // GET: /SurgeryType/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_surgeryTypes.GetSurgeryTypes());
+            return View(await _surgeryTypes.GetSurgeryTypes());
         }
 
         // GET: /SurgeryType/Create

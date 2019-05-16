@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Linq;
 using System.Collections.Generic;
-using AnimalDB.Repo.Implementations;
+using AnimalDB.Repo.Services;
 using AnimalDB.Models;
 using AnimalDB.Web.Models;
 
@@ -17,32 +17,37 @@ namespace AnimalDB.Controllers
     public class AnimalManipulationReportsController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IAnimalManipulationReport _animalManipulationReports;
-        private IEthicsNumber _ethicsNumbers;
-        private IEthicsNumberHistory _ethicsNumberHistories;
-        private IAnimal _animals;
-        private IArrivalStatus _arrivalStatus;
+        private readonly IAnimalManipulationReportService _animalManipulationReports;
+        private readonly IEthicsNumberService _ethicsNumbers;
+        private readonly IEthicsNumberHistoryService _ethicsNumberHistories;
+        private readonly IAnimalService _animals;
+        private readonly IArrivalStatusService _arrivalStatus;
 
-        public AnimalManipulationReportsController()
+        public AnimalManipulationReportsController(IAnimalManipulationReportService animalManipulationReports,
+                                                   IEthicsNumberService ethicsNumbers,
+                                                   IEthicsNumberHistoryService ethicsNumberHistories,
+                                                   IAnimalService animals,
+                                                   IArrivalStatusService arrivalStatus
+                                                   )
         {
-            this._animalManipulationReports = new AnimalManipulationReportRepo();
-            this._ethicsNumbers = new EthicsNumberRepo();
-            this._ethicsNumberHistories = new EthicsNumberHistoryRepo();
-            this._animals = new AnimalRepo();
-            this._arrivalStatus = new ArrivalStatusRepo();
+            this._animalManipulationReports = animalManipulationReports;
+            this._ethicsNumbers = ethicsNumbers;
+            this._ethicsNumberHistories = ethicsNumberHistories;
+            this._animals = animals;
+            this._arrivalStatus = arrivalStatus;
         }
 
         // GET: AnimalManipulationReports
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             //var animalManipulationReports = db.AnimalManipulationReports.Include(a => a.Investigator).Include(a => a.Species);
-            return View(_animalManipulationReports.GetAnimalManipulationReports());
+            return View(await _animalManipulationReports.GetAnimalManipulationReports());
         }
 
         // GET: AnimalManipulationReports/SelectEthics
-        public ActionResult SelectEthics()
+        public async Task<ActionResult> SelectEthics()
         {
-            ViewBag.Ethics_Id = new SelectList(_ethicsNumbers.GetEthicsNumbers(), "Id", "Text");
+            ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text");
             return View();
         }
 
@@ -207,10 +212,10 @@ namespace AnimalDB.Controllers
         }
 
         // GET: AnimalManipulationReports/View/?category=SourceType&identifier=BreedingUnit
-        public ActionResult ViewAnimals(int ethics_Id, string category, string identifier)
+        public async Task<ActionResult> ViewAnimals(int ethics_Id, string category, string identifier)
         {
-            var model = _animals
-                .GetAllAnimals()
+            var animals = await _animals.GetAllAnimals();
+            var model = animals
                 .Where(m => m.EthicsNumbers.Count(n => n.Ethics_Id == ethics_Id) != 0)
                 .Select(m => new ViewAnimalManipulationReportViewModel() { Animal = m, Change = false });
 
@@ -257,7 +262,7 @@ namespace AnimalDB.Controllers
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<ViewResult> BulkChange(string[] animalIds, string returnUrl, string ethics_Id)
+        public async Task<ViewResult> BulkChange(string[] animalIds, string returnUrl)
         {
             List<Animal> animals = new List<Animal>();
 
@@ -275,13 +280,13 @@ namespace AnimalDB.Controllers
             };
 
             ViewBag.returnUrl = returnUrl;
-            ViewBag.ArrivalStatus_Id = new SelectList(_arrivalStatus.GetArrivalStatus(), "Id", "Description");
+            ViewBag.ArrivalStatus_Id = new SelectList(await _arrivalStatus.GetArrivalStatus(), "Id", "Description");
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<ActionResult> BulkChange(BulkChangeAnimalViewModel model, string[] animalIds, string returnUrl, string ethics_Id)
+        public async Task<ActionResult> BulkChange(BulkChangeAnimalViewModel model, string[] animalIds, string ethics_Id)
         {
             List<Animal> animals = new List<Animal>();
 

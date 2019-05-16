@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,18 +9,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class MedicationTypeController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IMedicationType _medicationTypes;
+        private IMedicationTypeService _medicationTypes;
 
-        public MedicationTypeController()
+        public MedicationTypeController(IMedicationTypeService medicationTypes)
         {
-            this._medicationTypes = new MedicationTypeRepo();
+            this._medicationTypes = medicationTypes;
         }
 
         // GET: /MedicationType/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_medicationTypes.GetMedicationTypes());
+            return View(await _medicationTypes.GetMedicationTypes());
         }
 
         // GET: /MedicationType/Create

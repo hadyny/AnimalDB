@@ -1,6 +1,5 @@
 ﻿using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Enums;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,26 +14,29 @@ namespace AnimalDB.Controllers
     public class MedicationController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IAnimal _animals;
-        private IMedication _medications;
-        private IMedicationType _medicationTypes;
-        private IMedicationFollowUp _medicationFollowUps;
-        private INotification _notifications;
+        private readonly IAnimalService _animals;
+        private readonly IMedicationService _medications;
+        private readonly IMedicationTypeService _medicationTypes;
+        private readonly IMedicationFollowUpService _medicationFollowUps;
+        private readonly INotificationService _notifications;
 
-        public MedicationController()
+        public MedicationController(IAnimalService animals,
+                                    IMedicationService medications,
+                                    IMedicationTypeService medicationTypes,
+                                    IMedicationFollowUpService medicationFollowUps,
+                                    INotificationService notifications)
         {
-            this._animals = new AnimalRepo();
-            this._medications = new MedicationRepo();
-            this._medicationTypes = new MedicationTypeRepo();
-            this._medicationFollowUps = new MedicationFollowUpRepo();
-            this._notifications = new NotificationRepo();
+            this._animals = animals;
+            this._medications = medications;
+            this._medicationTypes = medicationTypes;
+            this._medicationFollowUps = medicationFollowUps;
+            this._notifications = notifications;
         }
 
 
         // GET: /Medication/
         public async Task<ActionResult> Index(int? id)
         {
-
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -43,11 +45,11 @@ namespace AnimalDB.Controllers
             ViewBag.AnimalId = id.Value;
             var animal = await _animals.GetAnimalById(id.Value);
             ViewBag.AnimalName = animal.UniqueAnimalId;
-            return View(_medications.GetMedicationByAnimalId(id.Value));
+            return View(await _medications.GetMedicationByAnimalId(id.Value));
         }
 
         // GET: /Medication/Create
-        public async Task<ActionResult> Create(int? id, string returnUrl, int? report)
+        public async Task<ActionResult> Create(int? id)
         {
             if (id == null)
             {
@@ -73,7 +75,7 @@ namespace AnimalDB.Controllers
             }
 
             ViewBag.WhoToNotify_Id = new SelectList(users, "Id", "FullName");
-            ViewBag.MedicationType_Id = new SelectList(_medicationTypes.GetMedicationTypes(), "Id", "Description");
+            ViewBag.MedicationType_Id = new SelectList(await _medicationTypes.GetMedicationTypes(), "Id", "Description");
             
             var model = new Medication() { Animal = animal, Timestamp = DateTime.Now };
             return View(model);
@@ -101,14 +103,14 @@ namespace AnimalDB.Controllers
             {
                 await _medications.CreateMedication(medication);
 
-                await createReminders(medication);
+                await CreateReminders(medication);
 
                 if (this.Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                     && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
                 {
                     return this.Redirect(returnUrl + "?medid=" + medication.Id);
                 }
-                return RedirectToAction("Index", new { id=id });
+                return RedirectToAction("Index", new { id });
             }
             ICollection<AnimalUser> users = new List<AnimalUser>
             {
@@ -119,7 +121,7 @@ namespace AnimalDB.Controllers
                 users.Add(user);
             }
             ViewBag.WhoToNotify_Id = new SelectList(users, "Id", "FullName", medication.WhoToNotify_Id);
-            ViewBag.MedicationType_Id = new SelectList(_medicationTypes.GetMedicationTypes(), "Id", "Description", medication.MedicationType_Id);
+            ViewBag.MedicationType_Id = new SelectList(await _medicationTypes.GetMedicationTypes(), "Id", "Description", medication.MedicationType_Id);
             return View(medication);
         }
 
@@ -145,7 +147,7 @@ namespace AnimalDB.Controllers
                 users.Add(user);
             }
             ViewBag.WhoToNotify_Id = new SelectList(users, "Id", "FullName", medication.WhoToNotify_Id);
-            ViewBag.MedicationType_Id = new SelectList(_medicationTypes.GetMedicationTypes(), "Id", "Description", medication.MedicationType_Id);
+            ViewBag.MedicationType_Id = new SelectList(await _medicationTypes.GetMedicationTypes(), "Id", "Description", medication.MedicationType_Id);
             return View(medication);
         }
 
@@ -157,7 +159,7 @@ namespace AnimalDB.Controllers
             if (ModelState.IsValid)
             {
                 await _medications.UpdateMedication(medication);
-                await createReminders(medication);
+                await CreateReminders(medication);
                 return RedirectToAction("Index", new { id = medication.Animal_Id });
             }
             var animal = await _animals.GetAnimalById(medication.Animal_Id);
@@ -170,12 +172,12 @@ namespace AnimalDB.Controllers
                 users.Add(user);
             }
             ViewBag.WhoToNotify_Id = new SelectList(users, "Id", "FullName", medication.WhoToNotify_Id);
-            ViewBag.MedicationType_Id = new SelectList(_medicationTypes.GetMedicationTypes(), "Id", "Description", medication.MedicationType_Id);
+            ViewBag.MedicationType_Id = new SelectList(await _medicationTypes.GetMedicationTypes(), "Id", "Description", medication.MedicationType_Id);
             return View(medication);
         }
 
         // GET: /Medication/Delete/5
-        public async Task<ActionResult> Delete(int? id, string returnUrl)
+        public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -224,7 +226,7 @@ namespace AnimalDB.Controllers
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.Animal_Id = id.Value;
 
-            return View(_medicationFollowUps.GetMedicationFollowUpByAnimalId(id.Value));
+            return View(await _medicationFollowUps.GetMedicationFollowsUpByAnimalId(id.Value));
         }
 
 
@@ -284,14 +286,14 @@ namespace AnimalDB.Controllers
             {
                 await _medicationFollowUps.CreateMedicationFollowUp(medicalFollowUp);
                 // Remove relevant notification
-                var notifications = _notifications.GetNotificationsByMedicationId(medicalFollowUp.Medication_Id);
+                var notifications = await _notifications.GetNotificationsByMedicationId(medicalFollowUp.Medication_Id);
 
                 if (notifications.Count(m => m.NotificationDate < DateTime.Now.AddMinutes(5)) != 0)
                 {
                     await _notifications.DeleteNotification(notifications.First());
                 }
                 
-                return RedirectToAction("Followups", new { id = id });
+                return RedirectToAction("Followups", new { id });
             }
             var animal = await _animals.GetAnimalById(id.Value);
             ViewBag.Animal_Id = id;
@@ -351,11 +353,13 @@ namespace AnimalDB.Controllers
             if (ModelState.IsValid)
             {
                 await _medicationFollowUps.UpdateMedicationFollowUp(medicalFollowUp);
-                var animalId = _medications.GetMedicationById(medicalFollowUp.Medication_Id).Result.Animal_Id;
+                var medication = await _medications.GetMedicationById(medicalFollowUp.Medication_Id);
+                var animalId = medication.Animal_Id;
                 return RedirectToAction("Followups", new { id = animalId });
             }
 
-            var animal = _medicationFollowUps.GetMedicationFollowUpById(id).Result.Medication.Animal;
+            var followUp = await _medicationFollowUps.GetMedicationFollowUpById(id);
+            var animal = followUp.Medication.Animal;
 
             ViewBag.Animal_Id = animal.Id;
             
@@ -373,7 +377,7 @@ namespace AnimalDB.Controllers
             return View(medicalFollowUp);
         }
 
-        private async Task createReminders(Medication medication)
+        private async Task CreateReminders(Medication medication)
         {
             // Do nothing if no frequency or duration
             if (!medication.Frequency.HasValue || !medication.Duration.HasValue)

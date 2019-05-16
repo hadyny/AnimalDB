@@ -1,6 +1,7 @@
-﻿using AnimalDB.Functions;
-using AnimalDB.Repo.Enums;
+﻿using AnimalDB.Repo.Enums;
+using AnimalDB.Repo.Interfaces;
 using Microsoft.AspNet.Identity;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -8,6 +9,12 @@ namespace AnimalDB.Controllers
 {
     public class AccountController : Controller
     {
+        private readonly IUserManagementService _users;
+
+        public AccountController(IUserManagementService users)
+        {
+            _users = users;
+        }
         //
         // GET: /Account/Login
         public ActionResult Login(string returnUrl)
@@ -20,9 +27,9 @@ namespace AnimalDB.Controllers
         // POST: /Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async System.Threading.Tasks.Task<ActionResult> Login(Models.LoginViewModel model, string returnUrl)
+        public async Task<ActionResult> Login(Models.LoginViewModel model, string returnUrl)
         {
-            UserType? userType = HelperFunctions.GetUserType(model.UserName);
+            UserType? userType = await _users.GetUserType(model.UserName);
 
             if (userType == null)
             {
@@ -31,7 +38,7 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                if (await UserManagement.SignInADUserAsync(model.UserName, model.Password, userType.Value))
+                if (await _users.SignInADUserAsync(model.UserName, model.Password, userType.Value))
                 {
                     if (this.Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                         && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))

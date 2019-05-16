@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,19 +9,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class SourceController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        ISource _sources;
+        private readonly ISourceService _sources;
 
-        public SourceController()
+        public SourceController(ISourceService sources)
         {
-            this._sources = new SourceRepo();
+            this._sources = sources;
         }
 
-
         // GET: /Source/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_sources.GetSources());
+            return View(await _sources.GetSources());
         }
 
         // GET: /Source/Create

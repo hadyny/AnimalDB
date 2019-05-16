@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,25 +11,25 @@ namespace AnimalDB.Controllers
     {
         //private AnimalDBContext db = new AnimalDBContext();
 
-        private INotificationEmail _notificationEmails;
-        private IInvestigator _investigators;
+        private INotificationEmailService _notificationEmails;
+        private IInvestigatorService _investigators;
 
-        public NotificationEmailsController()
+        public NotificationEmailsController(INotificationEmailService notificationEmails, IInvestigatorService investigators)
         {
-            this._notificationEmails = new NotificationEmailRepo();
-            this._investigators = new InvestigatorRepo();
+            this._notificationEmails = notificationEmails;
+            this._investigators = investigators;
         }
 
         // GET: NotificationEmails
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_notificationEmails.GetNotificationEmails());
+            return View(await _notificationEmails.GetNotificationEmails());
         }
 
         // GET: NotificationEmails/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName");
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName");
             return View();
         }
 
@@ -43,7 +42,7 @@ namespace AnimalDB.Controllers
         {
             if (User.IsInRole("Investigator"))
             {
-                var investigator = _investigators.GetInvestigatorByUsername(User.Identity.Name);
+                var investigator = await _investigators.GetInvestigatorByUsername(User.Identity.Name);
                 notificationEmail.Investigator_Id = investigator.Id;
             }
 
@@ -52,7 +51,7 @@ namespace AnimalDB.Controllers
                 await _notificationEmails.CreateNotificationEmail(notificationEmail);
                 return RedirectToAction("Index");
             }
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName");
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName");
             return View(notificationEmail);
         }
 
@@ -68,7 +67,7 @@ namespace AnimalDB.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", notificationEmail.Investigator_Id);
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", notificationEmail.Investigator_Id);
             return View(notificationEmail);
         }
 
@@ -81,7 +80,7 @@ namespace AnimalDB.Controllers
         {
             if (User.IsInRole("Investigator"))
             {
-                var investigator = _investigators.GetInvestigatorByUsername(User.Identity.Name);
+                var investigator = await _investigators.GetInvestigatorByUsername(User.Identity.Name);
                 notificationEmail.Investigator_Id = investigator.Id;
             }
             if (ModelState.IsValid)
@@ -89,7 +88,7 @@ namespace AnimalDB.Controllers
                 await _notificationEmails.UpdateNotificationEmail(notificationEmail);
                 return RedirectToAction("Index");
             }
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", notificationEmail.Investigator_Id);
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", notificationEmail.Investigator_Id);
             return View(notificationEmail);
         }
 

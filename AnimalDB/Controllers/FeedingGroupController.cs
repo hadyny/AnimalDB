@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Linq;
 using System.Net;
@@ -12,33 +11,37 @@ namespace AnimalDB.Controllers
     public class FeedingGroupController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IFeedingGroup _feedingGroups;
-        private IRoom _rooms;
-        private IInvestigator _investigators;
-        private IGroup _groups;
-        private IAnimal _animals;
+        private readonly IFeedingGroupService _feedingGroups;
+        private readonly IRoomService _rooms;
+        private readonly IInvestigatorService _investigators;
+        private readonly IGroupService _groups;
+        private readonly IAnimalService _animals;
 
-        public FeedingGroupController()
+        public FeedingGroupController(IFeedingGroupService feedingGroups,
+                                      IRoomService rooms,
+                                      IInvestigatorService investigators,
+                                      IGroupService groups,
+                                      IAnimalService animals)
         {
-            this._feedingGroups = new FeedingGroupRepo();
-            this._rooms = new RoomRepo();
-            this._investigators = new InvestigatorRepo();
-            this._groups = new GroupRepo();
-            this._animals = new AnimalRepo();
+            this._feedingGroups = feedingGroups;
+            this._rooms = rooms;
+            this._investigators = investigators;
+            this._groups = groups;
+            this._animals = animals;
         }
 
         // GET: /FeedingGroup/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_feedingGroups.GetFeedingGroups());
+            return View(await _feedingGroups.GetFeedingGroups());
         }
 
         [Authorize(Roles = "Administrator,Technician,Investigator")]
         // GET: /FeedingGroup/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName");
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description");
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName");
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description");
             return View();
         }
 
@@ -50,7 +53,7 @@ namespace AnimalDB.Controllers
         {
             if (User.IsInRole("Investigator"))
             {
-                var investigator = _investigators.GetInvestigatorByUsername(User.Identity.Name);
+                var investigator = await _investigators.GetInvestigatorByUsername(User.Identity.Name);
                 feedinggroup.Investigator_Id = investigator.Id;
             }
 
@@ -59,8 +62,8 @@ namespace AnimalDB.Controllers
                 await _feedingGroups.CreateFeedingGroup(feedinggroup);
                 return RedirectToAction("Index");
             }
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName");
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", feedinggroup.Room_Id);
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName");
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", feedinggroup.Room_Id);
             return View(feedinggroup);
         }
 
@@ -77,8 +80,8 @@ namespace AnimalDB.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", feedinggroup.Investigator_Id);
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", feedinggroup.Room_Id);
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", feedinggroup.Investigator_Id);
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", feedinggroup.Room_Id);
             return View(feedinggroup);
         }
 
@@ -90,7 +93,7 @@ namespace AnimalDB.Controllers
         {
             if (User.IsInRole("Investigator"))
             {
-                var investigator = _investigators.GetInvestigatorByUsername(User.Identity.Name);
+                var investigator = await _investigators.GetInvestigatorByUsername(User.Identity.Name);
                 feedinggroup.Investigator_Id = investigator.Id;
             }
            
@@ -99,8 +102,8 @@ namespace AnimalDB.Controllers
                 await _feedingGroups.UpdateFeedingGroup(feedinggroup);
                 return RedirectToAction("Index");
             }
-            ViewBag.Investigator_Id = new SelectList(_investigators.GetInvestigators(), "Id", "FullName", feedinggroup.Investigator_Id);
-            ViewBag.Room_Id = new SelectList(_rooms.GetRooms(), "Id", "Description", feedinggroup.Room_Id);
+            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", feedinggroup.Investigator_Id);
+            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", feedinggroup.Room_Id);
             return View(feedinggroup);
         }
         
@@ -117,7 +120,7 @@ namespace AnimalDB.Controllers
                 return HttpNotFound();
             }
             
-            ViewBag.Group_Id = new SelectList(_groups.GetGroupsByFeedingGroupId(id.Value),
+            ViewBag.Group_Id = new SelectList(await _groups.GetGroupsByFeedingGroupId(id.Value),
                                             "Id", "Description");
 
             var model = new Models.CreateGroupViewModel()
@@ -134,7 +137,7 @@ namespace AnimalDB.Controllers
                                     .ToList()
             };
 
-            var tmp = new SelectList(_groups.GetGroupsByFeedingGroupId(id.Value), "Id", "Description");
+            var tmp = new SelectList(await _groups.GetGroupsByFeedingGroupId(id.Value), "Id", "Description");
 
             ViewBag.Groups = tmp;
 
@@ -205,7 +208,7 @@ namespace AnimalDB.Controllers
             var model = new Models.AddToFeedingGroupViewModel()
             {
                 Id = feedinggroup.Id,
-                ExistingAnimals = _feedingGroups.GetAnimalsInFeedingGroup(feedinggroup.Id)
+                ExistingAnimals = await _feedingGroups.GetAnimalsInFeedingGroup(feedinggroup.Id)
             };
 
             ViewBag.Animal_Id = new SelectList(feedinggroup
@@ -214,7 +217,7 @@ namespace AnimalDB.Controllers
                                                         .Where(m => m.CauseOfDeath == null && m.FeedingGroup_Id == null)
                                                         .OrderBy(m => m.UniqueAnimalId.Length), 
                                                 "Id", "UniqueAnimalId");
-            ViewBag.Group_Id = new SelectList(_groups.GetGroups(), "Id", "Description");
+            ViewBag.Group_Id = new SelectList(await _groups.GetGroups(), "Id", "Description");
 
             return View(model);
         }
@@ -224,22 +227,23 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Add(Models.AddToFeedingGroupViewModel addToFeedingGroupModel)
         {
-            int feedingGroupSize = _feedingGroups.GetAnimalsInFeedingGroup(addToFeedingGroupModel.Id).Count();
+            var feedingGroup = await _feedingGroups.GetAnimalsInFeedingGroup(addToFeedingGroupModel.Id);
 
-            if (addToFeedingGroupModel.Animal_Id != null && feedingGroupSize < 6)
+            if (ModelState.IsValid && feedingGroup.Count() < 6)
             {
                 var addAnimal = await _animals.GetAnimalById(addToFeedingGroupModel.Animal_Id.Value);
                 addAnimal.FeedingGroup_Id = addToFeedingGroupModel.Id;
                 await _animals.UpdateAnimal(addAnimal);
+                return RedirectToAction("Add", addToFeedingGroupModel.Id);
             }
-            else if (feedingGroupSize > 5)
+            else if (feedingGroup.Count() > 5)
             {
                 ModelState.AddModelError("", "You can only have up to six animals in a feeding group.");
             }
-
-            addToFeedingGroupModel.ExistingAnimals = _feedingGroups.GetAnimalsInFeedingGroup(addToFeedingGroupModel.Id);
-            ViewBag.Animal_Id = new SelectList(_animals.GetLivingAnimals().Where(m => m.FeedingGroup_Id == null), "Id", "UniqueAnimalId", null);
-            ViewBag.Group_Id = new SelectList(new GroupRepo().GetGroups(), "Id", "Description", null);
+            var animals = await _animals.GetLivingAnimals();
+            addToFeedingGroupModel.ExistingAnimals = await _feedingGroups.GetAnimalsInFeedingGroup(addToFeedingGroupModel.Id);
+            ViewBag.Animal_Id = new SelectList(animals.Where(m => m.FeedingGroup_Id == null), "Id", "UniqueAnimalId", null);
+            ViewBag.Group_Id = new SelectList(await _groups.GetGroups(), "Id", "Description", null);
             return View("Add", addToFeedingGroupModel);
         }
 
@@ -250,7 +254,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            int? group = _feedingGroups.GetFeedingGroupByAnimalId(id.Value);
+            int? group = await _feedingGroups.GetFeedingGroupByAnimalId(id.Value);
             await _feedingGroups.RemoveAnimalFromFeedingGroup(id.Value);
 
             return RedirectToAction("Add", new { Id = group });

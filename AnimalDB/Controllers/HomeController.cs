@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -10,35 +9,35 @@ namespace AnimalDB.Controllers
     public class HomeController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IAnimal _animals;
+        private readonly IAnimalService _animals;
 
-        public HomeController()
+        public HomeController(IAnimalService animals)
         {
-            this._animals = new AnimalRepo();
+            this._animals = animals;
         }
 
         // GET: /Home/
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             if (User.IsInRole("Investigator"))
             {
-                ViewBag.animalid = new SelectList(_animals.GetInvestigatorsAnimals(User.Identity.Name), "Id", "UniqueAnimalId");
+                ViewBag.animalid = new SelectList(await _animals.GetInvestigatorsAnimals(User.Identity.Name), "Id", "UniqueAnimalId");
             }
             else if (User.IsInRole("Student"))
             {
-                ViewBag.animalid = new SelectList(_animals.GetStudentsAnimals(User.Identity.Name), "Id", "UniqueAnimalId");
+                ViewBag.animalid = new SelectList(await _animals.GetStudentsAnimals(User.Identity.Name), "Id", "UniqueAnimalId");
             }
             else if (User.IsInRole("Administrator") || 
                      User.IsInRole("Veterinarian") || 
                      User.IsInRole("Technician"))
             {
-                ViewBag.animalid = new SelectList(_animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
+                ViewBag.animalid = new SelectList(await _animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
             }
             return View();
         }
 
         [HttpPost]
-        public async Task<ActionResult> Index(FormCollection values, string animalid)
+        public async Task<ActionResult> Index(string animalid)
         {
             Animal _animal = null;
             if (int.TryParse(animalid, out int value))
@@ -61,19 +60,19 @@ namespace AnimalDB.Controllers
 
             if (User.IsInRole("Investigator"))
             {
-                ViewBag.animalid = new SelectList(_animals.GetInvestigatorsAnimals(User.Identity.Name), 
+                ViewBag.animalid = new SelectList(await _animals.GetInvestigatorsAnimals(User.Identity.Name), 
                                                 "Id", "UniqueAnimalId");
             }
             else if (User.IsInRole("Student"))
             {
-                ViewBag.animalid = new SelectList(_animals.GetStudentsAnimals(User.Identity.Name), 
+                ViewBag.animalid = new SelectList(await _animals.GetStudentsAnimals(User.Identity.Name), 
                                                 "Id", "UniqueAnimalId");
             }
             else if (User.IsInRole("Administrator") || 
                      User.IsInRole("Veterinarian") || 
                      User.IsInRole("Technician"))
             {
-                ViewBag.animalid = new SelectList(_animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
+                ViewBag.animalid = new SelectList(await _animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
             }
             ViewBag.Errors = "Could not find the animal, please try again.";
             return View();

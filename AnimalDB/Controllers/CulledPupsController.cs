@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
-using AnimalDB.Repo.Implementations;
+using AnimalDB.Repo.Services;
 using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Enums;
 using AnimalDB.Repo.Interfaces;
@@ -16,19 +16,19 @@ namespace AnimalDB.Controllers
     public class CulledPupsController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private ICulledPups _culledPups;
-        private IAnimal _animals;
+        private ICulledPupsService _culledPups;
+        private IAnimalService _animals;
 
-        public CulledPupsController()
+        public CulledPupsController(ICulledPupsService culledPups, IAnimalService animals)
         {
-            this._culledPups = new CulledPupsRepo();
-            this._animals = new AnimalRepo();
+            this._culledPups = culledPups;
+            this._animals = animals;
         }
 
         // GET: CulledPups
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(_culledPups.GetCulledPups());
+            return View(await _culledPups.GetCulledPups());
         }
 
         // GET: CulledPups/Details/5
@@ -47,10 +47,10 @@ namespace AnimalDB.Controllers
         }
 
         // GET: CulledPups/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            ViewBag.AnimalId = new SelectList(_animals
-                                                .GetLivingAnimals()
+            var animals = await _animals.GetLivingAnimals();
+            ViewBag.AnimalId = new SelectList(animals
                                                 .Where(m => m.Sex == Sex.Female), 
                                             "Id", "UniqueAnimalId");
             return View();
@@ -72,9 +72,8 @@ namespace AnimalDB.Controllers
                 await _culledPups.CreateCulledPups(culledPups);
                 return RedirectToAction("Index");
             }
-
-            ViewBag.AnimalId = new SelectList(_animals
-                                                .GetLivingAnimals()
+            var animals = await _animals.GetLivingAnimals();
+            ViewBag.AnimalId = new SelectList(animals
                                                 .Where(m => m.Sex == Sex.Female),
                                            "Id", "UniqueAnimalId", culledPups.AnimalId);
             return View(culledPups);
@@ -92,8 +91,8 @@ namespace AnimalDB.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.AnimalId = new SelectList(_animals
-                                                .GetLivingAnimals()
+            var animals = await _animals.GetLivingAnimals();
+            ViewBag.AnimalId = new SelectList(animals                                                
                                                 .Where(m => m.Sex == Sex.Female),
                                            "Id", "UniqueAnimalId", culledPups.AnimalId);
             return View(culledPups);
@@ -109,8 +108,8 @@ namespace AnimalDB.Controllers
                 await _culledPups.UpdateCulledPups(culledPups);
                 return RedirectToAction("Index");
             }
-            ViewBag.AnimalId = new SelectList(_animals
-                                                .GetLivingAnimals()
+            var animals = await _animals.GetLivingAnimals();
+            ViewBag.AnimalId = new SelectList(animals
                                                 .Where(m => m.Sex == Sex.Female),
                                            "Id", "UniqueAnimalId", culledPups.AnimalId);
             return View(culledPups);
@@ -143,12 +142,12 @@ namespace AnimalDB.Controllers
 
 
         // GET: CulledPups/PupsByEthics/5
-        public ActionResult PupsByEthics()
+        public async Task<ActionResult> PupsByEthics()
         {
             var model = new List<PupsByEthicsViewModel>();
             EthicsNumberHistory entry;
 
-            foreach (var animal in _culledPups.GetCulledPups())
+            foreach (var animal in await _culledPups.GetCulledPups())
             {
                 entry = animal.Animal.EthicsNumbers.OrderByDescending(n => n.Timestamp).FirstOrDefault();
 

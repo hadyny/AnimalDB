@@ -4,7 +4,7 @@
     @Html.ActionLink("Back", "Index", new { id = ViewBag.FeedingGroupId }, new { @class = "btn btn-primary" })
 </h3>
 
-<h2>Edit Group Name</h2>
+<h2>Edit Sub-Group Name</h2>
 
 
 @using (Html.BeginForm())
@@ -18,7 +18,7 @@
         @Html.HiddenFor(model => model.FeedingGroup_Id)
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Description, "New Group Name", new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.Description, "New Sub-Group Name", new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.Description)
                 @Html.ValidationMessageFor(model => model.Description)
@@ -26,7 +26,7 @@
         </div>
 
         <div class="form-group">
-            <div class="offset-md-2 col-md-10">
+            <div class="col-md-10">
                 <input type="submit" value="Save" class="btn  btn-outline-dark" />
             </div>
         </div>

@@ -1,8 +1,6 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Implementations;
 using AnimalDB.Repo.Interfaces;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -13,18 +11,18 @@ namespace AnimalDB.Controllers
     public class VetSchedulesController : Controller
     {
         //private AnimalDBContext db = new AnimalDBContext();
-        private IVetSchedule _vetSchedules;
+        private IVetScheduleService _vetSchedules;
 
-        public VetSchedulesController()
+        public VetSchedulesController(IVetScheduleService vetSchedules)
         {
-            this._vetSchedules = new VetScheduleRepo();
+            this._vetSchedules = vetSchedules;
         }
 
         // GET: VetSchedules
         [Authorize]
-        public ActionResult Index(string returnUrl)
+        public async Task<ActionResult> Index(string returnUrl)
         {
-            if (_vetSchedules.GetVetSchedules().Count() != 0)
+            if (await _vetSchedules.DoesVetScheduleExist())
             {
                 ViewBag.Exists = true;
             }
@@ -45,9 +43,9 @@ namespace AnimalDB.Controllers
 
         [Authorize]
         // GET: VetSchedules/GetDoc/5
-        public FileResult GetDoc()
+        public async Task<FileResult> GetDoc()
         {
-            var doc = _vetSchedules.GetVetSchedules().FirstOrDefault();
+            var doc = await _vetSchedules.GetVetSchedule();
 
             if (doc == null)
             {
@@ -92,9 +90,9 @@ namespace AnimalDB.Controllers
         }
         [Authorize(Roles = "Technician,Administrator")]
         // GET: VetSchedules/Delete/5
-        public ActionResult Delete()
+        public async Task<ActionResult> Delete()
         {
-            VetSchedule vetSchedule = _vetSchedules.GetVetSchedules().FirstOrDefault();
+            VetSchedule vetSchedule = await _vetSchedules.GetVetSchedule();
             
             return View(vetSchedule);
         }
@@ -104,7 +102,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed()
         {
-            VetSchedule vetSchedule = _vetSchedules.GetVetSchedules().FirstOrDefault();
+            VetSchedule vetSchedule = await _vetSchedules.GetVetSchedule();
             if (vetSchedule != null)
             {
                 await _vetSchedules.DeleteVetSchedule(vetSchedule);
