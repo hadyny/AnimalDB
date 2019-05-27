@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteNotCheckedAnimal(NotCheckedAnimal notCheckedAnimal)
         {
-            await _notCheckedAnimals.Delete(notCheckedAnimal);
+            await _notCheckedAnimals.Delete(notCheckedAnimal.Id);
             await _notCheckedAnimals.Save();
         }
 

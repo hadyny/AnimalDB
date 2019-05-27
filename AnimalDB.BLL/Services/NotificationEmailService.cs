@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteNotificationEmail(NotificationEmail notificationEmail)
         {
-            await _notificationEmails.Delete(notificationEmail);
+            await _notificationEmails.Delete(notificationEmail.Id);
             await _notificationEmails.Save();
         }
 

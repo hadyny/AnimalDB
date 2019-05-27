@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteCageLocation(CageLocation cageLocation)
         {
-            await _cageLocations.Delete(cageLocation);
+            await _cageLocations.Delete(cageLocation.Id);
             await _cageLocations.Save();
         }
 

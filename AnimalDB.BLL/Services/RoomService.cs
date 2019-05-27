@@ -50,7 +50,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteRoom(Room room)
         {
-            await _rooms.Delete(room);
+            await _rooms.Delete(room.Id);
             await _rooms.Save();
         }
 

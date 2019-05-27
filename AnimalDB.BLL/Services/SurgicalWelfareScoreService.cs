@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteSurgicalWelfareScore(SurgicalWelfareScore surgicalWelfareScore)
         {
-            await _surgicalWelfareScores.Delete(surgicalWelfareScore);
+            await _surgicalWelfareScores.Delete(surgicalWelfareScore.Id);
             await _surgicalWelfareScores.Save();
         }
         public async Task<SurgicalWelfareScore> GetSurgicalWelfareScoreById(int id)

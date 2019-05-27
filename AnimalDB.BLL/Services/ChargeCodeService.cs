@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteChargeCode(ChargeCode chargeCode)
         {
-            await _chargeCodes.Delete(chargeCode);
+            await _chargeCodes.Delete(chargeCode.Id);
             await _chargeCodes.Save();
         }
 

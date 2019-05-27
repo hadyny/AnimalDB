@@ -297,6 +297,7 @@
     <Compile Include="Models\AnimalViewModel.cs" />
     <Compile Include="Models\BulkChangeAnimalViewModel.cs" />
     <Compile Include="Models\CageLocationHistoryViewModel.cs" />
+    <Compile Include="Models\DocumentCategoryViewModel.cs" />
     <Compile Include="Models\FeedGroupsViewModel.cs" />
     <Compile Include="Models\FeedViewModel.cs" />
     <Compile Include="Models\MenuViewModel.cs" />

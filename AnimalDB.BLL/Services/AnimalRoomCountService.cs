@@ -25,7 +25,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteAnimalRoomCount(AnimalRoomCount animalRoomCount)
         {
-            await _roomCounts.Delete(animalRoomCount);
+            await _roomCounts.Delete(animalRoomCount.Id);
             await _roomCounts.Save();
         }
 

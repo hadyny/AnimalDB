@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteSopCategory(SopCategory sopCategory)
         {
-            await _sopCategories.Delete(sopCategory);
+            await _sopCategories.Delete(sopCategory.Id);
             await _sopCategories.Save();
         }
 

@@ -24,7 +24,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteEthicsNumberHistory(EthicsNumberHistory ethicsNumberHistory)
         {
-            await _ethicsNumberHistories.Delete(ethicsNumberHistory);
+            await _ethicsNumberHistories.Delete(ethicsNumberHistory.Id);
             await _ethicsNumberHistories.Save();
         }
 

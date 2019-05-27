@@ -1,7 +1,7 @@
 ﻿@model AnimalDB.Repo.Entities.Document
 
 <h3>
-    @Html.ActionLink("Back", "Index", new { id=Model.Category_Id }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Back", "Index", "DocumentCategories", new { id=Model.Category_Id }, new { @class = "btn btn-primary" })
 </h3>
 
 <h2>@Html.DisplayFor(model => model.Description) @Html.ActionLink("Download", "GetDocument", new { id = Model.Id, download = 1 }, new { @class = "btn btn-outline-dark" })</h2>
@@ -33,5 +33,5 @@
 </div>
 <hr />
 <h3>
-    @Html.ActionLink("Back", "Index", new { id = Model.Category_Id }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Back", "Index", "DocumentCategories", new { id = Model.Category_Id }, new { @class = "btn btn-primary" })
 </h3>

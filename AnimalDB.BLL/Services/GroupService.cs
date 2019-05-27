@@ -31,7 +31,7 @@ namespace AnimalDB.Repo.Services
                 animal.Group_Id = null;
             }
 
-            await _groups.Delete(group);
+            await _groups.Delete(group.Id);
             await _animals.Save();
             await _groups.Save();
         }

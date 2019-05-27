@@ -24,7 +24,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteDocument(Document document)
         {
-            await _documents.Delete(document);
+            await _documents.Delete(document.Id);
             await _documents.Save();
         }
 
@@ -44,10 +44,9 @@ namespace AnimalDB.Repo.Services
             return await _documents.GetAll();
         }
 
-        public async Task<IEnumerable<Document>> GetDocumentsByCategoryId(int categoryId)
+        public async Task<IEnumerable<Document>> GetDocumentsByCategoryId(int? categoryId)
         {
-            var docs = await GetDocuments();
-            return docs.Where(m => m.Category_Id == categoryId);
+            return await _documents.GetAll(m => m.Category_Id == categoryId);
         }
 
         public async Task UpdateDocument(Document document)

@@ -1,15 +1,16 @@
-﻿using System;
+﻿using AnimalDB.Repo.Entities;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using AnimalDB.Repo.Entities;
 
 namespace AnimalDB.Repo.Interfaces
 {
     public interface IDocumentCategoryService
     {
         Task<IEnumerable<DocumentCategory>> GetDocumentCategories();
+
+        Task<IEnumerable<DocumentCategory>> GetRootDocumentCategories();
+
+        Task<IEnumerable<DocumentCategory>> GetDocumentCategoriesByParentId(int? id);
 
         Task CreateDocumentCategory(DocumentCategory documentCategory);
 
@@ -18,5 +19,7 @@ namespace AnimalDB.Repo.Interfaces
         Task UpdateDocumentCategory(DocumentCategory documentCategory);
 
         Task DeleteDocumentCategory(DocumentCategory documentCategory);
+
+        IEnumerable<DocumentCategory> GetParentHierarchy(DocumentCategory documentCategory);
     }
 }

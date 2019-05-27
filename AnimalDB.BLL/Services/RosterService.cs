@@ -38,7 +38,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteRoster(Roster roster)
         {
-            await _rosters.Delete(roster);
+            await _rosters.Delete(roster.Id);
             await _rosters.Save();
         }
 

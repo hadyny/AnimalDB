@@ -20,8 +20,6 @@ namespace AnimalDB.Web.Controllers
             this._categories = categories;
         }
 
-        //private AnimalDBContext db = new AnimalDBContext();
-
         // GET: Documents
         public async Task<ActionResult> Index(int? id)
         {
@@ -51,8 +49,6 @@ namespace AnimalDB.Web.Controllers
         }
 
         // POST: Documents/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Id,Description,FileName,Content,DateUploaded,Category_Id")] Document document)
@@ -60,7 +56,7 @@ namespace AnimalDB.Web.Controllers
             if (ModelState.IsValid)
             {
                 await _docs.CreateDocument(document);
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "DocumentCategories", document.Category_Id);
             }
 
             ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
@@ -84,8 +80,6 @@ namespace AnimalDB.Web.Controllers
         }
 
         // POST: Documents/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Description,FileName,Content,DateUploaded,Category_Id")] Document document, HttpPostedFileBase upload)
@@ -112,7 +106,7 @@ namespace AnimalDB.Web.Controllers
 
                 await _docs.UpdateDocument(olddoc);
 
-                return RedirectToAction("Index", new { id = document.Category_Id });
+                return RedirectToAction("Index", "DocumentCategories", new { id = document.Category_Id });
             }
             ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
             return View(document);
@@ -131,7 +125,7 @@ namespace AnimalDB.Web.Controllers
                 ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description");
             }
 
-            ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "DocumentCategories");
+            ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "DocumentCategories", new { id });
 
             return View();
         }
@@ -163,9 +157,9 @@ namespace AnimalDB.Web.Controllers
             if (ModelState.IsValid)
             {
                 await _docs.CreateDocument(document);
-                return RedirectToAction("Index", new { id = document.Category_Id });
+                return RedirectToAction("Index", "DocumentCategories", new { id = document.Category_Id });
             }
-            ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "DocumentCategories");
+            ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "DocumentCategories", new { id = document.Category_Id });
             ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
             return View(document);
         }
@@ -230,8 +224,9 @@ namespace AnimalDB.Web.Controllers
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
             Document document = await _docs.GetDocumentById(id);
+            int catergory = document.Category_Id;
             await _docs.DeleteDocument(document);
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "DocumentCategories", new { id = catergory });
         }
     }
 }

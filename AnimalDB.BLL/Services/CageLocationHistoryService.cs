@@ -24,7 +24,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteCageLocationHistory(CageLocationHistory cageLocationHistory)
         {
-            await _cageLocationHistory.Delete(cageLocationHistory);
+            await _cageLocationHistory.Delete(cageLocationHistory.Id);
             await _cageLocationHistory.Save();
         }
 

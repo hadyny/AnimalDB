@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteSource(Source source)
         {
-            await _sources.Delete(source);
+            await _sources.Delete(source.Id);
             await _sources.Save();
         }
 

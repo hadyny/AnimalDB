@@ -1,5 +1,6 @@
 ﻿using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
+using AnimalDB.Web.Models;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -11,21 +12,38 @@ namespace AnimalDB.Web.Controllers
     {
         //private AnimalDBContext db = new AnimalDBContext();
         private readonly IDocumentCategoryService _categories;
+        private readonly IDocumentService _documents;
 
-        public DocumentCategoriesController(IDocumentCategoryService categories)
+        public DocumentCategoriesController(IDocumentCategoryService categories, IDocumentService documents)
         {
             this._categories = categories;
+            this._documents = documents;
         }
 
         // GET: DocumentCategories
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(int? id)
         {
-            return View(await _categories.GetDocumentCategories());
+            var category = id.HasValue ? await _categories.GetDocumentCategoryById(id.Value) : null;
+
+            var model = new DocumentCategoryViewModel() {
+                CategoryName = category?.Description,
+                Category_Id = category?.Id,
+                Parent_Id = id,
+                IsRootCategory = !id.HasValue,
+                AuthenticatedUser = User.IsInRole("Administrator") || User.IsInRole("Technician"),
+                Documents = await _documents.GetDocumentsByCategoryId(id), // takes ages
+                SubCategories = await _categories.GetDocumentCategoriesByParentId(id),
+                ParentHierarchy = _categories.GetParentHierarchy(category)
+            };
+
+            return View(model);
         }
 
         // GET: DocumentCategories/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create(int? id)
         {
+            ViewBag.Id = id;
+            ViewBag.ParentCategory_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", id);
             return View();
         }
 
@@ -34,14 +52,15 @@ namespace AnimalDB.Web.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Description")] DocumentCategory documentCategory)
+        public async Task<ActionResult> Create([Bind(Include = "Id,Description,ParentCategory_Id")] DocumentCategory documentCategory, int? id)
         {
             if (ModelState.IsValid)
             {
                 await _categories.CreateDocumentCategory(documentCategory);
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { id });
             }
-
+            ViewBag.Id = id;
+            ViewBag.ParentCategory_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", documentCategory.ParentCategory_Id);
             return View(documentCategory);
         }
 
@@ -57,6 +76,8 @@ namespace AnimalDB.Web.Controllers
             {
                 return HttpNotFound();
             }
+
+            ViewBag.ParentCategory_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", documentCategory.ParentCategory_Id);
             return View(documentCategory);
         }
 
@@ -70,8 +91,10 @@ namespace AnimalDB.Web.Controllers
             if (ModelState.IsValid)
             {
                 await _categories.UpdateDocumentCategory(documentCategory);
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { id = documentCategory.Id });
             }
+
+            ViewBag.ParentCategory_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", documentCategory.ParentCategory_Id);
             return View(documentCategory);
         }
 

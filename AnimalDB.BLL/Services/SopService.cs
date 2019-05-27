@@ -24,7 +24,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteSop(Sop sop)
         {
-            await _sops.Delete(sop);
+            await _sops.Delete(sop.Id);
             await _sops.Save();
         }
 

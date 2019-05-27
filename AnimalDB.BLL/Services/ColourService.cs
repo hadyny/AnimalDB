@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteColour(Colour colour)
         {
-            await _colours.Delete(colour);
+            await _colours.Delete(colour.Id);
             await _colours.Save();
         }
 

@@ -24,7 +24,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteRack(Rack rack)
         {
-            await _racks.Delete(rack);
+            await _racks.Delete(rack.Id);
             await _racks.Save();
         }
 

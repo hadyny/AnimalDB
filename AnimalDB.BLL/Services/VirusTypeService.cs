@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteVirusType(VirusType virusType)
         {
-            await _virusTypes.Delete(virusType);
+            await _virusTypes.Delete(virusType.Id);
             await _virusTypes.Save();
         }
 

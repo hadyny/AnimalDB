@@ -38,7 +38,7 @@ namespace AnimalDB.Repo.Services
                 _animals.Update(animal);
             }
             await _animals.Save();
-            await _feedingGroups.Delete(feedingGroup);
+            await _feedingGroups.Delete(feedingGroup.Id);
             await _feedingGroups.Save();
         }
 
@@ -86,7 +86,7 @@ namespace AnimalDB.Repo.Services
 
                         if (feed.FeedAmount == null && feed.Weight == null)
                         {
-                            await _feeds.Delete(oldFeed);
+                            await _feeds.Delete(oldFeed.Id);
                         }
                         else
                         {

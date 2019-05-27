@@ -28,10 +28,10 @@ namespace AnimalDB.Repo.Services
         {
             foreach (var notification in await _notifications.GetAll(m => m.Medication_Id == medication.Id))
             {
-                await _notifications.Delete(notification);
+                await _notifications.Delete(notification.Id);
             }
 
-            await _medications.Delete(medication);
+            await _medications.Delete(medication.Id);
 
             await _notifications.Save();
             await _medications.Save();

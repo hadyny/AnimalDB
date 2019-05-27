@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteClinicalIncidentReport(ClinicalIncidentReport clinicalIncidentReport)
         {
-            await _clinicalIncidentReports.Delete(clinicalIncidentReport);
+            await _clinicalIncidentReports.Delete(clinicalIncidentReport.Id);
             await _clinicalIncidentReports.Save();
         }
 

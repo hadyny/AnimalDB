@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteTransgene(Transgene transgene)
         {
-            await _transgenes.Delete(transgene);
+            await _transgenes.Delete(transgene.Id);
             await _transgenes.Save();
         }
 

@@ -24,7 +24,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteArrivalStatus(ArrivalStatus arrivalStatus)
         {
-            await _arrivalStatus.Delete(arrivalStatus);
+            await _arrivalStatus.Delete(arrivalStatus.Id);
             await _arrivalStatus.Save();
         }
 

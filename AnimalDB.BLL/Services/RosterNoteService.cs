@@ -24,7 +24,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteRosterNote(RosterNote rosterNote)
         { 
-            await _rosterNotes.Delete(rosterNote);
+            await _rosterNotes.Delete(rosterNote.Id);
             await _rosterNotes.Save();
         }
 

@@ -33,7 +33,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteNotification(Notification notification)
         {
-            await _notifications.Delete(notification);
+            await _notifications.Delete(notification.Id);
             await _notifications.Save();
         }
 

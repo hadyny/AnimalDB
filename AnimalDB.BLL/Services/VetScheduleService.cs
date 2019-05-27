@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteVetSchedule(VetSchedule vetSchedule)
         {
-            await _vetSchedules.Delete(vetSchedule);
+            await _vetSchedules.Delete(vetSchedule.Id);
             await _vetSchedules.Save();
         }
 

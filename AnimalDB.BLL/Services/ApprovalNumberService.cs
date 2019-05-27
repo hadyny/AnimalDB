@@ -24,7 +24,7 @@ namespace AnimalDB.Repo.Services
         public async Task DeleteApprovalNumber(ApprovalNumber approvalNumber)
         {
            
-            await _approvalNumbers.Delete(approvalNumber);
+            await _approvalNumbers.Delete(approvalNumber.Id);
             await _approvalNumbers.Save();
         }
 

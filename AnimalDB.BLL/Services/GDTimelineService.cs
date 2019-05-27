@@ -36,7 +36,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteGDTimeline(GDTimeline gDTimeline)
         {
-            await _gDTimelines.Delete(gDTimeline);
+            await _gDTimelines.Delete(gDTimeline.Id);
             await _gDTimelines.Save();
         }
 

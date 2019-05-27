@@ -24,7 +24,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteCulledPups(CulledPups culledPups)
         {
-            await _culledPups.Delete(culledPups);
+            await _culledPups.Delete(culledPups.Id);
             await _culledPups.Save();
         }
 

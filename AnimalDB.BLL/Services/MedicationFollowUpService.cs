@@ -24,7 +24,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteMedicationFollowUp(MedicationFollowUp medicationFollowUp)
         {
-            await _medicationFollowUps.Delete(medicationFollowUp);
+            await _medicationFollowUps.Delete(medicationFollowUp.Id);
             await _medicationFollowUps.Save();
         }
 

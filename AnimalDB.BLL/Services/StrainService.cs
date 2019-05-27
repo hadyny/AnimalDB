@@ -23,7 +23,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task DeleteStrain(Strain Strain)
         {
-            await _strains.Delete(Strain);
+            await _strains.Delete(Strain.Id);
             await _strains.Save();
         }
 

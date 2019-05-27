@@ -301,7 +301,7 @@ namespace AnimalDB.Repo.Services
             animal.Parents.Clear();
             animal.Offspring.Clear();
             _animals.Update(animal);
-            await _animals.Delete(animal);
+            await _animals.Delete(animal.Id);
             await _animals.Save();
         }
 
@@ -312,7 +312,7 @@ namespace AnimalDB.Repo.Services
             animal.EthicsNumbers.Clear();
             foreach (var ethics in await _ethicsNumberHistories.GetAll(m => m.Animal_Id == id))
             {
-                await _ethicsNumberHistories.Delete(ethics);
+                await _ethicsNumberHistories.Delete(ethics.Id);
             }
             animal.StockAnimal = true;
 

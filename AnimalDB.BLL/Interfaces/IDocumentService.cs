@@ -16,7 +16,7 @@ namespace AnimalDB.Repo.Interfaces
 
         Task DeleteDocument(Document document);
 
-        Task<IEnumerable<Document>> GetDocumentsByCategoryId(int categoryId);
+        Task<IEnumerable<Document>> GetDocumentsByCategoryId(int? categoryId);
 
         Task<bool> DoesDocumentFileNameExist(string fileName);
     }
