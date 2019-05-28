@@ -38,13 +38,15 @@
 
     </ul>
 }
+@if (!Model.IsRootCategory)
+{
 <hr />
 <h3>
     Documents
 </h3>
-@if (Model.AuthenticatedUser)
+if (Model.AuthenticatedUser)
 {@Html.ActionLink("Upload New Document", "Upload", "Documents", new { returnUrl = Request.Path, id = Model.Category_Id }, new { @class = "btn btn-primary btn-sm" })}
-@if (Model.Documents.Count() != 0)
+if (Model.Documents.Count() != 0)
 {
     <table class="table table-striped table-hover">
         @foreach (var item in Model.Documents.OrderByDescending(m => m.DateUploaded))
@@ -67,4 +69,5 @@
             </tr>
         }
     </table>
+}
 }

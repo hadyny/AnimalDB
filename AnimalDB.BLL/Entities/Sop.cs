@@ -14,8 +14,6 @@ namespace AnimalDB.Repo.Entities
 
         [StringLength(255)]
         public string FileName { get; set; }
-        
-        public byte[] Content { get; set; }
 
         [Display(Name = "Date Uploaded")]
         public DateTime DateUploaded { get; set; }

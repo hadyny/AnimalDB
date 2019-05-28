@@ -1,6 +1,7 @@
 ﻿using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
@@ -84,7 +85,7 @@ namespace AnimalDB.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Description,FileName,Content,DateUploaded,Category_Id")] Document document, HttpPostedFileBase upload)
         {
-            if (upload != null && upload.ContentType != "application/pdf")
+            if (upload != null && upload.ContentType != System.Net.Mime.MediaTypeNames.Application.Pdf)
             {
                 ModelState.AddModelError("file", "A pdf file is required");
             }
@@ -94,12 +95,11 @@ namespace AnimalDB.Web.Controllers
                 var olddoc = await _docs.GetDocumentById(document.Id);
                 if (upload != null && upload.ContentLength > 0)
                 {
+                    var filename = Path.GetFileName(upload.FileName);
                     olddoc.DateUploaded = DateTime.Now;
-                    olddoc.FileName = System.IO.Path.GetFileName(upload.FileName);
-                    using (var reader = new System.IO.BinaryReader(upload.InputStream))
-                    {
-                        olddoc.Content = reader.ReadBytes(upload.ContentLength);
-                    }
+                    olddoc.FileName = filename;
+                    var path = Path.Combine(Server.MapPath("~/Content/Documents"), filename);
+                    upload.SaveAs(path);
                 }
                 olddoc.Description = document.Description;
                 olddoc.Category_Id = document.Category_Id;
@@ -130,14 +130,12 @@ namespace AnimalDB.Web.Controllers
             return View();
         }
 
-        // POST: Sops/Upload
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Documents/Upload
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Upload([Bind(Include = "Id,Description,FileName,DateUploaded,Category_Id")] Document document, HttpPostedFileBase upload)
         {
-            if (upload == null || upload.ContentLength <= 0 || upload.ContentType != "application/pdf")
+            if (upload == null || upload.ContentLength <= 0 || upload.ContentType != System.Net.Mime.MediaTypeNames.Application.Pdf)
             {
                 ModelState.AddModelError("file", "A pdf file is required");
             }
@@ -146,17 +144,16 @@ namespace AnimalDB.Web.Controllers
             {
                 ModelState.AddModelError("file", "\"" + upload.FileName + "\" already exists in the database. If you want to update the file, locate the entry and click \"Edit\".");
             }
-
+           
+            var filename = Path.GetFileName(upload.FileName);
             document.DateUploaded = DateTime.Now;
-            document.FileName = System.IO.Path.GetFileName(upload.FileName);
-            using (var reader = new System.IO.BinaryReader(upload.InputStream))
-            {
-                document.Content = reader.ReadBytes(upload.ContentLength);
-            }
+            document.FileName = filename;
+            var path = Path.Combine(Server.MapPath("~/Content/Documents"), filename);            
 
             if (ModelState.IsValid)
             {
                 await _docs.CreateDocument(document);
+                upload.SaveAs(path);
                 return RedirectToAction("Index", "DocumentCategories", new { id = document.Category_Id });
             }
             ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "DocumentCategories", new { id = document.Category_Id });
@@ -188,6 +185,7 @@ namespace AnimalDB.Web.Controllers
                 return null;
             }
             Document doc = await _docs.GetDocumentById(id.Value);
+            var content = System.IO.File.ReadAllBytes(Path.Combine(Server.MapPath("~/Content/Documents"), doc.FileName));
             if (doc == null)
             {
                 return null;
@@ -195,11 +193,11 @@ namespace AnimalDB.Web.Controllers
 
             if (download.HasValue)
             {
-                return File(doc.Content, "application/pdf", doc.FileName);
+                return File(content, System.Net.Mime.MediaTypeNames.Application.Pdf, doc.FileName);
             }
             else
             {
-                return File(doc.Content, "application/pdf");
+                return File(content, System.Net.Mime.MediaTypeNames.Application.Pdf);
             }
         }
 

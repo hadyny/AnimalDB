@@ -758,6 +758,9 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\AnimalImages\" />
+    <Folder Include="Content\Documents\" />
+    <Folder Include="Content\Sops\" />
+    <Folder Include="Content\VetSchedule\" />
     <Folder Include="Content\VetSignatures\" />
   </ItemGroup>
   <ItemGroup>

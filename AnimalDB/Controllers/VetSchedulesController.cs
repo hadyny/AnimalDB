@@ -46,13 +46,14 @@ namespace AnimalDB.Controllers
         public async Task<FileResult> GetDoc()
         {
             var doc = await _vetSchedules.GetVetSchedule();
+            var content = System.IO.File.ReadAllBytes(Server.MapPath("~/Content/VetSchedule/Schedule.pdf"));
 
             if (doc == null)
             {
                 return null;
             }
 
-            return File(doc.Content, "application/pdf");
+            return File(content, System.Net.Mime.MediaTypeNames.Application.Pdf);
             
         }
 
@@ -68,21 +69,18 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Upload([Bind(Include = "Id,Content")] VetSchedule vetSchedule, HttpPostedFileBase upload)
         {
-            if (upload == null || upload.ContentLength <= 0 || upload.ContentType != "application/pdf")
+            if (upload == null || upload.ContentLength <= 0 || upload.ContentType != System.Net.Mime.MediaTypeNames.Application.Pdf)
             {
                 ModelState.AddModelError("file", "A pdf file is required");
             }
 
             vetSchedule.DateUploaded = DateTime.Now;
-
-            using (var reader = new System.IO.BinaryReader(upload.InputStream))
-            {
-                vetSchedule.Content = reader.ReadBytes(upload.ContentLength);
-            }
+            var path = Server.MapPath("~/Content/VetSchedule/Schedule.pdf");
 
             if (ModelState.IsValid)
             {
                 await _vetSchedules.CreateVetSchedule(vetSchedule);
+                upload.SaveAs(path);
                 return RedirectToAction("Index");
             }
             

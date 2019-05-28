@@ -1,6 +1,7 @@
 ﻿using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
@@ -64,7 +65,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Upload([Bind(Include = "Id,Description,FileName,DateUploaded,Category_Id")] Sop sop, HttpPostedFileBase upload)
         {
-            if (upload == null || upload.ContentLength <= 0 || upload.ContentType != "application/pdf")
+            if (upload == null || upload.ContentLength <= 0 || upload.ContentType != System.Net.Mime.MediaTypeNames.Application.Pdf)
             {
                 ModelState.AddModelError("file", "A pdf file is required");
             }
@@ -74,16 +75,15 @@ namespace AnimalDB.Controllers
                 ModelState.AddModelError("file", "\"" + upload.FileName + "\" already exists in the database. If you want to update the file, locate the entry and click \"Edit\".");
             }
 
+            var filename = Path.GetFileName(upload.FileName);
             sop.DateUploaded = DateTime.Now;
-            sop.FileName = System.IO.Path.GetFileName(upload.FileName);
-            using (var reader = new System.IO.BinaryReader(upload.InputStream))
-            {
-                sop.Content = reader.ReadBytes(upload.ContentLength);
-            }
+            sop.FileName = filename;
+            var path = Path.Combine(Server.MapPath("~/Content/Sops"), filename);
 
             if (ModelState.IsValid)
             {
                 await _sops.CreateSop(sop);
+                upload.SaveAs(path);
                 return RedirectToAction("Index", new { id = sop.Category_Id });
             }
             ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "SopCategories");
@@ -99,6 +99,7 @@ namespace AnimalDB.Controllers
                 return null;
             }
             Sop sop = await _sops.GetSopById(id.Value);
+            var content = System.IO.File.ReadAllBytes(Path.Combine(Server.MapPath("~/Content/Sops"), sop.FileName));
             if (sop == null)
             {
                 return null;
@@ -106,11 +107,11 @@ namespace AnimalDB.Controllers
 
             if (download.HasValue)
             {
-                return File(sop.Content, "application/pdf", sop.FileName);
+                return File(content, System.Net.Mime.MediaTypeNames.Application.Pdf, sop.FileName);
             }
             else
             {
-                return File(sop.Content, "application/pdf");
+                return File(content, System.Net.Mime.MediaTypeNames.Application.Pdf);
             }
         }
 
@@ -152,7 +153,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Description,FileName,DateUploaded,Category_Id")] Sop sop, HttpPostedFileBase upload)
         {
-            if (upload != null && upload.ContentType != "application/pdf")
+            if (upload != null && upload.ContentType != System.Net.Mime.MediaTypeNames.Application.Pdf)
             {
                 ModelState.AddModelError("file", "A pdf file is required");
             }
@@ -162,12 +163,11 @@ namespace AnimalDB.Controllers
                 var oldsop = await _sops.GetSopById(sop.Id);
                 if (upload != null && upload.ContentLength > 0)
                 {
+                    var filename = Path.GetFileName(upload.FileName);
                     oldsop.DateUploaded = DateTime.Now;
-                    oldsop.FileName = System.IO.Path.GetFileName(upload.FileName);
-                    using (var reader = new System.IO.BinaryReader(upload.InputStream))
-                    {
-                        oldsop.Content = reader.ReadBytes(upload.ContentLength);
-                    }
+                    oldsop.FileName = filename;
+                    var path = Path.Combine(Server.MapPath("~/Content/Sops"), filename);
+                    upload.SaveAs(path);
                 }
                 oldsop.Description = sop.Description;
                 oldsop.Category_Id = sop.Category_Id;
