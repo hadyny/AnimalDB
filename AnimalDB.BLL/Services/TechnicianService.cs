@@ -26,7 +26,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task CreateTechnician(Technician technician)
         {
-            await _technicians.Insert(technician);
+            await _technicians.Insert(technician, Repo.Enums.UserType.Technician);
         }
 
         public async Task DeleteTechnician(Technician technician)

@@ -31,7 +31,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task CreateStudent(Student student)
         {
-            await _students.Insert(student);
+            await _students.Insert(student, Repo.Enums.UserType.Student);
         }
 
         public async Task DeleteStudent(Student student)
@@ -109,20 +109,39 @@ namespace AnimalDB.Repo.Services
 
         public async Task AddInvestigatorToStudent(string studentId, string investigatorId)
         {
+            /*
             var student = await _students.GetById(studentId);
             var investigator = await _investigators.GetById(investigatorId);
             if (student == null || investigator == null) return;
             student.Investigators.Add(investigator);
-            await _students.Save();
+            await _students.Save();*/
+
+            using (var db = new AnimalDBContext())
+            {
+                var student = await db.Students.FindAsync(studentId);
+                var investigator = await db.Investigators.FindAsync(investigatorId);
+                if (student == null || investigator == null) return;
+                student.Investigators.Add(investigator);
+                await db.SaveChangesAsync();
+            }
         }
 
         public async Task RemoveInvestigatorFromStudent(string studentId, string investigatorId)
         {
-            var student = await _students.GetById(studentId);
+            /*var student = await _students.GetById(studentId);
             var investigator = await _investigators.GetById(investigatorId);
             if (student == null || investigator == null) return;
             student.Investigators.Remove(investigator);
-            await _students.Save();
+            await _students.Save();*/
+
+            using (var db = new AnimalDBContext())
+            {
+                var student = await db.Students.FindAsync(studentId);
+                var investigator = await db.Investigators.FindAsync(investigatorId);
+                if (student == null || investigator == null) return;
+                student.Investigators.Remove(investigator);
+                await db.SaveChangesAsync();
+            }
         }
     }
 }

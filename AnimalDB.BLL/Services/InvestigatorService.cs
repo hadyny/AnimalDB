@@ -21,7 +21,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task CreateInvestigator(Investigator investigator)
         {
-            await _investigators.Insert(investigator);
+            await _investigators.Insert(investigator, Repo.Enums.UserType.Investigator);
         }
 
         public async Task<Investigator> GetInvestigatorByUsername(string username)

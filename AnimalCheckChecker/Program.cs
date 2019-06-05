@@ -35,7 +35,7 @@ namespace AnimalCheckChecker
                                                           kernel.Get<IRepository<EthicsNumberHistory>>(), 
                                                           kernel.Get<IRepository<EthicsNumber>>(), 
                                                           kernel.Get<IRepository<CageLocationHistory>>(), 
-                                                          kernel.Get<IRepository<Student>>());
+                                                          kernel.Get<IUserRepository<Student>>());
             INotCheckedAnimalService ncaRepo = new NotCheckedAnimalService(kernel.Get<IRepository<NotCheckedAnimal>>());
 
             /*var notCheckedRooms = db.Rooms.Where(m => m.NoDBAnimals && 

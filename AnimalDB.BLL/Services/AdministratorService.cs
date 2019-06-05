@@ -21,7 +21,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task CreateAdministrator(Administrator administrator)
         {
-            await _administrators.Insert(administrator);
+            await _administrators.Insert(administrator, Repo.Enums.UserType.Administrator);
         }
 
         public async Task<Administrator> GetAdministratorByUsername(string userName)

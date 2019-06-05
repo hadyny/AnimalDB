@@ -17,14 +17,14 @@ namespace AnimalDB.Repo.Services
         private readonly IRepository<EthicsNumberHistory> _ethicsNumberHistories;
         private readonly IRepository<EthicsNumber> _ethicsNumbers;
         private readonly IRepository<CageLocationHistory> _cageLocationHistories;
-        private readonly IRepository<Student> _students;
+        private readonly IUserRepository<Student> _students;
 
         public AnimalService(
             IRepository<Animal> animals,
             IRepository<EthicsNumberHistory> ethicsNumberHistories,
             IRepository<EthicsNumber> ethicsNumbers,
             IRepository<CageLocationHistory> cageLocationHistories,
-            IRepository<Student> students
+            IUserRepository<Student> students
             )
         {
             this._animals = animals;
@@ -267,10 +267,11 @@ namespace AnimalDB.Repo.Services
 
         public async Task<IEnumerable<Animal>> GetStudentsAnimals(string userName)
         {
-            var students = await this._students.GetAll();
             var animals = await GetLivingAnimals();
-            var student = students.Single(m => m.UserName == userName);
-            return (student == null) ? null : animals.Where(m => student.Investigators.Contains(m.Investigator));
+            var student = await _students.GetByUsername(userName);
+            var investigators = student.Investigators;
+            //return (student == null) ? null : animals.Where(m => investigators.Contains(m.Investigator));
+            return (student == null) ? null : animals.Where(m => investigators.Any(n => n.Id == m.Investigator_Id));
         }
 
         public async Task CreateAnimal(Animal animal)

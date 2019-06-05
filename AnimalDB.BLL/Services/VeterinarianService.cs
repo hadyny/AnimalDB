@@ -21,7 +21,7 @@ namespace AnimalDB.Repo.Services
 
         public async Task CreateVeterinarian(Veterinarian veterinarian)
         {
-            await _veterinarians.Insert(veterinarian);
+            await _veterinarians.Insert(veterinarian, Repo.Enums.UserType.Veterinarian);
         }
 
         public async Task<Veterinarian> GetVeterinarianByUsername(string username)

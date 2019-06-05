@@ -1,5 +1,4 @@
 ﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Services;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;

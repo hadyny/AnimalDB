@@ -49,15 +49,14 @@ namespace AnimalDB.Repositories.Concrete
             return await table.SingleOrDefaultAsync(m => m.UserName.Equals(name, System.StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task Insert(T obj)
+        public async Task Insert(T obj, Repo.Enums.UserType userType)
         {
             var usermanager = new UserManager<T>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<T>(db));
             var result = await usermanager.CreateAsync(obj, "Password not required");
             if (result.Succeeded)
             {
-                usermanager.AddToRole(obj.Id, "Administrator");
+                usermanager.AddToRole(obj.Id, userType.ToString());
             }
-
         }
 
         public async Task Save()
