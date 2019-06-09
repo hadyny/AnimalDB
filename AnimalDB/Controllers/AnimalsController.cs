@@ -334,7 +334,8 @@ namespace AnimalDB.Controllers
         [Authorize(Roles = "Student, Administrator, Technician, Investigator")]
         public async Task<ActionResult> Edit(Animal animal, int? Ethics_Id)
         {
-            if (await _animals.GetAnimalByUniqueId(animal.UniqueAnimalId) != null && _animals.GetAnimalByUniqueId(animal.UniqueAnimalId).Id != animal.Id)
+            var a = await _animals.GetAnimalByUniqueId(animal.UniqueAnimalId);
+            if  (a != null && a.Id != animal.Id)
             {
                 ModelState.AddModelError("UniqueAnimalId", "Unique Animal Id is already in use.");
             }

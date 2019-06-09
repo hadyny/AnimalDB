@@ -35,7 +35,6 @@ namespace AnimalDB.Repositories.Concrete
                 table.Attach(existing);
             }
 
-            
             table.Remove(existing);
         }
 

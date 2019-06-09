@@ -8,6 +8,7 @@ using System;
 using System.Text;
 using AnimalDB.Repo.Enums;
 using AnimalDB.Repo.Repositories.Abstract;
+using AnimalDB.Repo.Contexts;
 
 namespace AnimalDB.Repo.Services
 {
@@ -270,7 +271,6 @@ namespace AnimalDB.Repo.Services
             var animals = await GetLivingAnimals();
             var student = await _students.GetByUsername(userName);
             var investigators = student.Investigators;
-            //return (student == null) ? null : animals.Where(m => investigators.Contains(m.Investigator));
             return (student == null) ? null : animals.Where(m => investigators.Any(n => n.Id == m.Investigator_Id));
         }
 
@@ -293,8 +293,15 @@ namespace AnimalDB.Repo.Services
 
         public async Task UpdateAnimal(Animal animal)
         {
-            _animals.Update(animal);
-            await _animals.Save();
+            using (var db = new AnimalDBContext())
+            {
+                db.Entry(animal).State = EntityState.Modified;
+                await db.SaveChangesAsync();
+            }
+
+
+            //_animals.Update(animal);
+            //await _animals.Save();
         }
 
         public async Task DeleteAnimal(Animal animal)
