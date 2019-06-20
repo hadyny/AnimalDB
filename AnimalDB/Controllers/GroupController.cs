@@ -1,6 +1,6 @@
 ﻿using AnimalDB.Models;
+using AnimalDB.Repo.Contexts;
 using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Interfaces;
 using System;
 using System.Linq;
 using System.Net;
@@ -12,18 +12,11 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Student,Investigator, Technician, Administrator")]
     public class GroupController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly IAnimalService _animals;
-        private readonly IFeedingGroupService _feedingGroups;
-        private readonly IGroupService _groups;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GroupController(IAnimalService animals,
-                               IFeedingGroupService feedingGroups,
-                               IGroupService groups)
+        public GroupController(IUnitOfWork unitOfWork)
         {
-            this._animals = animals;
-            this._feedingGroups = feedingGroups;
-            this._groups = groups;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /Group/
@@ -33,7 +26,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            FeedingGroup group = await _feedingGroups.GetFeedingGroupById(id.Value);
+            FeedingGroup group = await _unitOfWork.FeedingGroups.GetById(id.Value);
             if (group == null)
             {
                 return HttpNotFound();
@@ -42,7 +35,7 @@ namespace AnimalDB.Controllers
             ViewBag.FeedingGroupId = id.Value;
             ViewBag.FeedingGroupName = group.Description;
 
-            return View(await _groups.GetGroupsByFeedingGroupId(id.Value));
+            return View(_unitOfWork.Groups.GetByFeedingGroupId(id.Value));
         }
 
         // GET: /Group/Create
@@ -61,7 +54,8 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _groups.CreateGroup(group);
+                _unitOfWork.Groups.Insert(group);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id });
             }
             ViewBag.FeedingGroupId = id;
@@ -75,7 +69,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Group group = await _groups.GetGroupById(id.Value);
+            Group group = await _unitOfWork.Groups.GetById(id.Value);
             if (group == null)
             {
                 return HttpNotFound();
@@ -92,7 +86,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _groups.UpdateGroup(group);
+                _unitOfWork.Groups.Update(group);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = group.FeedingGroup_Id });
             }
             ViewBag.FeedingGroupId = group.FeedingGroup_Id;
@@ -108,7 +103,7 @@ namespace AnimalDB.Controllers
             }
 
             //Animal animal = await _animals.GetAnimalByUniqueId(animalId);
-            Group group = await _groups.GetGroupById(id.Value);
+            Group group = await _unitOfWork.Groups.GetById(id.Value);
             if (group == null || (!string.IsNullOrEmpty(animalId) && animalId == null))
             {
                 return HttpNotFound();
@@ -122,7 +117,7 @@ namespace AnimalDB.Controllers
 
             ViewBag.FeedingGroupId = group.FeedingGroup_Id;
             ViewBag.AnimalList = group.Animals;
-            ViewBag.AnimalId = new SelectList(await _animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
+            ViewBag.AnimalId = new SelectList(_unitOfWork.Animals.GetLiving(), "Id", "UniqueAnimalId");
             return View(model);
         }
 
@@ -131,27 +126,28 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> AddTo([Bind(Include = "AnimalId,GroupId")] AddToGroupViewModel group)
         {
-            var _group = await _groups.GetGroupById(group.GroupId);
+            var _group = await _unitOfWork.Groups.GetById(group.GroupId);
 
             if (ModelState.IsValid)
             {
                 int animalId = Convert.ToInt32(group.AnimalId);
                 if (_group.Animals.Count(m => m.Id == animalId) == 0)
                 {
-                    _group.Animals.Add(await _animals.GetAnimalById(animalId));
-                    await _groups.UpdateGroup(_group);
+                    _group.Animals.Add(await _unitOfWork.Animals.GetById(animalId));
+                    _unitOfWork.Groups.Update(_group);
+                    await _unitOfWork.Complete();
                     return RedirectToAction("AddTo", new { Id = group.GroupId });
                 }
                 else
                 {
-                    Animal animal = await _animals.GetAnimalById(animalId);
+                    Animal animal = await _unitOfWork.Animals.GetById(animalId);
                     ModelState.AddModelError("AnimalId", "Animal \"" + animal.UniqueAnimalId + "\" is already in this group");
                 }
             }
 
             ViewBag.FeedingGroupId = _group.FeedingGroup_Id;
             ViewBag.AnimalList = _group.Animals;
-            ViewBag.AnimalId = new SelectList(await _animals.GetLivingAnimals(), "Id", "UniqueAnimalId");
+            ViewBag.AnimalId = new SelectList(_unitOfWork.Animals.GetLiving(), "Id", "UniqueAnimalId");
 
             return View(group);
         }
@@ -164,7 +160,8 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             
-            await _groups.RemoveAnimalFromGroup(id.Value, groupid.Value);
+            await _unitOfWork.Groups.RemoveAnimalFromGroup(id.Value, groupid.Value);
+            await _unitOfWork.Complete();
             return RedirectToAction("AddTo", new { Id = groupid });
         }
 
@@ -175,7 +172,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Group group = await _groups.GetGroupById(id.Value);
+            Group group = await _unitOfWork.Groups.GetById(id.Value);
             if (group == null)
             {
                 return HttpNotFound();
@@ -189,9 +186,10 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Group group = await _groups.GetGroupById(id);
+            Group group = await _unitOfWork.Groups.GetById(id);
             int feedingGroupId = group.FeedingGroup_Id.Value;
-            await _groups.DeleteGroup(group);
+            _unitOfWork.Groups.Delete(group);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id = feedingGroupId });
         }
     }

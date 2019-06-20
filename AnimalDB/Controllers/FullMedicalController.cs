@@ -5,29 +5,20 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using AnimalDB.Repo.Contexts;
 
 namespace AnimalDB.Controllers
 {
     [Authorize]
     public class FullMedicalController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly IAnimalService _animals;
-        private readonly INoteService _notes;
-        private readonly IMedicationFollowUpService _medicationFollowUps;
-        private readonly ISurgicalNoteService _surgicalNotes;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public FullMedicalController(IAnimalService animals, 
-                                     INoteService notes, 
-                                     IMedicationFollowUpService medicationFollowUps, 
-                                     ISurgicalNoteService surgicalNotes)
+        public FullMedicalController(IUnitOfWork unitOfWork)
         {
-            this._animals = animals;
-            this._notes = notes;
-            this._medicationFollowUps = medicationFollowUps;
-            this._surgicalNotes = surgicalNotes;
-
+            _unitOfWork = unitOfWork;
         }
+
         //
         // GET: /FullMedical/
         public async Task<ActionResult> Index(int? id)
@@ -37,7 +28,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -46,7 +37,7 @@ namespace AnimalDB.Controllers
 
             IEnumerable<Models.MedicalReportItem> items;
 
-            var notes = await _notes.GetNotesByAnimalId(animal.Id);
+            var notes = _unitOfWork.Notes.GetByAnimalId(animal.Id);
             items = notes
                         .Select(m => new Models.MedicalReportItem()
                         {
@@ -57,7 +48,7 @@ namespace AnimalDB.Controllers
                                 Css = "note"
                         });
 
-            var followUps = await _medicationFollowUps.GetMedicationFollowsUpByAnimalId(animal.Id);
+            var followUps = _unitOfWork.MedicationFollowUps.GetByAnimalId(animal.Id);
             items = items
                         .Concat(followUps
                         .Select(m => new Models.MedicalReportItem()
@@ -69,7 +60,7 @@ namespace AnimalDB.Controllers
                             Css = "med"
                         }));
 
-            var surgicalNotes = await _surgicalNotes.GetSurgicalNotesByAnimalId(animal.Id);
+            var surgicalNotes = _unitOfWork.SurgicalNotes.GetByAnimalId(animal.Id);
             items = items
                         .Concat(surgicalNotes
                         .Select(m => new Models.MedicalReportItem()

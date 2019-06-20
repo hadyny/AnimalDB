@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Interfaces;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -9,17 +9,17 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class VirusTypesController : Controller
     {
-        private IVirusTypeService _virusTypes;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public VirusTypesController(IVirusTypeService virusTypes)
+        public VirusTypesController(IUnitOfWork unitOfWork)
         {
-            this._virusTypes = virusTypes;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: VirusTypes
         public async Task<ActionResult> Index()
         {
-            return View(await _virusTypes.GetVirusTypes());
+            return View(await _unitOfWork.VirusTypes.Get());
         }
 
         // GET: VirusTypes/Create
@@ -35,7 +35,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _virusTypes.CreateVirusType(virusType);
+                _unitOfWork.VirusTypes.Insert(virusType);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -49,7 +50,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            VirusType virusType = await _virusTypes.GetVirusTypeById(id.Value);
+            VirusType virusType = await _unitOfWork.VirusTypes.GetById(id.Value);
             if (virusType == null)
             {
                 return HttpNotFound();
@@ -64,7 +65,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _virusTypes.UpdateVirusType(virusType);
+                _unitOfWork.VirusTypes.Update(virusType);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(virusType);
@@ -77,7 +79,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            VirusType virusType = await _virusTypes.GetVirusTypeById(id.Value);
+            VirusType virusType = await _unitOfWork.VirusTypes.GetById(id.Value);
             if (virusType == null)
             {
                 return HttpNotFound();
@@ -90,8 +92,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            VirusType virusType = await _virusTypes.GetVirusTypeById(id);
-            await _virusTypes.DeleteVirusType(virusType);
+            VirusType virusType = await _unitOfWork.VirusTypes.GetById(id);
+            _unitOfWork.VirusTypes.Delete(virusType);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

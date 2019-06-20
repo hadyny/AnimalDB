@@ -6,25 +6,24 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using AnimalDB.Repo.Contexts;
 
 namespace AnimalDB.Controllers
 {
     [Authorize(Roles = "Administrator,Technician")]
     public class RoomsController : Controller
     {
-        private IRoomService _rooms;
-        private ITechnicianService _technicians;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public RoomsController(IRoomService rooms, ITechnicianService technicians)
+        public RoomsController(IUnitOfWork unitOfWork)
         {
-            this._rooms = rooms;
-            this._technicians = technicians;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Rooms
         public async Task<ActionResult> Index()
         {
-            return View(await _rooms.GetRooms());
+            return View(await _unitOfWork.Rooms.Get());
         }
 
         // GET: Rooms/Details/5
@@ -34,7 +33,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Room room = await _rooms.GetRoomById(id.Value);
+            Room room = await _unitOfWork.Rooms.GetById(id.Value);
             if (room == null)
             {
                 return HttpNotFound();
@@ -45,7 +44,7 @@ namespace AnimalDB.Controllers
         // GET: Rooms/Create
         public async Task<ActionResult> Create()
         {
-            ViewBag.Technician_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName");
+            ViewBag.Technician_Id = new SelectList(await _unitOfWork.Technicians.Get(), "Id", "FullName");
             return View();
         }
 
@@ -56,11 +55,12 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _rooms.CreateRoom(room);
+                _unitOfWork.Rooms.Insert(room);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Technician_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", room.Technician_Id);
+            ViewBag.Technician_Id = new SelectList(await _unitOfWork.Technicians.Get(), "Id", "FullName", room.Technician_Id);
             return View(room);
         }
 
@@ -71,12 +71,12 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Room room = await _rooms.GetRoomById(id.Value);
+            Room room = await _unitOfWork.Rooms.GetById(id.Value);
             if (room == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.Technician_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", room.Technician_Id);
+            ViewBag.Technician_Id = new SelectList(await _unitOfWork.Technicians.Get(), "Id", "FullName", room.Technician_Id);
             return View(room);
         }
 
@@ -87,10 +87,11 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _rooms.UpdateRoom(room);
+                _unitOfWork.Rooms.Update(room);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
-            ViewBag.Technician_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", room.Technician_Id);
+            ViewBag.Technician_Id = new SelectList(await _unitOfWork.Technicians.Get(), "Id", "FullName", room.Technician_Id);
             return View(room);
         }
 
@@ -101,7 +102,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Room room = await _rooms.GetRoomById(id.Value);
+            Room room = await _unitOfWork.Rooms.GetById(id.Value);
             var animals = room.Animals.Where(m => m.DeathDate == null);
             if (room == null)
             {
@@ -129,7 +130,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Room room = await _rooms.GetRoomById(id.Value);
+            Room room = await _unitOfWork.Rooms.GetById(id.Value);
             if (room == null)
             {
                 return HttpNotFound();
@@ -142,8 +143,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Room room = await _rooms.GetRoomById(id);
-            await _rooms.DeleteRoom(room);
+            Room room = await _unitOfWork.Rooms.GetById(id);
+            _unitOfWork.Rooms.Delete(room);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

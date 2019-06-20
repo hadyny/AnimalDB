@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Interfaces;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -9,18 +9,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class SpeciesController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        ISpeciesService _species;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public SpeciesController(ISpeciesService species)
+        public SpeciesController(IUnitOfWork unitOfWork)
         {
-            this._species = species;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /Species/
         public async Task<ActionResult> Index()
         {
-            return View(await _species.GetSpecies());
+            return View(await _unitOfWork.Species.Get());
         }
 
         // GET: /Species/Create
@@ -36,7 +35,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _species.CreateSpecies(species);
+                _unitOfWork.Species.Insert(species);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -50,7 +50,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Species species = await _species.GetSpeciesById(id.Value);
+            Species species = await _unitOfWork.Species.GetById(id.Value);
             if (species == null)
             {
                 return HttpNotFound();
@@ -65,7 +65,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _species.UpdateSpecies(species);
+                _unitOfWork.Species.Update(species);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(species);
@@ -78,7 +79,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Species species = await _species.GetSpeciesById(id.Value);
+            Species species = await _unitOfWork.Species.GetById(id.Value);
             if (species == null)
             {
                 return HttpNotFound();
@@ -91,8 +92,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Species species = await _species.GetSpeciesById(id);
-            await _species.DeleteSpecies(species);
+            Species species = await _unitOfWork.Species.GetById(id);
+            _unitOfWork.Species.Delete(species);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

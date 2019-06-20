@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,17 +10,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class SourceController : Controller
     {
-        private readonly ISourceService _sources;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public SourceController(ISourceService sources)
+        public SourceController(IUnitOfWork unitOfWork)
         {
-            this._sources = sources;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /Source/
         public async Task<ActionResult> Index()
         {
-            return View(await _sources.GetSources());
+            return View(await _unitOfWork.Sources.Get());
         }
 
         // GET: /Source/Create
@@ -35,7 +36,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _sources.CreateSource(source);
+                _unitOfWork.Sources.Insert(source);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -49,7 +51,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Source source = await _sources.GetSourceById(id.Value);
+            Source source = await _unitOfWork.Sources.GetById(id.Value);
             if (source == null)
             {
                 return HttpNotFound();
@@ -64,7 +66,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _sources.UpdateSource(source);
+                _unitOfWork.Sources.Update(source);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(source);
@@ -77,7 +80,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Source source = await _sources.GetSourceById(id.Value);
+            Source source = await _unitOfWork.Sources.GetById(id.Value);
             if (source == null)
             {
                 return HttpNotFound();
@@ -90,8 +93,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Source source = await _sources.GetSourceById(id);
-            await _sources.DeleteSource(source);
+            Source source = await _unitOfWork.Sources.GetById(id);
+            _unitOfWork.Sources.Delete(source);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

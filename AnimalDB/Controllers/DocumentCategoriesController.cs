@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using AnimalDB.Web.Models;
 using System.Net;
@@ -10,20 +11,17 @@ namespace AnimalDB.Web.Controllers
     [Authorize]
     public class DocumentCategoriesController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly IDocumentCategoryService _categories;
-        private readonly IDocumentService _documents;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DocumentCategoriesController(IDocumentCategoryService categories, IDocumentService documents)
+        public DocumentCategoriesController(IUnitOfWork unitOfWork)
         {
-            this._categories = categories;
-            this._documents = documents;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: DocumentCategories
         public async Task<ActionResult> Index(int? id)
         {
-            var category = id.HasValue ? await _categories.GetDocumentCategoryById(id.Value) : null;
+            var category = id.HasValue ? await _unitOfWork.DocumentCategories.GetById(id.Value) : null;
 
             var model = new DocumentCategoryViewModel() {
                 CategoryName = category?.Description,
@@ -31,9 +29,9 @@ namespace AnimalDB.Web.Controllers
                 Parent_Id = id,
                 IsRootCategory = !id.HasValue,
                 AuthenticatedUser = User.IsInRole("Administrator") || User.IsInRole("Technician"),
-                Documents = await _documents.GetDocumentsByCategoryId(id), // takes ages
-                SubCategories = await _categories.GetDocumentCategoriesByParentId(id),
-                ParentHierarchy = _categories.GetParentHierarchy(category)
+                Documents = _unitOfWork.Documents.GetByCategoryId(id),
+                SubCategories = _unitOfWork.DocumentCategories.GetByParentId(id),
+                ParentHierarchy = _unitOfWork.DocumentCategories.GetParentHierarchy(category)
             };
 
             return View(model);
@@ -43,7 +41,7 @@ namespace AnimalDB.Web.Controllers
         public async Task<ActionResult> Create(int? id)
         {
             ViewBag.Id = id;
-            ViewBag.ParentCategory_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", id);
+            ViewBag.ParentCategory_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description", id);
             return View();
         }
 
@@ -56,11 +54,12 @@ namespace AnimalDB.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _categories.CreateDocumentCategory(documentCategory);
+                _unitOfWork.DocumentCategories.Insert(documentCategory);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id });
             }
             ViewBag.Id = id;
-            ViewBag.ParentCategory_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", documentCategory.ParentCategory_Id);
+            ViewBag.ParentCategory_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description", documentCategory.ParentCategory_Id);
             return View(documentCategory);
         }
 
@@ -71,13 +70,13 @@ namespace AnimalDB.Web.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            DocumentCategory documentCategory = await _categories.GetDocumentCategoryById(id.Value);
+            DocumentCategory documentCategory = await _unitOfWork.DocumentCategories.GetById(id.Value);
             if (documentCategory == null)
             {
                 return HttpNotFound();
             }
 
-            ViewBag.ParentCategory_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", documentCategory.ParentCategory_Id);
+            ViewBag.ParentCategory_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description", documentCategory.ParentCategory_Id);
             return View(documentCategory);
         }
 
@@ -90,11 +89,12 @@ namespace AnimalDB.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _categories.UpdateDocumentCategory(documentCategory);
+                _unitOfWork.DocumentCategories.Update(documentCategory);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = documentCategory.Id });
             }
 
-            ViewBag.ParentCategory_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", documentCategory.ParentCategory_Id);
+            ViewBag.ParentCategory_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description", documentCategory.ParentCategory_Id);
             return View(documentCategory);
         }
 
@@ -105,7 +105,7 @@ namespace AnimalDB.Web.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            DocumentCategory documentCategory = await _categories.GetDocumentCategoryById(id.Value);
+            DocumentCategory documentCategory = await _unitOfWork.DocumentCategories.GetById(id.Value);
             if (documentCategory == null)
             {
                 return HttpNotFound();
@@ -118,8 +118,9 @@ namespace AnimalDB.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            DocumentCategory documentCategory = await _categories.GetDocumentCategoryById(id);
-            await _categories.DeleteDocumentCategory(documentCategory);
+            DocumentCategory documentCategory = await _unitOfWork.DocumentCategories.GetById(id);
+             _unitOfWork.DocumentCategories.Delete(documentCategory);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

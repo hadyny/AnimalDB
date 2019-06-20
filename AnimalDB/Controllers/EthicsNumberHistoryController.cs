@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Net;
@@ -10,18 +11,11 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Student, Investigator, Veterinarian, Technician, Administrator")]
     public class EthicsNumberHistoryController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly IAnimalService _animals;
-        private readonly IEthicsNumberHistoryService _ethicsNumberHistories;
-        private readonly IEthicsNumberService _ethicsNumbers;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public EthicsNumberHistoryController(IAnimalService animals, 
-                                             IEthicsNumberHistoryService ethicsNumberHistories,
-                                             IEthicsNumberService ethicsNumbers)
+        public EthicsNumberHistoryController(IUnitOfWork unitOfWork)
         {
-            this._animals = animals;
-            this._ethicsNumberHistories = ethicsNumberHistories;
-            this._ethicsNumbers = ethicsNumbers;
+            _unitOfWork = unitOfWork;
         }
 
 
@@ -33,7 +27,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -42,7 +36,7 @@ namespace AnimalDB.Controllers
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
 
-            return View(await _ethicsNumberHistories.GetEthicsNumberHistoriesByAnimal(id.Value));
+            return View(_unitOfWork.EthicsNumberHistories.GetByAnimal(id.Value));
         }
 
         // GET: /EthicsnumberHistory/Create
@@ -53,7 +47,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -61,7 +55,7 @@ namespace AnimalDB.Controllers
             }
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
-            ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text");
+            ViewBag.Ethics_Id = new SelectList(await _unitOfWork.EthicsNumbers.Get(), "Id", "Text");
             var model = new EthicsNumberHistory
             {
                 Timestamp = DateTime.Now
@@ -81,7 +75,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -92,13 +86,14 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _animals.AddAnimalToEthicsNumber(animal.Id, ethicsnumberhistory.Ethics_Id);
+                await _unitOfWork.Animals.AddAnimalToEthicsNumber(animal.Id, ethicsnumberhistory.Ethics_Id);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id });
             }
 
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
-            ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text", ethicsnumberhistory.Ethics_Id);
+            ViewBag.Ethics_Id = new SelectList(await _unitOfWork.EthicsNumbers.Get(), "Id", "Text", ethicsnumberhistory.Ethics_Id);
             return View(ethicsnumberhistory);
         }
 
@@ -109,15 +104,15 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var ethicsnumberhistory = await _ethicsNumberHistories.GetEthicsNumberHistoryById(id.Value);
+            var ethicsnumberhistory = await _unitOfWork.EthicsNumberHistories.GetById(id.Value);
             if (ethicsnumberhistory == null)
             {
                 return HttpNotFound();
             }
 
-            var animals = await _animals.GetLivingAnimals();
+            var animals = _unitOfWork.Animals.GetLiving();
             ViewBag.Animal_Id = new SelectList(animals, "Id", "UniqueAnimalId", ethicsnumberhistory.Animal_Id);
-            ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text", ethicsnumberhistory.Ethics_Id);
+            ViewBag.Ethics_Id = new SelectList(await _unitOfWork.EthicsNumbers.Get(), "Id", "Text", ethicsnumberhistory.Ethics_Id);
             return View(ethicsnumberhistory);
         }
 
@@ -130,11 +125,12 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _animals.UpdateEthicsNumberHistoryForAnimalId(ethicsnumberhistory);
+                await _unitOfWork.Animals.UpdateEthicsNumberHistoryForAnimalId(ethicsnumberhistory);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = ethicsnumberhistory.Animal_Id });
             }
-            ViewBag.Animal_Id = new SelectList(await _animals.GetLivingAnimals(), "Id", "UniqueAnimalId", ethicsnumberhistory.Animal_Id);
-            ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text", ethicsnumberhistory.Ethics_Id);
+            ViewBag.Animal_Id = new SelectList(_unitOfWork.Animals.GetLiving(), "Id", "UniqueAnimalId", ethicsnumberhistory.Animal_Id);
+            ViewBag.Ethics_Id = new SelectList(await _unitOfWork.EthicsNumbers.Get(), "Id", "Text", ethicsnumberhistory.Ethics_Id);
             return View(ethicsnumberhistory);
         }
 
@@ -145,7 +141,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var ethicsnumberhistory = await _ethicsNumberHistories.GetEthicsNumberHistoryById(id.Value);
+            var ethicsnumberhistory = await _unitOfWork.EthicsNumberHistories.GetById(id.Value);
             if (ethicsnumberhistory == null)
             {
                 return HttpNotFound();
@@ -158,8 +154,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            var ethicsnumberhistory = await _ethicsNumberHistories.GetEthicsNumberHistoryById(id);
-            await _ethicsNumberHistories.DeleteEthicsNumberHistory(ethicsnumberhistory);
+            var ethicsnumberhistory = await _unitOfWork.EthicsNumberHistories.GetById(id);
+            _unitOfWork.EthicsNumberHistories.Delete(ethicsnumberhistory);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id = ethicsnumberhistory.Animal_Id });
         }
 
@@ -172,7 +169,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -187,7 +184,8 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RevertToStock(int id)
         {
-            await _animals.ReturnAnimalToStock(id);
+            await _unitOfWork.Animals.ReturnAnimalToStock(id);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id });
         }
     }

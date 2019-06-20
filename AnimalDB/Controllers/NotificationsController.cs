@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Collections.Generic;
 using System.Net;
@@ -10,13 +11,11 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Investigator, Technician, Administrator")]
     public class NotificationsController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
+        private readonly IUnitOfWork _unitOfWork;
 
-        private INotificationService _notifications;
-
-        public NotificationsController(INotificationService notifications)
+        public NotificationsController(IUnitOfWork unitOfWork)
         {
-            this._notifications = notifications;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Notifications
@@ -26,11 +25,11 @@ namespace AnimalDB.Controllers
 
             if (User.IsInRole("Investigator"))
             {
-                notifications = await _notifications.GetNotificationByInvestigatorUsername(User.Identity.Name);
+                notifications = _unitOfWork.Notifications.GetByInvestigatorUsername(User.Identity.Name);
             }
             else
             {
-                notifications = await _notifications.GetNotifications();
+                notifications = await _unitOfWork.Notifications.Get();
             }
 
             return View(notifications);
@@ -45,10 +44,11 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DismissAllConfirmed()
         {
-            foreach (var notification in await _notifications.GetPastNotifications())
+            foreach (var notification in _unitOfWork.Notifications.GetPast())
             {
-                await _notifications.DeleteNotification(notification);
+                _unitOfWork.Notifications.Delete(notification);
             }
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
 
@@ -68,7 +68,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Notification notification = await _notifications.GetNotificationById(id.Value);
+            Notification notification = await _unitOfWork.Notifications.GetById(id.Value);
             if (notification == null)
             {
                 return HttpNotFound();
@@ -82,8 +82,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Notification notification = await _notifications.GetNotificationById(id);
-            await _notifications.DeleteNotification(notification);
+            Notification notification = await _unitOfWork.Notifications.GetById(id);
+            _unitOfWork.Notifications.Delete(notification);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

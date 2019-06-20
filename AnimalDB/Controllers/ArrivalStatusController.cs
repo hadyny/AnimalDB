@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,18 +10,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class ArrivalStatusController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IArrivalStatusService _arrivalStatus;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ArrivalStatusController(IArrivalStatusService arrivalStatus)
+        public ArrivalStatusController(IUnitOfWork unitOfWork)
         {
-            this._arrivalStatus = arrivalStatus;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /ArrivalStatus/
         public async Task<ActionResult> Index()
         {
-            return View(await _arrivalStatus.GetArrivalStatus());
+            return View(await _unitOfWork.ArrivalStatus.Get());
         }
 
         // GET: /ArrivalStatus/Details/5
@@ -30,7 +30,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ArrivalStatus arrivalstatus = await _arrivalStatus.GetArrivalStatusById(id.Value);
+            ArrivalStatus arrivalstatus = await _unitOfWork.ArrivalStatus.GetById(id.Value);
             if (arrivalstatus == null)
             {
                 return HttpNotFound();
@@ -51,7 +51,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _arrivalStatus.CreateArrivalStatus(arrivalstatus);
+                _unitOfWork.ArrivalStatus.Insert(arrivalstatus);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -65,7 +66,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ArrivalStatus arrivalstatus = await _arrivalStatus.GetArrivalStatusById(id.Value);
+            ArrivalStatus arrivalstatus = await _unitOfWork.ArrivalStatus.GetById(id.Value);
             if (arrivalstatus == null)
             {
                 return HttpNotFound();
@@ -80,7 +81,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _arrivalStatus.UpdateArrivalStatus(arrivalstatus);
+                _unitOfWork.ArrivalStatus.Update(arrivalstatus);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(arrivalstatus);
@@ -93,7 +95,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ArrivalStatus arrivalstatus = await _arrivalStatus.GetArrivalStatusById(id.Value);
+            ArrivalStatus arrivalstatus = await _unitOfWork.ArrivalStatus.GetById(id.Value);
             if (arrivalstatus == null)
             {
                 return HttpNotFound();
@@ -106,8 +108,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            ArrivalStatus arrivalstatus = await _arrivalStatus.GetArrivalStatusById(id);
-            await _arrivalStatus.DeleteArrivalStatus(arrivalstatus);
+            ArrivalStatus arrivalstatus = await _unitOfWork.ArrivalStatus.GetById(id);
+            _unitOfWork.ArrivalStatus.Delete(arrivalstatus);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

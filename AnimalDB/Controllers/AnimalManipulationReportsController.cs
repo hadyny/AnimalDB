@@ -1,53 +1,37 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Models;
+using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Enums;
-using AnimalDB.Repo.Interfaces;
+using AnimalDB.Web.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using System.Linq;
-using System.Collections.Generic;
-using AnimalDB.Repo.Services;
-using AnimalDB.Models;
-using AnimalDB.Web.Models;
 
 namespace AnimalDB.Controllers
 {
     [Authorize(Roles = "Investigator, Technician, Administrator")]
     public class AnimalManipulationReportsController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly IAnimalManipulationReportService _animalManipulationReports;
-        private readonly IEthicsNumberService _ethicsNumbers;
-        private readonly IEthicsNumberHistoryService _ethicsNumberHistories;
-        private readonly IAnimalService _animals;
-        private readonly IArrivalStatusService _arrivalStatus;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AnimalManipulationReportsController(IAnimalManipulationReportService animalManipulationReports,
-                                                   IEthicsNumberService ethicsNumbers,
-                                                   IEthicsNumberHistoryService ethicsNumberHistories,
-                                                   IAnimalService animals,
-                                                   IArrivalStatusService arrivalStatus
-                                                   )
+        public AnimalManipulationReportsController(IUnitOfWork unitOfWork)
         {
-            this._animalManipulationReports = animalManipulationReports;
-            this._ethicsNumbers = ethicsNumbers;
-            this._ethicsNumberHistories = ethicsNumberHistories;
-            this._animals = animals;
-            this._arrivalStatus = arrivalStatus;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: AnimalManipulationReports
         public async Task<ActionResult> Index()
         {
-            //var animalManipulationReports = db.AnimalManipulationReports.Include(a => a.Investigator).Include(a => a.Species);
-            return View(await _animalManipulationReports.GetAnimalManipulationReports());
+            return View(await _unitOfWork.AnimalManipulationReports.Get());
         }
 
         // GET: AnimalManipulationReports/SelectEthics
         public async Task<ActionResult> SelectEthics()
         {
-            ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text");
+            ViewBag.Ethics_Id = new SelectList(await _unitOfWork.EthicsNumbers.Get(), "Id", "Text");
             return View();
         }
 
@@ -59,7 +43,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var ethics = await _ethicsNumbers.GetEthicsNumberById(Ethics_Id.Value);
+            var ethics = await _unitOfWork.EthicsNumbers.GetById(Ethics_Id.Value);
             var ethicsNumberHistories = ethics.EthicsNumberHistory;
             if (ethics == null)
             {
@@ -145,7 +129,8 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _animalManipulationReports.CreateAnimalManipulationReport(animalManipulationReport);
+                _unitOfWork.AnimalManipulationReports.Insert(animalManipulationReport);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -159,13 +144,13 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            AnimalManipulationReport animalManipulationReport = await _animalManipulationReports.GetAnimalManipulationReportById(id.Value);
+            AnimalManipulationReport animalManipulationReport = await _unitOfWork.AnimalManipulationReports.GetById(id.Value);
             if (animalManipulationReport == null)
             {
                 return HttpNotFound();
             }
 
-            var ethicsNumber = await _ethicsNumbers.GetEthicsNumberByName(animalManipulationReport.ProtocolNumber);
+            var ethicsNumber = _unitOfWork.EthicsNumbers.GetByName(animalManipulationReport.ProtocolNumber);
             ViewBag.Ethics_Id = ethicsNumber.Id;
 
             return View(animalManipulationReport);
@@ -178,10 +163,11 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _animalManipulationReports.UpdateAnimalManipulationReport(animalManipulationReport);
+                _unitOfWork.AnimalManipulationReports.Update(animalManipulationReport);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
-            var ethicsNumber = await _ethicsNumbers.GetEthicsNumberByName(animalManipulationReport.ProtocolNumber);
+            var ethicsNumber = _unitOfWork.EthicsNumbers.GetByName(animalManipulationReport.ProtocolNumber);
             ViewBag.Ethics_Id = ethicsNumber.Id;
             return View(animalManipulationReport);
         }
@@ -193,7 +179,8 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            AnimalManipulationReport animalManipulationReport = await _animalManipulationReports.GetAnimalManipulationReportById(id.Value);
+
+            AnimalManipulationReport animalManipulationReport = await _unitOfWork.AnimalManipulationReports.GetById(id.Value);
             if (animalManipulationReport == null)
             {
                 return HttpNotFound();
@@ -206,15 +193,15 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            AnimalManipulationReport animalManipulationReport = await _animalManipulationReports.GetAnimalManipulationReportById(id);
-            await _animalManipulationReports.DeleteAnimalManipulationReport(animalManipulationReport);
+            await _unitOfWork.AnimalManipulationReports.Delete(id);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
 
         // GET: AnimalManipulationReports/View/?category=SourceType&identifier=BreedingUnit
         public async Task<ActionResult> ViewAnimals(int ethics_Id, string category, string identifier)
         {
-            var animals = await _animals.GetAllAnimals();
+            var animals = await _unitOfWork.Animals.Get();
             var model = animals
                 .Where(m => m.EthicsNumbers.Count(n => n.Ethics_Id == ethics_Id) != 0)
                 .Select(m => new ViewAnimalManipulationReportViewModel() { Animal = m, Change = false });
@@ -254,7 +241,7 @@ namespace AnimalDB.Controllers
                 case "aliveStatus":
                     AliveStatus aliveStatus;
                     Enum.TryParse(identifier, out aliveStatus);
-                    model = model.Where(m => _animals.GetAnimalsEthicsNumber(m.Animal.Id).Result.AliveStatus == aliveStatus);
+                    model = model.Where(m => _unitOfWork.Animals.GetAnimalsEthicsNumber(m.Animal.Id).AliveStatus == aliveStatus);
                     break;
             }
 
@@ -270,7 +257,7 @@ namespace AnimalDB.Controllers
             {
                 int _id = Convert.ToInt32(id);
                 animals.Add(
-                    await _animals.GetAnimalById(_id)
+                    await _unitOfWork.Animals.GetById(_id)
                     );
             }
 
@@ -280,7 +267,7 @@ namespace AnimalDB.Controllers
             };
 
             ViewBag.returnUrl = returnUrl;
-            ViewBag.ArrivalStatus_Id = new SelectList(await _arrivalStatus.GetArrivalStatus(), "Id", "Description");
+            ViewBag.ArrivalStatus_Id = new SelectList(await _unitOfWork.ArrivalStatus.Get(), "Id", "Description");
 
             return View(model);
         }
@@ -294,11 +281,12 @@ namespace AnimalDB.Controllers
             {
                 int _id = Convert.ToInt32(id);
                 animals.Add(
-                    await _animals.GetAnimalById(_id)
+                    await _unitOfWork.Animals.GetById(_id)
                     );
             }
 
-            await _animals.BulkUpdateAnimals(animals, model.Grading, model.Purpose, model.ArrivalStatus_Id);
+            _unitOfWork.Animals.BulkUpdateAnimals(animals, model.Grading, model.Purpose, model.ArrivalStatus_Id);
+            await _unitOfWork.Complete();
 
             return RedirectToAction("Create", new { ethics_Id });
         }

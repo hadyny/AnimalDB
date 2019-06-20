@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.IO;
@@ -12,14 +13,11 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class SopsController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly ISopService _sops;
-        private readonly ISopCategoryService _sopCategories;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public SopsController(ISopService sops, ISopCategoryService sopCategories)
+        public SopsController(IUnitOfWork unitOfWork)
         {
-            this._sops = sops;
-            this._sopCategories = sopCategories;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Sops
@@ -29,7 +27,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SopCategory category = await _sopCategories.GetSopCategoryById(id.Value);
+            SopCategory category = await _unitOfWork.SopCategories.GetById(id.Value);
             if (category == null)
             {
                 return HttpNotFound();
@@ -38,7 +36,7 @@ namespace AnimalDB.Controllers
             ViewBag.Id = category.Id;
             ViewBag.Category = category.Description;
 
-            return View(await _sops.GetSopsByCategoryId(category.Id));
+            return View(_unitOfWork.Sops.GetByCategoryId(category.Id));
         }
         [Authorize(Roles = "Administrator,Technician")]
         // GET: Sops/Upload
@@ -46,11 +44,11 @@ namespace AnimalDB.Controllers
         {
             if (id.HasValue)
             {
-                ViewBag.Category_Id = new SelectList(await _sopCategories.GetSopCategories(), "Id", "Description", id.Value);
+                ViewBag.Category_Id = new SelectList(await _unitOfWork.SopCategories.Get(), "Id", "Description", id.Value);
             }
             else
             {
-                ViewBag.Category_Id = new SelectList(await _sopCategories.GetSopCategories(), "Id", "Description");
+                ViewBag.Category_Id = new SelectList(await _unitOfWork.SopCategories.Get(), "Id", "Description");
             }
 
             ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "SopCategories");
@@ -70,7 +68,7 @@ namespace AnimalDB.Controllers
                 ModelState.AddModelError("file", "A pdf file is required");
             }
             
-            if (await _sops.DoesSopFileNameExist(upload.FileName))
+            if (_unitOfWork.Sops.FileNameExists(upload.FileName))
             {
                 ModelState.AddModelError("file", "\"" + upload.FileName + "\" already exists in the database. If you want to update the file, locate the entry and click \"Edit\".");
             }
@@ -82,12 +80,13 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _sops.CreateSop(sop);
+                _unitOfWork.Sops.Insert(sop);
+                await _unitOfWork.Complete();
                 upload.SaveAs(path);
                 return RedirectToAction("Index", new { id = sop.Category_Id });
             }
             ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "SopCategories");
-            ViewBag.Category_Id = new SelectList(await _sopCategories.GetSopCategories(), "Id", "Description", sop.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _unitOfWork.SopCategories.Get(), "Id", "Description", sop.Category_Id);
             return View(sop);
         }
 
@@ -98,7 +97,7 @@ namespace AnimalDB.Controllers
             {
                 return null;
             }
-            Sop sop = await _sops.GetSopById(id.Value);
+            Sop sop = await _unitOfWork.Sops.GetById(id.Value);
             var content = System.IO.File.ReadAllBytes(Path.Combine(Server.MapPath("~/Content/Sops"), sop.FileName));
             if (sop == null)
             {
@@ -122,7 +121,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Sop sop = await _sops.GetSopById(id.Value);
+            Sop sop = await _unitOfWork.Sops.GetById(id.Value);
             if (sop == null)
             {
                 return HttpNotFound();
@@ -139,12 +138,12 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Sop sop = await _sops.GetSopById(id.Value);
+            Sop sop = await _unitOfWork.Sops.GetById(id.Value);
             if (sop == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.Category_Id = new SelectList(await _sopCategories.GetSopCategories(), "Id", "Description", sop.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _unitOfWork.SopCategories.Get(), "Id", "Description", sop.Category_Id);
             return View(sop);
         }
 
@@ -160,7 +159,7 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                var oldsop = await _sops.GetSopById(sop.Id);
+                var oldsop = await _unitOfWork.Sops.GetById(sop.Id);
                 if (upload != null && upload.ContentLength > 0)
                 {
                     var filename = Path.GetFileName(upload.FileName);
@@ -172,11 +171,12 @@ namespace AnimalDB.Controllers
                 oldsop.Description = sop.Description;
                 oldsop.Category_Id = sop.Category_Id;
 
-                await _sops.UpdateSop(oldsop);
+                _unitOfWork.Sops.Update(oldsop);
+                await _unitOfWork.Complete();
 
                 return RedirectToAction("Index", new { id = sop.Category_Id });
             }
-            ViewBag.Category_Id = new SelectList(await _sopCategories.GetSopCategories(), "Id", "Description", sop.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _unitOfWork.SopCategories.Get(), "Id", "Description", sop.Category_Id);
             return View(sop);
         }
 
@@ -188,7 +188,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Sop sop = await _sops.GetSopById(id.Value);
+            Sop sop = await _unitOfWork.Sops.GetById(id.Value);
             if (sop == null)
             {
                 return HttpNotFound();
@@ -201,9 +201,10 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Sop sop = await _sops.GetSopById(id);
+            Sop sop = await _unitOfWork.Sops.GetById(id);
             int cat_id = sop.Category_Id;
-            await _sops.DeleteSop(sop);
+            _unitOfWork.Sops.Delete(sop);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id = cat_id });
         }
     }

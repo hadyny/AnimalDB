@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Interfaces;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -9,27 +9,24 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class StrainController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IStrainService _strains;
-        private ISpeciesService _species;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public StrainController(IStrainService strains, ISpeciesService species)
+        public StrainController(IUnitOfWork unitOfWork)
         {
-            this._strains = strains;
-            this._species = species;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /Strain/
         public async Task<ActionResult> Index()
         {
-            return View(await _strains.GetStrains());
+            return View(await _unitOfWork.Strains.Get());
         }
 
 
         // GET: /Strain/Create
         public async Task<ActionResult> Create()
         {
-            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description");
+            ViewBag.Species_Id = new SelectList(await _unitOfWork.Species.Get(), "Id", "Description");
             return View();
         }
 
@@ -40,11 +37,12 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _strains.CreateStrain(strain);
+                _unitOfWork.Strains.Insert(strain);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description", strain.Species_Id);
+            ViewBag.Species_Id = new SelectList(await _unitOfWork.Species.Get(), "Id", "Description", strain.Species_Id);
             return View(strain);
         }
 
@@ -55,12 +53,13 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Strain strain = await _strains.GetStrainById(id.Value);
+            Strain strain = await _unitOfWork.Strains.GetById(id.Value);
             if (strain == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description", strain.Species_Id);
+            ViewBag.Species_Id = new SelectList(await _unitOfWork.Species.Get(), "Id", "Description", strain.Species_Id);
+
             return View(strain);
         }
 
@@ -71,10 +70,11 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _strains.UpdateStrain(strain);
+                _unitOfWork.Strains.Update(strain);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
-            ViewBag.Species_Id = new SelectList(await _species.GetSpecies(), "Id", "Description", strain.Species_Id);
+            ViewBag.Species_Id = new SelectList(await _unitOfWork.Species.Get(), "Id", "Description", strain.Species_Id);
             return View(strain);
         }
 
@@ -85,7 +85,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Strain strain = await _strains.GetStrainById(id.Value);
+            Strain strain = await _unitOfWork.Strains.GetById(id.Value);
             if (strain == null)
             {
                 return HttpNotFound();
@@ -98,8 +98,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Strain strain = await _strains.GetStrainById(id);
-            await _strains.DeleteStrain(strain);
+            Strain strain = await _unitOfWork.Strains.GetById(id);
+            _unitOfWork.Strains.Delete(strain);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

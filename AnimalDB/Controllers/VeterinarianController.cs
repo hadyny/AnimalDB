@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Services;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,19 +10,19 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Administrator")]
     public class VeterinarianController : Controller
     {
-        private IVeterinarianService _veterinarians;
-        private IUserManagementService _users;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserManagementService _userManagementService;
 
-        public VeterinarianController(IVeterinarianService veterinarians, IUserManagementService users)
+        public VeterinarianController(IUnitOfWork unitOfWork, IUserManagementService userManagementService)
         {
-            this._veterinarians = veterinarians;
-            this._users = users;
+            _unitOfWork = unitOfWork;
+            _userManagementService = userManagementService;
         }
 
         // GET: /Veterinarian/
         public async Task<ActionResult> Index()
         {
-            return View(await _veterinarians.GetVeterinarians());
+            return View(await _unitOfWork.Veterinarians.Get());
         }
 
         // GET: /Veterinarian/Create
@@ -35,7 +35,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include="UserName,Email,FirstName,LastName")] Veterinarian veterinarian)
         {
-            string error = await _users.CreateAnimalUser(veterinarian, Repo.Enums.UserType.Veterinarian);
+            string error = await _userManagementService.Register(veterinarian, Repo.Enums.UserType.Veterinarian);
 
             if (string.IsNullOrEmpty(error))
             {
@@ -56,7 +56,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Veterinarian Veterinarian = await _veterinarians.GetVeterinarianById(id);
+            Veterinarian Veterinarian = await _unitOfWork.Veterinarians.GetById(id);
             if (Veterinarian == null)
             {
                 return HttpNotFound();
@@ -69,8 +69,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
-            Veterinarian veterinarian = await _veterinarians.GetVeterinarianById(id);
-            await _veterinarians.DeleteVeterinarian(veterinarian);
+            Veterinarian veterinarian = await _unitOfWork.Veterinarians.GetById(id);
+            await _unitOfWork.Veterinarians.Delete(veterinarian);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

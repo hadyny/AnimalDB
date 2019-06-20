@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Services;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Linq;
 using System.Net;
@@ -11,19 +11,19 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Administrator")]
     public class AdministratorsController : Controller
     {
-        private readonly IAdministratorService _administrators;
-        private readonly IUserManagementService _users;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserManagementService _userManagementService;
 
-        public AdministratorsController(IAdministratorService administrators, IUserManagementService users)
+        public AdministratorsController(IUnitOfWork unitOfWork, IUserManagementService userManagementService)
         {
-            this._administrators = administrators;
-            this._users = users;
+            _unitOfWork = unitOfWork;
+            _userManagementService = userManagementService;
         }
 
         // GET: Administrators
         public async Task<ActionResult> Index()
         {
-            return View(await _administrators.GetAdministrators());
+            return View(await _unitOfWork.Administrators.Get());
         }
         
         // GET: Administrators/Create
@@ -37,7 +37,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Id,FirstName,LastName,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName")] Administrator administrator)
         {
-            string error = await _users.CreateAnimalUser(administrator, Repo.Enums.UserType.Administrator);
+            string error = await _userManagementService.Register(administrator, Repo.Enums.UserType.Administrator);
 
             if (string.IsNullOrEmpty(error))
             {
@@ -59,7 +59,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Administrator administrator = await _administrators.GetAdministratorById(id);
+            Administrator administrator = await _unitOfWork.Administrators.GetById(id);
             if (administrator == null)
             {
                 return HttpNotFound();
@@ -72,8 +72,8 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
-            Administrator administrator = await _administrators.GetAdministratorById(id);
-            var administrators = await _administrators.GetAdministrators();
+            Administrator administrator = await _unitOfWork.Administrators.GetById(id);
+            var administrators = await _unitOfWork.Administrators.Get();
 
             if (administrators.Count() == 1)
             {
@@ -81,7 +81,8 @@ namespace AnimalDB.Controllers
             }
             else
             {
-                await _administrators.DeleteAdministrator(administrator);
+                await _unitOfWork.Administrators.Delete(administrator);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             

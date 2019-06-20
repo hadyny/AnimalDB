@@ -27,13 +27,13 @@
     <ul>
         @foreach (var item in Model.SubCategories)
         {
-            <li>
-                @Html.ActionLink(item.Description + " (" + item.Documents.Count() + " documents, " + item.SubCatergories.Count() + " sub-categories)",
-                    "Index",
-                    "DocumentCategories",
-                    new { id = item.Id },
-                    new { @class = "btn btn-outline-dark " })
-            </li>
+        <li>
+            @Html.ActionLink(item.Description + " (" + item.Documents.Count() + " documents, " + item.SubCatergories.Count() + " sub-categories)",
+                           "Index",
+                           "DocumentCategories",
+                           new { id = item.Id },
+                           new { @class = "btn btn-outline-dark " })
+        </li>
         }
 
     </ul>

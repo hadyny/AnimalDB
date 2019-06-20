@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,18 +10,17 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class SopCategoriesController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        ISopCategoryService _sopCategories;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public SopCategoriesController(ISopCategoryService sopCategories)
+        public SopCategoriesController(IUnitOfWork unitOfWork)
         {
-            this._sopCategories = sopCategories;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: SopCategories
         public async Task<ActionResult> Index()
         {
-            return View(await _sopCategories.GetSopCategories());
+            return View(await _unitOfWork.SopCategories.Get());
         }
 
         // GET: SopCategories/Details/5
@@ -30,7 +30,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SopCategory sopCategory = await _sopCategories.GetSopCategoryById(id.Value);
+            SopCategory sopCategory = await _unitOfWork.SopCategories.GetById(id.Value);
             if (sopCategory == null)
             {
                 return HttpNotFound();
@@ -52,7 +52,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _sopCategories.CreateSopCategory(sopCategory);
+                _unitOfWork.SopCategories.Insert(sopCategory);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -67,7 +68,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SopCategory sopCategory = await _sopCategories.GetSopCategoryById(id.Value);
+            SopCategory sopCategory = await _unitOfWork.SopCategories.GetById(id.Value);
             if (sopCategory == null)
             {
                 return HttpNotFound();
@@ -82,7 +83,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _sopCategories.UpdateSopCategory(sopCategory);
+                _unitOfWork.SopCategories.Update(sopCategory);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(sopCategory);
@@ -96,7 +98,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SopCategory sopCategory = await _sopCategories.GetSopCategoryById(id.Value);
+            SopCategory sopCategory = await _unitOfWork.SopCategories.GetById(id.Value);
             if (sopCategory == null)
             {
                 return HttpNotFound();
@@ -109,8 +111,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            SopCategory sopCategory = await _sopCategories.GetSopCategoryById(id);
-            await _sopCategories.DeleteSopCategory(sopCategory);
+            SopCategory sopCategory = await _unitOfWork.SopCategories.GetById(id);
+            _unitOfWork.SopCategories.Delete(sopCategory);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

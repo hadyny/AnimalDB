@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Services;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,18 +10,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class TransgenesController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private ITransgeneService _transgenes;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public TransgenesController(ITransgeneService transgenes)
+        public TransgenesController(IUnitOfWork unitOfWork)
         {
-            this._transgenes = transgenes;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Transgenes
         public async Task<ActionResult> Index()
         {
-            return View(await _transgenes.GetTransgenes());
+            return View(await _unitOfWork.Transgenes.Get());
         }
 
         // GET: Transgenes/Create
@@ -37,7 +36,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _transgenes.CreateTransgene(transgene);
+                _unitOfWork.Transgenes.Insert(transgene);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -51,7 +51,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Transgene transgene = await _transgenes.GetTransgeneById(id.Value);
+            Transgene transgene = await _unitOfWork.Transgenes.GetById(id.Value);
             if (transgene == null)
             {
                 return HttpNotFound();
@@ -66,7 +66,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _transgenes.UpdateTransgene(transgene);
+                _unitOfWork.Transgenes.Update(transgene);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(transgene);
@@ -79,7 +80,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Transgene transgene = await _transgenes.GetTransgeneById(id.Value);
+            Transgene transgene = await _unitOfWork.Transgenes.GetById(id.Value);
             if (transgene == null)
             {
                 return HttpNotFound();
@@ -92,8 +93,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Transgene transgene = await _transgenes.GetTransgeneById(id);
-            await _transgenes.DeleteTransgene(transgene);
+            Transgene transgene = await _unitOfWork.Transgenes.GetById(id);
+            _unitOfWork.Transgenes.Delete(transgene);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

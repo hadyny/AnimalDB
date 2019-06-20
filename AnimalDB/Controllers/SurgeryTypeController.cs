@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,19 +10,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class SurgeryTypeController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
+        private readonly IUnitOfWork _unitOfWork;
 
-        private ISurgeryTypeService _surgeryTypes;
-
-        public SurgeryTypeController(ISurgeryTypeService surgeryTypes)
+        public SurgeryTypeController(IUnitOfWork unitOfWork)
         {
-            this._surgeryTypes = surgeryTypes;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /SurgeryType/
         public async Task<ActionResult> Index()
         {
-            return View(await _surgeryTypes.GetSurgeryTypes());
+            return View(await _unitOfWork.SurgeryTypes.Get());
         }
 
         // GET: /SurgeryType/Create
@@ -37,7 +36,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _surgeryTypes.CreateSurgeryType(surgerytype);
+                _unitOfWork.SurgeryTypes.Insert(surgerytype);
+                await _unitOfWork.Complete();
 
                 if (this.Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                         && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
@@ -58,7 +58,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SurgeryType surgerytype = await _surgeryTypes.GetSurgeryTypeById(id.Value);
+            SurgeryType surgerytype = await _unitOfWork.SurgeryTypes.GetById(id.Value);
             if (surgerytype == null)
             {
                 return HttpNotFound();
@@ -73,7 +73,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _surgeryTypes.UpdateSurgeryType(surgerytype);
+                _unitOfWork.SurgeryTypes.Update(surgerytype);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(surgerytype);
@@ -86,7 +87,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SurgeryType surgerytype = await _surgeryTypes.GetSurgeryTypeById(id.Value);
+            SurgeryType surgerytype = await _unitOfWork.SurgeryTypes.GetById(id.Value);
             if (surgerytype == null)
             {
                 return HttpNotFound();
@@ -99,8 +100,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            SurgeryType surgerytype = await _surgeryTypes.GetSurgeryTypeById(id);
-            await _surgeryTypes.DeleteSurgeryType(surgerytype);
+            SurgeryType surgerytype = await _unitOfWork.SurgeryTypes.GetById(id);
+            _unitOfWork.SurgeryTypes.Delete(surgerytype);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

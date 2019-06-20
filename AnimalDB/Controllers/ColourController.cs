@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Interfaces;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -9,17 +9,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class ColourController : Controller
     {
-        private IColourService _colours;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ColourController(IColourService colours)
+        public ColourController(IUnitOfWork unitOfWork)
         {
-            this._colours = colours;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /Colour/
         public async Task<ActionResult> Index()
         {
-            return View(await _colours.GetColours());
+            return View(await _unitOfWork.Colours.Get());
         }
 
 
@@ -36,7 +36,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _colours.CreateColour(colour);
+                _unitOfWork.Colours.Insert(colour);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -50,7 +51,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Colour colour = await _colours.GetColourById(id.Value);
+            Colour colour = await _unitOfWork.Colours.GetById(id.Value);
             if (colour == null)
             {
                 return HttpNotFound();
@@ -65,7 +66,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _colours.UpdateColour(colour);
+                _unitOfWork.Colours.Update(colour);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(colour);
@@ -78,7 +80,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Colour colour = await _colours.GetColourById(id.Value);
+            Colour colour = await _unitOfWork.Colours.GetById(id.Value);
             if (colour == null)
             {
                 return HttpNotFound();
@@ -91,8 +93,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Colour colour = await _colours.GetColourById(id);
-            await _colours.DeleteColour(colour);
+            Colour colour = await _unitOfWork.Colours.GetById(id);
+            _unitOfWork.Colours.Delete(colour);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
             
 

@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Net;
@@ -10,14 +11,11 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class RosterNotesController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IRosterNoteService _rosterNotes;
-        private IRosterService _rosters;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public RosterNotesController(IRosterNoteService rosterNotes, IRosterService rosters)
+        public RosterNotesController(IUnitOfWork unitOfWork)
         {
-            this._rosterNotes = rosterNotes;
-            this._rosters = rosters;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: RosterNotes
@@ -27,7 +25,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Roster roster = await _rosters.GetRosterById(id.Value);
+            Roster roster = await _unitOfWork.Rosters.GetById(id.Value);
             if (roster == null)
             {
                 return HttpNotFound();
@@ -44,7 +42,7 @@ namespace AnimalDB.Controllers
 
             ViewBag.Id = roster.Id;
             ViewBag.Room_Id = roster.Room_Id;
-            return View(await _rosterNotes.GetRosterNotesByRosterId(id.Value));
+            return View(_unitOfWork.RosterNotes.GetByRosterId(id.Value));
         }
 
         // GET: RosterNotes/Details/5
@@ -54,7 +52,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            RosterNote rosterNote = await _rosterNotes.GetRosterNoteById(id.Value);
+            RosterNote rosterNote = await _unitOfWork.RosterNotes.GetById(id.Value);
             if (rosterNote == null)
             {
                 return HttpNotFound();
@@ -69,7 +67,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Roster roster = await _rosters.GetRosterById(id.Value);
+            Roster roster = await _unitOfWork.Rosters.GetById(id.Value);
             if (roster == null)
             {
                 return HttpNotFound();
@@ -96,10 +94,11 @@ namespace AnimalDB.Controllers
             if (ModelState.IsValid)
             {
                 rosterNote.Roster_Id = id;
-                await _rosterNotes.CreateRosterNote(rosterNote);
+                _unitOfWork.RosterNotes.Insert(rosterNote);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = id });
             }
-            Roster roster = await _rosters.GetRosterById(id);
+            Roster roster = await _unitOfWork.Rosters.GetById(id);
             if (roster == null)
             {
                 return HttpNotFound();
@@ -124,7 +123,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            RosterNote rosterNote = await _rosterNotes.GetRosterNoteById(id.Value);
+            RosterNote rosterNote = await _unitOfWork.RosterNotes.GetById(id.Value);
             if (rosterNote == null)
             {
                 return HttpNotFound();
@@ -139,7 +138,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _rosterNotes.UpdateRosterNote(rosterNote);
+                _unitOfWork.RosterNotes.Update(rosterNote);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = rosterNote.Roster_Id });
             }
             return View(rosterNote);
@@ -152,7 +152,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            RosterNote rosterNote = await _rosterNotes.GetRosterNoteById(id.Value);
+            RosterNote rosterNote = await _unitOfWork.RosterNotes.GetById(id.Value);
             if (rosterNote == null)
             {
                 return HttpNotFound();
@@ -165,9 +165,10 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            RosterNote rosterNote = await _rosterNotes.GetRosterNoteById(id);
+            RosterNote rosterNote = await _unitOfWork.RosterNotes.GetById(id);
             int rosterId = rosterNote.Roster_Id;
-            await _rosterNotes.DeleteRosterNote(rosterNote);
+            _unitOfWork.RosterNotes.Delete(rosterNote);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id = rosterId });
         }
     }

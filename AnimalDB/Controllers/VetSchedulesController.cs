@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Threading.Tasks;
@@ -10,19 +11,18 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class VetSchedulesController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IVetScheduleService _vetSchedules;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public VetSchedulesController(IVetScheduleService vetSchedules)
+        public VetSchedulesController(IUnitOfWork unitOfWork)
         {
-            this._vetSchedules = vetSchedules;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: VetSchedules
         [Authorize]
-        public async Task<ActionResult> Index(string returnUrl)
+        public ActionResult Index(string returnUrl)
         {
-            if (await _vetSchedules.DoesVetScheduleExist())
+            if (_unitOfWork.VetSchedules.Exists())
             {
                 ViewBag.Exists = true;
             }
@@ -43,9 +43,9 @@ namespace AnimalDB.Controllers
 
         [Authorize]
         // GET: VetSchedules/GetDoc/5
-        public async Task<FileResult> GetDoc()
+        public FileResult GetDoc()
         {
-            var doc = await _vetSchedules.GetVetSchedule();
+            var doc = _unitOfWork.VetSchedules.GetVetSchedule();
             var content = System.IO.File.ReadAllBytes(Server.MapPath("~/Content/VetSchedule/Schedule.pdf"));
 
             if (doc == null)
@@ -79,8 +79,9 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _vetSchedules.CreateVetSchedule(vetSchedule);
+                _unitOfWork.VetSchedules.Insert(vetSchedule);
                 upload.SaveAs(path);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             
@@ -88,9 +89,9 @@ namespace AnimalDB.Controllers
         }
         [Authorize(Roles = "Technician,Administrator")]
         // GET: VetSchedules/Delete/5
-        public async Task<ActionResult> Delete()
+        public ActionResult Delete()
         {
-            VetSchedule vetSchedule = await _vetSchedules.GetVetSchedule();
+            VetSchedule vetSchedule = _unitOfWork.VetSchedules.GetVetSchedule();
             
             return View(vetSchedule);
         }
@@ -100,10 +101,11 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed()
         {
-            VetSchedule vetSchedule = await _vetSchedules.GetVetSchedule();
+            VetSchedule vetSchedule = _unitOfWork.VetSchedules.GetVetSchedule();
             if (vetSchedule != null)
             {
-                await _vetSchedules.DeleteVetSchedule(vetSchedule);
+                _unitOfWork.VetSchedules.Delete(vetSchedule);
+                await _unitOfWork.Complete();
             }
             return RedirectToAction("Index");
         }

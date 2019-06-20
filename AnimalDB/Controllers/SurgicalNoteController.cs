@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Enums;
 using AnimalDB.Repo.Interfaces;
 using System;
@@ -13,38 +14,12 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Student, Investigator, Veterinarian, Technician, Administrator")]
     public class SurgicalNoteController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-
-        private readonly IAnimalService _animals;
-        private readonly ISurgicalNoteService _surgicalNotes;
-        private readonly IInvestigatorService _investigators;
-        private readonly IStudentService _students;
-        private readonly ISurgeryTypeService _surgeryTypes;
-        private readonly IVirusTypeService _virusTypes;
-        private readonly IGDTimelineService _gDTimelines;
-        private readonly IApprovalNumberService _approvalNumbers;
-        private readonly ISurgicalWelfareScoreService _surgicalWelfareScores;
+        private readonly IUnitOfWork _unitOfWork;
 
 
-        public SurgicalNoteController(IAnimalService animals,
-                                      ISurgicalNoteService surgicalNotes,
-                                      IInvestigatorService investigators,
-                                      IStudentService students,
-                                      ISurgeryTypeService surgeryTypes,
-                                      IVirusTypeService virusTypes,
-                                      IGDTimelineService gDTimelines,
-                                      IApprovalNumberService approvalNumbers,
-                                      ISurgicalWelfareScoreService surgicalWelfareScores)
+        public SurgicalNoteController(IUnitOfWork unitOfWork)
         {
-            this._animals = animals;
-            this._surgicalNotes = surgicalNotes;
-            this._investigators = investigators;
-            this._students = students;
-            this._surgeryTypes = surgeryTypes;
-            this._virusTypes = virusTypes;
-            this._gDTimelines = gDTimelines;
-            this._approvalNumbers = approvalNumbers;
-            this._surgicalWelfareScores = surgicalWelfareScores;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /SurgicalNote/
@@ -54,14 +29,14 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
             }
             ViewBag.AnimalId = animal.Id;
             ViewBag.AnimalName = animal.UniqueAnimalId;
-            return View(await _surgicalNotes.GetSurgicalNotesByAnimalId(animal.Id));
+            return View(_unitOfWork.SurgicalNotes.GetByAnimalId(animal.Id));
         }
 
         // GET: /SurgicalNote/Create
@@ -72,7 +47,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -91,28 +66,28 @@ namespace AnimalDB.Controllers
                 "HTRU"
             };
 
-            foreach (var user in await _investigators.GetInvestigators())
+            foreach (var user in await _unitOfWork.Investigators.Get())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
-            foreach (var user in await _students.GetStudents())
+            foreach (var user in await _unitOfWork.Students.Get())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
             ViewBag.Surgeon = new SelectList(surgeons);
-            ViewBag.SurgeryType_Id = new SelectList(await _surgeryTypes.GetSurgeryTypes(), "Id", "Description");
-            ViewBag.VirusType_Id = new SelectList(await _virusTypes.GetVirusTypes(), "Id", "Description");
-            ViewBag.GDTimeline_Id = new SelectList(await _gDTimelines.GetGDTimelines(), "Id", "Description");
+            ViewBag.SurgeryType_Id = new SelectList(await _unitOfWork.SurgeryTypes.Get(), "Id", "Description");
+            ViewBag.VirusType_Id = new SelectList(await _unitOfWork.VirusTypes.Get(), "Id", "Description");
+            ViewBag.GDTimeline_Id = new SelectList(await _unitOfWork.GDTimelines.Get(), "Id", "Description");
 
             if (animal.ApprovalNumber_Id != null)
             {
-                ViewBag.hsno = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
+                ViewBag.hsno = new SelectList(await _unitOfWork.ApprovalNumbers.Get(), "Id", "Description", animal.ApprovalNumber_Id);
             }
             else
             {
-                ViewBag.hsno = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description");
+                ViewBag.hsno = new SelectList(await _unitOfWork.ApprovalNumbers.Get(), "Id", "Description");
             }
 
             return View(model);
@@ -128,7 +103,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -136,7 +111,7 @@ namespace AnimalDB.Controllers
             }
 
             surgicalnote.Animal_Id = id.Value;
-            var surgeryType = await _surgeryTypes.GetSurgeryTypeById(surgicalnote.SurgeryType_Id);
+            var surgeryType = await _unitOfWork.SurgeryTypes.GetById(surgicalnote.SurgeryType_Id);
             if (animal.Sex == Sex.Male && surgeryType.Description == "Plug")
             {
                 ModelState.AddModelError("", "This animal is a male. You can only add Plug surgeries to female animals.");
@@ -154,7 +129,8 @@ namespace AnimalDB.Controllers
                     animal.ApprovalNumber_Id = hsno;
                 }
 
-                await _surgicalNotes.CreateSurgicalNote(surgicalnote);
+                _unitOfWork.SurgicalNotes.Insert(surgicalnote);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = surgicalnote.Animal_Id });
             }
 
@@ -165,21 +141,21 @@ namespace AnimalDB.Controllers
                 "HTRU"
             };
 
-            foreach (var user in await _investigators.GetInvestigators())
+            foreach (var user in await _unitOfWork.Investigators.Get())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
-            foreach (var user in await _students.GetStudents())
+            foreach (var user in await _unitOfWork.Investigators.Get())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
             ViewBag.Surgeon = new SelectList(surgeons, surgicalnote.Surgeon);
-            ViewBag.SurgeryType_Id = new SelectList(await _surgeryTypes.GetSurgeryTypes(), "Id", "Description", surgicalnote.SurgeryType_Id);
-            ViewBag.VirusType_Id = new SelectList(await _virusTypes.GetVirusTypes(), "Id", "Description", surgicalnote.VirusType_Id);
-            ViewBag.GDTimeline_Id = new SelectList(await _gDTimelines.GetGDTimelines(), "Id", "Description", surgicalnote.GDTimeline_Id);
-            ViewBag.hsno= new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", hsno);
+            ViewBag.SurgeryType_Id = new SelectList(await _unitOfWork.SurgeryTypes.Get(), "Id", "Description", surgicalnote.SurgeryType_Id);
+            ViewBag.VirusType_Id = new SelectList(await _unitOfWork.VirusTypes.Get(), "Id", "Description", surgicalnote.VirusType_Id);
+            ViewBag.GDTimeline_Id = new SelectList(await _unitOfWork.GDTimelines.Get(), "Id", "Description", surgicalnote.GDTimeline_Id);
+            ViewBag.hsno = new SelectList(await _unitOfWork.ApprovalNumbers.Get(), "Id", "Description", hsno);
             return View(surgicalnote);
         }
 
@@ -190,7 +166,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SurgicalNote surgicalnote = await _surgicalNotes.GetSurgicalNoteById(id.Value);
+            SurgicalNote surgicalnote = await _unitOfWork.SurgicalNotes.GetById(id.Value);
             if (surgicalnote == null)
             {
                 return HttpNotFound();
@@ -210,7 +186,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SurgicalNote surgicalnote = await _surgicalNotes.GetSurgicalNoteById(id.Value);
+            SurgicalNote surgicalnote = await _unitOfWork.SurgicalNotes.GetById(id.Value);
             if (surgicalnote == null)
             {
                 return HttpNotFound();
@@ -243,9 +219,10 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                var surgicalNote = await _surgicalNotes.GetSurgicalNoteById(surgicalWelfareScore.SurgicalNote_Id);
+                var surgicalNote = await _unitOfWork.SurgicalNotes.GetById(surgicalWelfareScore.SurgicalNote_Id);
                 surgicalNote.WellfareScores.Add(surgicalWelfareScore);
-                await _surgicalNotes.UpdateSurgicalNote(surgicalNote);
+                _unitOfWork.SurgicalNotes.Update(surgicalNote);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Followups", new { id = surgicalWelfareScore.SurgicalNote_Id });
             }
 
@@ -260,7 +237,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            SurgicalWelfareScore surgicalWelfareScore = await _surgicalWelfareScores.GetSurgicalWelfareScoreById(id.Value);
+            SurgicalWelfareScore surgicalWelfareScore = await _unitOfWork.SurgicalWelfareScores.GetById(id.Value);
 
             if (surgicalWelfareScore == null)
             {
@@ -278,7 +255,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _surgicalWelfareScores.UpdateSurgicalWelfareScore(surgicalWelfareScore);
+                _unitOfWork.SurgicalWelfareScores.Update(surgicalWelfareScore);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Followups", new { id = surgicalWelfareScore.SurgicalNote_Id });
             }
 
@@ -292,7 +270,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SurgicalNote surgicalnote = await _surgicalNotes.GetSurgicalNoteById(id.Value);
+            SurgicalNote surgicalnote = await _unitOfWork.SurgicalNotes.GetById(id.Value);
             if (surgicalnote == null)
             {
                 return HttpNotFound();
@@ -303,20 +281,20 @@ namespace AnimalDB.Controllers
                 "HTRU"
             };
 
-            foreach (var user in await _investigators.GetInvestigators())
+            foreach (var user in await _unitOfWork.Investigators.Get())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
-            foreach (var user in await _students.GetStudents())
+            foreach (var user in await _unitOfWork.Students.Get())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
             ViewBag.Surgeon = new SelectList(surgeons, surgicalnote.Surgeon);
-            ViewBag.SurgeryType_Id = new SelectList(await _surgeryTypes.GetSurgeryTypes(), "Id", "Description", surgicalnote.SurgeryType_Id);
-            ViewBag.VirusType_Id = new SelectList(await _virusTypes.GetVirusTypes(), "Id", "Description", surgicalnote.VirusType_Id);
-            ViewBag.GDTimeline_Id = new SelectList(await _gDTimelines.GetGDTimelines(), "Id", "Description", surgicalnote.GDTimeline_Id);
+            ViewBag.SurgeryType_Id = new SelectList(await _unitOfWork.SurgeryTypes.Get(), "Id", "Description", surgicalnote.SurgeryType_Id);
+            ViewBag.VirusType_Id = new SelectList(await _unitOfWork.VirusTypes.Get(), "Id", "Description", surgicalnote.VirusType_Id);
+            ViewBag.GDTimeline_Id = new SelectList(await _unitOfWork.GDTimelines.Get(), "Id", "Description", surgicalnote.GDTimeline_Id);
             return View(surgicalnote);
         }
 
@@ -325,8 +303,8 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include="Id,Animal_Id,Timestamp,Surgeon,SurgeryType_Id,VirusType_Id,GDTimeline_Id")] SurgicalNote surgicalnote)
         {
-            var animal = await _animals.GetAnimalById(surgicalnote.Animal_Id);
-            surgicalnote.SurgeryType = await _surgeryTypes.GetSurgeryTypeById(surgicalnote.SurgeryType_Id);
+            var animal = await _unitOfWork.Animals.GetById(surgicalnote.Animal_Id);
+            surgicalnote.SurgeryType = await _unitOfWork.SurgeryTypes.GetById(surgicalnote.SurgeryType_Id);
             if (animal.Sex == Sex.Male && surgicalnote.SurgeryType.Description == "Plug")
             {
                 ModelState.AddModelError("", "This animal is a male. You can only add Plug surgeries to female animals.");
@@ -339,7 +317,8 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _surgicalNotes.UpdateSurgicalNote(surgicalnote);
+                _unitOfWork.SurgicalNotes.Update(surgicalnote);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = surgicalnote.Animal_Id });
             }
 
@@ -348,12 +327,12 @@ namespace AnimalDB.Controllers
                 "HTRU"
             };
 
-            foreach (var user in await _investigators.GetInvestigators())
+            foreach (var user in await _unitOfWork.Investigators.Get())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
 
-            foreach (var user in await _students.GetStudents())
+            foreach (var user in await _unitOfWork.Students.Get())
             {
                 surgeons.Add(user.FirstName + " " + user.LastName);
             }
@@ -361,9 +340,9 @@ namespace AnimalDB.Controllers
             ViewBag.Surgeon = new SelectList(surgeons, surgicalnote.Surgeon);
 
             surgicalnote.Animal = animal;
-            ViewBag.SurgeryType_Id = new SelectList(await _surgeryTypes.GetSurgeryTypes(), "Id", "Description", surgicalnote.SurgeryType_Id);
-            ViewBag.VirusType_Id = new SelectList(await _virusTypes.GetVirusTypes(), "Id", "Description", surgicalnote.VirusType_Id);
-            ViewBag.GDTimeline_Id = new SelectList(await _gDTimelines.GetGDTimelines(), "Id", "Description", surgicalnote.GDTimeline_Id);
+            ViewBag.SurgeryType_Id = new SelectList(await _unitOfWork.SurgeryTypes.Get(), "Id", "Description", surgicalnote.SurgeryType_Id);
+            ViewBag.VirusType_Id = new SelectList(await _unitOfWork.VirusTypes.Get(), "Id", "Description", surgicalnote.VirusType_Id);
+            ViewBag.GDTimeline_Id = new SelectList(await _unitOfWork.GDTimelines.Get(), "Id", "Description", surgicalnote.GDTimeline_Id);
             return View(surgicalnote);
         }
 
@@ -374,7 +353,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SurgicalNote surgicalnote = await _surgicalNotes.GetSurgicalNoteById(id.Value);
+            SurgicalNote surgicalnote = await _unitOfWork.SurgicalNotes.GetById(id.Value);
             if (surgicalnote == null)
             {
                 return HttpNotFound();
@@ -387,8 +366,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            SurgicalNote surgicalnote = await _surgicalNotes.GetSurgicalNoteById(id);
-            await _surgicalNotes.DeleteSurgicalNote(surgicalnote);
+            SurgicalNote surgicalnote = await _unitOfWork.SurgicalNotes.GetById(id);
+            _unitOfWork.SurgicalNotes.Delete(surgicalnote);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id = surgicalnote.Animal_Id });
         }
     }

@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Enums;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Enums;
 using AnimalDB.Repo.Interfaces;
 using Microsoft.AspNet.Identity;
 using System.Threading.Tasks;
@@ -9,12 +10,15 @@ namespace AnimalDB.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IUserManagementService _users;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserManagementService _userManagementService;
 
-        public AccountController(IUserManagementService users)
+        public AccountController(IUnitOfWork unitOfWork, IUserManagementService userManagementService)
         {
-            _users = users;
+            _unitOfWork = unitOfWork;
+            _userManagementService = userManagementService;
         }
+
         //
         // GET: /Account/Login
         public ActionResult Login(string returnUrl)
@@ -29,7 +33,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(Models.LoginViewModel model, string returnUrl)
         {
-            UserType? userType = await _users.GetUserType(model.UserName);
+            UserType? userType = await _userManagementService.GetUserType(model.UserName);
 
             if (userType == null)
             {
@@ -38,7 +42,7 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                if (await _users.SignInADUserAsync(model.UserName, model.Password, userType.Value))
+                if (await _userManagementService.SignInADUserAsync(model.UserName, model.Password, userType.Value))
                 {
                     if (this.Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                         && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))

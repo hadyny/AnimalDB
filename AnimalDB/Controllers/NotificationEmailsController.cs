@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Interfaces;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -9,27 +9,23 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Investigator, Technician, Administrator")]
     public class NotificationEmailsController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
+        private readonly IUnitOfWork _unitOfWork;
 
-        private INotificationEmailService _notificationEmails;
-        private IInvestigatorService _investigators;
-
-        public NotificationEmailsController(INotificationEmailService notificationEmails, IInvestigatorService investigators)
+        public NotificationEmailsController(IUnitOfWork unitOfWork)
         {
-            this._notificationEmails = notificationEmails;
-            this._investigators = investigators;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: NotificationEmails
         public async Task<ActionResult> Index()
         {
-            return View(await _notificationEmails.GetNotificationEmails());
+            return View(await _unitOfWork.NotificationEmails.Get());
         }
 
         // GET: NotificationEmails/Create
         public async Task<ActionResult> Create()
         {
-            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName");
+            ViewBag.Investigator_Id = new SelectList(await _unitOfWork.Investigators.Get(), "Id", "FullName");
             return View();
         }
 
@@ -42,16 +38,17 @@ namespace AnimalDB.Controllers
         {
             if (User.IsInRole("Investigator"))
             {
-                var investigator = await _investigators.GetInvestigatorByUsername(User.Identity.Name);
+                var investigator = await _unitOfWork.Investigators.GetByUsername(User.Identity.Name);
                 notificationEmail.Investigator_Id = investigator.Id;
             }
 
             if (ModelState.IsValid)
             {
-                await _notificationEmails.CreateNotificationEmail(notificationEmail);
+                _unitOfWork.NotificationEmails.Insert(notificationEmail);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
-            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName");
+            ViewBag.Investigator_Id = new SelectList(await _unitOfWork.Investigators.Get(), "Id", "FullName");
             return View(notificationEmail);
         }
 
@@ -62,12 +59,12 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            NotificationEmail notificationEmail = await _notificationEmails.GetNotificationEmailById(id.Value);
+            NotificationEmail notificationEmail = await _unitOfWork.NotificationEmails.GetById(id.Value);
             if (notificationEmail == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", notificationEmail.Investigator_Id);
+            ViewBag.Investigator_Id = new SelectList(await _unitOfWork.Investigators.Get(), "Id", "FullName", notificationEmail.Investigator_Id);
             return View(notificationEmail);
         }
 
@@ -80,15 +77,16 @@ namespace AnimalDB.Controllers
         {
             if (User.IsInRole("Investigator"))
             {
-                var investigator = await _investigators.GetInvestigatorByUsername(User.Identity.Name);
+                var investigator = await _unitOfWork.Investigators.GetByUsername(User.Identity.Name);
                 notificationEmail.Investigator_Id = investigator.Id;
             }
             if (ModelState.IsValid)
             {
-                await _notificationEmails.UpdateNotificationEmail(notificationEmail);
+                _unitOfWork.NotificationEmails.Update(notificationEmail);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
-            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", notificationEmail.Investigator_Id);
+            ViewBag.Investigator_Id = new SelectList(await _unitOfWork.Investigators.Get(), "Id", "FullName", notificationEmail.Investigator_Id);
             return View(notificationEmail);
         }
 
@@ -99,7 +97,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            NotificationEmail notificationEmail = await _notificationEmails.GetNotificationEmailById(id.Value);
+            NotificationEmail notificationEmail = await _unitOfWork.NotificationEmails.GetById(id.Value);
             if (notificationEmail == null)
             {
                 return HttpNotFound();
@@ -112,8 +110,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            NotificationEmail notificationEmail = await _notificationEmails.GetNotificationEmailById(id);
-            await _notificationEmails.DeleteNotificationEmail(notificationEmail);
+            NotificationEmail notificationEmail = await _unitOfWork.NotificationEmails.GetById(id);
+            _unitOfWork.NotificationEmails.Delete(notificationEmail);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

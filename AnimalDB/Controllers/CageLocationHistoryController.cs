@@ -1,4 +1,5 @@
 ﻿using AnimalDB.Models;
+using AnimalDB.Repo.Contexts;
 using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System;
@@ -12,24 +13,11 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Student, Investigator, Veterinarian, Technician, Administrator")]
     public class CageLocationHistoryController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly IAnimalService _animals;
-        private readonly ICageLocationHistoryService _cageLocationHistories;
-        private readonly ICageLocationService _cageLocations;
-        private readonly IRackService _racks;
-        private readonly IRackEntryService _rackEntries;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CageLocationHistoryController(IAnimalService animals,
-                                             ICageLocationHistoryService cageLocationHistories,
-                                             ICageLocationService cageLocations,
-                                             IRackService racks,
-                                             IRackEntryService rackEntries)
+        public CageLocationHistoryController(IUnitOfWork unitOfWork)
         {
-            this._animals = animals;
-            this._cageLocationHistories = cageLocationHistories;
-            this._cageLocations = cageLocations;
-            this._racks = racks;
-            this._rackEntries = rackEntries;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /CageLocationHistory/
@@ -40,7 +28,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -49,7 +37,7 @@ namespace AnimalDB.Controllers
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
 
-            return View(await _cageLocationHistories.GetCageLocationHistoryByAnimalId(animal.Id));
+            return View(_unitOfWork.CageLocationHistories.GetByAnimalId(animal.Id));
         }
 
         // GET: /CageLocationHistory/Create
@@ -60,17 +48,17 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
                 return HttpNotFound();
             }
 
-            var thisRoomsRacks = await _racks.GetRacksByRoomId(animal.Room_Id.Value);
+            var thisRoomsRacks = _unitOfWork.Racks.GetByRoomId(animal.Room_Id.Value);
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
-            ViewBag.CageLocation_Id = new SelectList(await _cageLocations.GetCageLocations(), "Id", "Description");
+            ViewBag.CageLocation_Id = new SelectList(await _unitOfWork.CageLocations.Get(), "Id", "Description");
             ViewBag.Rack_Id = new SelectList(thisRoomsRacks, "Id", "Reference_Id");
 
             var model = new Models.CageLocationHistoryViewModel
@@ -116,7 +104,7 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                foreach (var entry in await _rackEntries.GetRackEntriesByAnimalId(id.Value))
+                foreach (var entry in _unitOfWork.RackEntries.GetByAnimalId(id.Value))
                 {
                     entry.IsCurrent = false;
                 }
@@ -131,7 +119,7 @@ namespace AnimalDB.Controllers
                         IsCurrent = true
                     };
 
-                    await _rackEntries.CreateRackEntry(newRack);
+                    _unitOfWork.RackEntries.Insert(newRack);
 
                     int rackEntryId = newRack.Id;
 
@@ -142,7 +130,7 @@ namespace AnimalDB.Controllers
                         Timestamp = cagelocationhistory.Timestamp
                     };
 
-                    await _cageLocationHistories.CreateCageLocationHistory(newCageLocationHistory);
+                    _unitOfWork.CageLocationHistories.Insert(newCageLocationHistory);
                 }
                 else
                 {
@@ -153,15 +141,16 @@ namespace AnimalDB.Controllers
                         Timestamp = cagelocationhistory.Timestamp
                     };
 
-                    await _cageLocationHistories.CreateCageLocationHistory(newCageLocationHistory);
+                    _unitOfWork.CageLocationHistories.Insert(newCageLocationHistory);
                 }
 
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id });
             }
-            var animal = _animals.GetAnimalById(id.Value);
+            var animal = _unitOfWork.Animals.GetById(id.Value);
             ViewBag.AnimalName = animal.Result.UniqueAnimalId;
             ViewBag.AnimalId = animal.Result.Id;
-            ViewBag.CageLocation_Id = new SelectList(await _cageLocations.GetCageLocations(), "Id", "Description");
+            ViewBag.CageLocation_Id = new SelectList(await _unitOfWork.CageLocations.Get(), "Id", "Description");
             return View(cagelocationhistory);
         }
 
@@ -172,16 +161,16 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var cagelocationhistory = await _cageLocationHistories.GetCageLocationHistoryById(id.Value);
+            var cagelocationhistory = await _unitOfWork.CageLocationHistories.GetById(id.Value);
             if (cagelocationhistory == null)
             {
                 return HttpNotFound();
             }
 
-            var roomsRacks = await _racks.GetRacksByRoomId(cagelocationhistory.Animal.Room_Id.Value);
+            var roomsRacks = _unitOfWork.Racks.GetByRoomId(cagelocationhistory.Animal.Room_Id.Value);
             ViewBag.AnimalName = cagelocationhistory.Animal.UniqueAnimalId;
             ViewBag.AnimalId = cagelocationhistory.Animal.Id;
-            ViewBag.CageLocation_Id = new SelectList(await _cageLocations.GetCageLocations(), "Id", "Description", cagelocationhistory.CageLocation_Id);
+            ViewBag.CageLocation_Id = new SelectList(await _unitOfWork.CageLocations.Get(), "Id", "Description", cagelocationhistory.CageLocation_Id);
             ViewBag.Rack_Id = new SelectList(roomsRacks, 
                                                         "Id", 
                                                         "Reference_Id", 
@@ -228,12 +217,12 @@ namespace AnimalDB.Controllers
         {            
             if (ModelState.IsValid)
             {
-                var location = await _cageLocationHistories.GetCageLocationHistoryById(id.Value);
+                var location = await _unitOfWork.CageLocationHistories.GetById(id.Value);
 
                 if (location.RackEntry_Id.HasValue)
                 {
-                    var rackEntry = await _rackEntries.GetRackEntryById(location.RackEntry_Id.Value);
-                    await _rackEntries.DeleteRackEntry(rackEntry);
+                    var rackEntry = await _unitOfWork.RackEntries.GetById(location.RackEntry_Id.Value);
+                    _unitOfWork.RackEntries.Delete(rackEntry);
                 }
                 else
                 {
@@ -250,7 +239,7 @@ namespace AnimalDB.Controllers
                         Animal_Id = cagelocationhistory.Animal_Id,
                         IsCurrent = true
                     };
-                    await _rackEntries.CreateRackEntry(newRack);
+                    _unitOfWork.RackEntries.Insert(newRack);
                     int rackEntryId = newRack.Id;
                     location.RackEntry_Id = rackEntryId;
                 }
@@ -258,21 +247,22 @@ namespace AnimalDB.Controllers
                 {
                     location.CageLocation_Id = cagelocationhistory.CageLocation_Id;
                 }
-                await _cageLocationHistories.UpdateCageLocationHistory(location);
+                _unitOfWork.CageLocationHistories.Update(location);
+                await _unitOfWork.Complete();
 
                 return RedirectToAction("Index", new { id = cagelocationhistory.Animal_Id });
             }
 
-            var cagelocation = await _cageLocationHistories.GetCageLocationHistoryById(cagelocationhistory.Id);
+            var cagelocation = await _unitOfWork.CageLocationHistories.GetById(cagelocationhistory.Id);
             if (cagelocation == null)
             {
                 return HttpNotFound();
             }
 
-            var rackRooms = await _racks.GetRacksByRoomId(cagelocation.Animal.Room_Id.Value);
+            var rackRooms = _unitOfWork.Racks.GetByRoomId(cagelocation.Animal.Room_Id.Value);
             ViewBag.AnimalName = cagelocation.Animal.UniqueAnimalId;
             ViewBag.AnimalId = cagelocation.Animal.Id;
-            ViewBag.CageLocation_Id = new SelectList(await _cageLocations.GetCageLocations(), "Id", "Description", cagelocation.CageLocation_Id);
+            ViewBag.CageLocation_Id = new SelectList(await _unitOfWork.CageLocations.Get(), "Id", "Description", cagelocation.CageLocation_Id);
             ViewBag.Rack_Id = new SelectList(rackRooms, "Id", "Reference_Id");
             var model = new CageLocationHistoryViewModel
             {
@@ -312,7 +302,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var cagelocationhistory = await _cageLocationHistories.GetCageLocationHistoryById(id.Value);
+            var cagelocationhistory = await _unitOfWork.CageLocationHistories.GetById(id.Value);
             if (cagelocationhistory == null)
             {
                 return HttpNotFound();
@@ -325,8 +315,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            var cagelocationhistory = await _cageLocationHistories.GetCageLocationHistoryById(id);
-            await _cageLocationHistories.DeleteCageLocationHistory(cagelocationhistory);
+            var cagelocationhistory = await _unitOfWork.CageLocationHistories.GetById(id);
+            _unitOfWork.CageLocationHistories.Delete(cagelocationhistory);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id=cagelocationhistory.Animal_Id });
         }
 

@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using AnimalDB.Repo.Repositories.Abstract;
 using AnimalDB.Repo.Services;
@@ -17,33 +18,35 @@ namespace AnimalCheckChecker
     {
         static void Main(string[] args)
         {
-            IKernel kernel = new StandardKernel();
-            kernel.Bind<IAnimalService>().To<AnimalService>();
-            kernel.Bind<IRoomService>().To<RoomService>();
-            kernel.Bind<INotCheckedRoomService>().To<NotCheckedRoomService>();
-            kernel.Bind<INotCheckedAnimalService>().To<NotCheckedAnimalService>();
-            kernel.Bind<IEthicsNumberHistoryService>().To<EthicsNumberHistoryService>();
-            kernel.Bind<IEthicsNumberService>().To<EthicsNumberService>();
-            kernel.Bind<ICageLocationHistoryService>().To<CageLocationHistoryService>();
-            kernel.Bind<IStudentService>().To<StudentService>();
-            kernel.Bind(typeof(IRepository<>)).To(typeof(Repository<>));
-            kernel.Bind(typeof(IUserRepository<>)).To(typeof(UserRepository<>));
+            //IKernel kernel = new StandardKernel();
+            //kernel.Bind<IAnimalService>().To<AnimalService>();
+            //kernel.Bind<IRoomService>().To<RoomService>();
+            //kernel.Bind<INotCheckedRoomService>().To<NotCheckedRoomService>();
+            //kernel.Bind<INotCheckedAnimalService>().To<NotCheckedAnimalService>();
+            //kernel.Bind<IEthicsNumberHistoryService>().To<EthicsNumberHistoryService>();
+            //kernel.Bind<IEthicsNumberService>().To<EthicsNumberService>();
+            //kernel.Bind<ICageLocationHistoryService>().To<CageLocationHistoryService>();
+            //kernel.Bind<IStudentService>().To<StudentService>();
+            //kernel.Bind(typeof(IRepository<>)).To(typeof(Repository<>));
+            //kernel.Bind(typeof(IUserRepository<>)).To(typeof(UserRepository<>));
 
-            IRoomService roomRepo = new RoomService(kernel.Get<IRepository<Room>>());
-            INotCheckedRoomService ncrRepo = new NotCheckedRoomService(kernel.Get<IRepository<NotCheckedRoom>>());
-            IAnimalService animalRepo = new AnimalService(kernel.Get<IRepository<Animal>>(), 
-                                                          kernel.Get<IRepository<EthicsNumberHistory>>(), 
-                                                          kernel.Get<IRepository<EthicsNumber>>(), 
-                                                          kernel.Get<IRepository<CageLocationHistory>>(), 
-                                                          kernel.Get<IUserRepository<Student>>());
-            INotCheckedAnimalService ncaRepo = new NotCheckedAnimalService(kernel.Get<IRepository<NotCheckedAnimal>>());
+            //IRoomService roomRepo = new RoomService(kernel.Get<IRepository<Room>>());
+            //INotCheckedRoomService ncrRepo = new NotCheckedRoomService(kernel.Get<IRepository<NotCheckedRoom>>());
+            //IAnimalService animalRepo = new AnimalService(kernel.Get<IRepository<Animal>>(), 
+            //                                              kernel.Get<IRepository<EthicsNumberHistory>>(), 
+            //                                              kernel.Get<IRepository<EthicsNumber>>(), 
+            //                                              kernel.Get<IRepository<CageLocationHistory>>(), 
+            //                                              kernel.Get<IUserRepository<Student>>());
+            //INotCheckedAnimalService ncaRepo = new NotCheckedAnimalService(kernel.Get<IRepository<NotCheckedAnimal>>());
+
+            UnitOfWork unitOfWork = new UnitOfWork();
 
             /*var notCheckedRooms = db.Rooms.Where(m => m.NoDBAnimals && 
                 (!m.NoDBAnimalsLastCheck.HasValue || (m.NoDBAnimalsLastCheck.HasValue && DbFunctions.TruncateTime(m.NoDBAnimalsLastCheck.Value) != DbFunctions.TruncateTime(DateTime.Now)))).ToList();
                 */
-            foreach (var room in roomRepo.RoomsThatHaventBeenCheckedToday().Result)
+            foreach (var room in unitOfWork.Rooms.NotCheckedToday())
             {
-                ncrRepo.CreateNotCheckedRoom(new NotCheckedRoom()
+                unitOfWork.NotCheckedRooms.Insert(new NotCheckedRoom()
                 {
                     Room_Id = room.Id,
                     Timestamp = DateTime.Now
@@ -57,14 +60,16 @@ namespace AnimalCheckChecker
 
             // add these animals to NotCheckedAnimal table
 
-            foreach (var animal in animalRepo.GetLivingAnimalsNotCheckedToday().Result)
+            foreach (var animal in unitOfWork.Animals.GetLivingAnimalsNotCheckedToday())
             {
-                ncaRepo.CreateNotCheckedAnimal(new NotCheckedAnimal()
+                unitOfWork.NotCheckedAnimals.Insert(new NotCheckedAnimal()
                 {
                     Animal_Id = animal.Id,
                     Timestamp = DateTime.Now
                 });
             }
+
+            unitOfWork.Complete();
 
             //// Search for all living animals that haven't had a feed yet
             //var notFedAnimals = db.Animals.Where(m => m.DeathDate == null &&
@@ -96,12 +101,12 @@ namespace AnimalCheckChecker
                                 <div style=""font-family:sans-serif;line-height:150%;margin:5%;color:#222222;font-size:14px;text-align:left;"">
                                 <h2>Animal database statistics for " + DateTime.Now.ToLongDateString() + @"</h2>";
 
-                if (animalRepo.GetLivingAnimalsNotCheckedTodayForEmailing().Result.Count() != 0)
+                if (unitOfWork.Animals.GetLivingAnimalsNotCheckedTodayForEmailing().Count() != 0)
                 {
                     email += "<h3>The following animals were not checked on " + DateTime.Now.ToShortDateString() + ":</h3>";
                     string room = "";
                     int daysSinceChecked = 0;
-                    foreach (var animal in animalRepo.GetLivingAnimalsNotCheckedTodayForEmailing().Result.OrderBy(m => m.Room_Id))
+                    foreach (var animal in unitOfWork.Animals.GetLivingAnimalsNotCheckedTodayForEmailing().OrderBy(m => m.Room_Id))
                     {
                         if (room != animal.Room.Description)
                         {
@@ -127,12 +132,12 @@ namespace AnimalCheckChecker
 
                 email += "<hr />";
 
-                if (animalRepo.GetLivingAnimalsNotFedTodayForEmailing().Result.Count() != 0)
+                if (unitOfWork.Animals.GetLivingAnimalsNotFedTodayForEmailing().Count() != 0)
                 {
                     email += "<h3>The following animals were not fed on " + DateTime.Now.ToShortDateString() + ":</h3>";
                     string room = "";
                     string daysSinceFed = "";
-                    foreach (var animal in animalRepo.GetLivingAnimalsNotFedTodayForEmailing().Result.OrderBy(m => m.Room_Id))
+                    foreach (var animal in unitOfWork.Animals.GetLivingAnimalsNotFedTodayForEmailing().OrderBy(m => m.Room_Id))
                     {
                         if (room != animal.Room.Description)
                         {
@@ -177,7 +182,7 @@ namespace AnimalCheckChecker
                 {
                     Body = email,
                     BodyEncoding = Encoding.UTF8,
-                    Subject = "Animal Database: " + animalRepo.GetLivingAnimalsNotCheckedTodayForEmailing().Result.Count() + " animals weren't checked today, " + animalRepo.GetLivingAnimalsNotFedTodayForEmailing().Result.Count() + " animals weren't fed today",
+                    Subject = "Animal Database: " + unitOfWork.Animals.GetLivingAnimalsNotCheckedTodayForEmailing().Count() + " animals weren't checked today, " + unitOfWork.Animals.GetLivingAnimalsNotFedTodayForEmailing().Count() + " animals weren't fed today",
                     SubjectEncoding = Encoding.UTF8,
                     IsBodyHtml = true
                 };

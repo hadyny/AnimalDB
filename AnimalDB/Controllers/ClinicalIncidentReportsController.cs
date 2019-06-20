@@ -1,6 +1,5 @@
-﻿using AnimalDB.Repo.Interfaces;
+﻿using AnimalDB.Repo.Contexts;
 using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Services;
 using System;
 using System.Configuration;
 using System.Linq;
@@ -14,20 +13,11 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Student, Investigator, Veterinarian, Technician, Administrator")]
     public class ClinicalIncidentReportsController : Controller
     {
-        private IAnimalService _animals;
-        private IClinicalIncidentReportService _clinicalIncidentReports;
-        private IMedicationTypeService _medicationTypes;
-        private IVeterinarianService _veterinarians;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ClinicalIncidentReportsController(IAnimalService animals,
-                                                 IClinicalIncidentReportService clinicalIncidentReports,
-                                                 IMedicationTypeService medicationTypes,
-                                                 IVeterinarianService veterinarians)
+        public ClinicalIncidentReportsController(IUnitOfWork unitOfWork)
         {
-            this._animals = animals;
-            this._clinicalIncidentReports = clinicalIncidentReports;
-            this._medicationTypes = medicationTypes;
-            this._veterinarians = veterinarians;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: ClinicalIncidentReports
@@ -37,7 +27,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
@@ -45,7 +35,7 @@ namespace AnimalDB.Controllers
 
             ViewBag.AnimalId = id.Value;
             ViewBag.AnimalName = animal.UniqueAnimalId;
-            var reports = await _clinicalIncidentReports.GetClinicalIncidentReports();
+            var reports = await _unitOfWork.ClinicalIncidentReports.Get(m => m.Animal_Id == id.Value);
             return View(reports.OrderByDescending(m => m.Timestamp));
         }
 
@@ -58,13 +48,13 @@ namespace AnimalDB.Controllers
             }
             
 
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
             }
             
-            ViewBag.CageLocation = await _animals.GetAnimalsCageLocationDescription(animal.Id);
+            ViewBag.CageLocation = _unitOfWork.Animals.GetAnimalsCageLocationDescription(animal.Id);
             
             var model = new ClinicalIncidentReport
             {
@@ -72,7 +62,7 @@ namespace AnimalDB.Controllers
                 Animal_Id = animal.Id
             };
 
-            model.EthicsNumber = await _animals.GetAnimalsEthicsNumberDescription(animal.Id);
+            model.EthicsNumber = _unitOfWork.Animals.GetAnimalsEthicsNumberDescription(animal.Id);
            
             return View(model);
         }
@@ -86,14 +76,15 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _clinicalIncidentReports.CreateClinicalIncidentReport(clinicalIncidentReport);
+                _unitOfWork.ClinicalIncidentReports.Insert(clinicalIncidentReport);
+                await _unitOfWork.Complete();
 
                 await SendEmailToVets(update: false, report: clinicalIncidentReport);
                 return RedirectToAction("Index", new { id = clinicalIncidentReport.Animal_Id });
                 
             }
 
-            ViewBag.MedicationType_Id = new SelectList(await _medicationTypes.GetMedicationTypes(), "Id", "Description");
+            ViewBag.MedicationType_Id = new SelectList(await _unitOfWork.MedicationTypes.Get(), "Id", "Description");
             return View(clinicalIncidentReport);
         }
 
@@ -104,17 +95,17 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ClinicalIncidentReport clinicalIncidentReport = await _clinicalIncidentReports.GetClinicalIncidentReportById(id.Value);
+            ClinicalIncidentReport clinicalIncidentReport = await _unitOfWork.ClinicalIncidentReports.GetById(id.Value);
             if (clinicalIncidentReport == null)
             {
                 return HttpNotFound();
             }
             
-            var animal = await _animals.GetAnimalById(clinicalIncidentReport.Animal_Id);
-            ViewBag.CageLocation = await _animals.GetAnimalsCageLocationDescription(animal.Id);
+            var animal = await _unitOfWork.Animals.GetById(clinicalIncidentReport.Animal_Id);
+            ViewBag.CageLocation = _unitOfWork.Animals.GetAnimalsCageLocationDescription(animal.Id);
             
             clinicalIncidentReport.Animal = animal;
-            clinicalIncidentReport.EthicsNumber = await _animals.GetAnimalsEthicsNumberDescription(animal.Id);
+            clinicalIncidentReport.EthicsNumber = _unitOfWork.Animals.GetAnimalsEthicsNumberDescription(animal.Id);
             return View(clinicalIncidentReport);
         }
 
@@ -126,7 +117,8 @@ namespace AnimalDB.Controllers
             
             if (ModelState.IsValid)
             {
-                await _clinicalIncidentReports.UpdateClinicalIncidentReport(clinicalIncidentReport);
+                _unitOfWork.ClinicalIncidentReports.Update(clinicalIncidentReport);
+                await _unitOfWork.Complete();
                 await SendEmailToVets(update: false, report: clinicalIncidentReport);
                 return RedirectToAction("Index", new { id = clinicalIncidentReport.Animal_Id });
                 
@@ -141,7 +133,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var clinicalIncidentReport = await _clinicalIncidentReports.GetClinicalIncidentReportById(id.Value);
+            var clinicalIncidentReport = await _unitOfWork.ClinicalIncidentReports.GetById(id.Value);
             if (clinicalIncidentReport == null)
             {
                 return HttpNotFound();
@@ -154,13 +146,15 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            var clinicalIncidentReport = await _clinicalIncidentReports.GetClinicalIncidentReportById(id);
-            await _clinicalIncidentReports.DeleteClinicalIncidentReport(clinicalIncidentReport);
+            var clinicalIncidentReport = await _unitOfWork.ClinicalIncidentReports.GetById(id);
+            _unitOfWork.ClinicalIncidentReports.Delete(clinicalIncidentReport);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id = clinicalIncidentReport.Animal_Id });
         }
 
         public async Task SendEmailToVets(bool update, ClinicalIncidentReport report)
         {
+            var animal = await _unitOfWork.Animals.GetById(report.Animal_Id);
             MailMessage msg = new MailMessage
             {
                 From = new MailAddress(ConfigurationManager.AppSettings["SystemEmail"])
@@ -169,18 +163,18 @@ namespace AnimalDB.Controllers
             if (update)
             {
                 msg.Subject = "Clinical Incident Report Updated";
-                body = "The Clinical Incident Report for the animal " + report.Animal.UniqueAnimalId + " has been updated.\r\n\r\n";
+                body = "The Clinical Incident Report for the animal " + animal.UniqueAnimalId + " has been updated.\r\n\r\n";
             }
             else
             {
                 msg.Subject = "New Clinical Incident Report created for animal";
-                body = "A Clinical Incident Report has been created for the animal " + report.Animal.UniqueAnimalId + ".\r\n\r\n";
+                body = "A Clinical Incident Report has been created for the animal " + animal.UniqueAnimalId + ".\r\n\r\n";
             }
 
             body += "Go here to view the report: https://web.psy.otago.ac.nz/adb/ClinicalIncidentReports/Edit/" + report.Id;
 
             msg.Body = body;
-            var vets = await _veterinarians.GetVeterinarians();
+            var vets = await _unitOfWork.Veterinarians.Get();
             foreach (var vet in vets.Where(m => m.Email != ""))
             {
                 msg.To.Add(vet.Email);

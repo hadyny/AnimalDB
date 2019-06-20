@@ -1,6 +1,6 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Enums;
-using AnimalDB.Repo.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,52 +17,12 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class AnimalsController : Controller
     {
-        private readonly IAnimalService _animals;
-        private readonly IArrivalStatusService _arrivalStatus;
-        private readonly IColourService _colours;
-        private readonly ISourceService _sources;
-        private readonly IStrainService _strains;
-        private readonly IInvestigatorService _investigators;
-        private readonly IStudentService _students;
-        private readonly IChargeCodeService _chargeCodes;
-        private readonly IRoomService _rooms;
-        private readonly IApprovalNumberService _approvalNumbers;
-        private readonly IEthicsNumberService _ethicsNumbers;
-        private readonly IEthicsNumberHistoryService _ethicsNumberHistories;
-        private readonly ITransgeneService _transgenes;
-        private readonly IGDTimelineService _gDTimelines;
+        private readonly IUnitOfWork _unitOfWork;
 
 
-        public AnimalsController(IAnimalService animals,
-                                 IArrivalStatusService arrivalStatus,
-                                 IColourService colours,
-                                 ISourceService sources,
-                                 IStrainService strains,
-                                 IInvestigatorService investigators,
-                                 IStudentService students,
-                                 IChargeCodeService chargeCodes,
-                                 IRoomService rooms,
-                                 IApprovalNumberService approvalNumbers,
-                                 IEthicsNumberService ethicsNumbers,
-                                 IEthicsNumberHistoryService ethicsNumberHistories,
-                                 ITransgeneService transgenes,
-                                 IGDTimelineService gDTimelines
-            )
+        public AnimalsController(IUnitOfWork unitOfWork)
         {
-            this._animals = animals;
-            this._arrivalStatus = arrivalStatus;
-            this._colours = colours;
-            this._sources = sources;
-            this._strains = strains;
-            this._investigators = investigators;
-            this._students = students;
-            this._chargeCodes = chargeCodes;
-            this._rooms = rooms;
-            this._approvalNumbers = approvalNumbers;
-            this._ethicsNumbers = ethicsNumbers;
-            this._ethicsNumberHistories = ethicsNumberHistories;
-            this._transgenes = transgenes;
-            this._gDTimelines = gDTimelines;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /Animals/Details/5
@@ -73,30 +33,30 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
             }
 
-            DateTime? _surgeryDate = await _animals.GetAnimalsSurgeryDate(id.Value);
-            DateTime? _gDDate = await _animals.GetAnimalsGDDate(id.Value);
-            DateTime? _injectionDate = await _animals.GetAnimalsInjectionDate(id.Value);
-            DateTime? _plugDate = await _animals.GetAnimalsPlugDate(id.Value);
-            IEnumerable<Animal> _keptOffspring = await _animals.GetAnimalsLivingOffspring(id.Value);
+            DateTime? _surgeryDate = await _unitOfWork.Animals.GetAnimalsSurgeryDate(id.Value);
+            DateTime? _gDDate = await _unitOfWork.Animals.GetAnimalsGDDate(id.Value);
+            DateTime? _injectionDate = await _unitOfWork.Animals.GetAnimalsInjectionDate(id.Value);
+            DateTime? _plugDate = await _unitOfWork.Animals.GetAnimalsPlugDate(id.Value);
+            IEnumerable<Animal> _keptOffspring = await _unitOfWork.Animals.GetAnimalsLivingOffspring(id.Value);
 
             ViewBag.AnimalId = id.Value;
-            ViewBag.CageLocation = await _animals.GetAnimalsCageLocationDescription(id.Value);
-            ViewBag.EthicsNumber = await _animals.GetAnimalsEthicsNumberDescription(id.Value);
+            ViewBag.CageLocation = _unitOfWork.Animals.GetAnimalsCageLocationDescription(id.Value);
+            ViewBag.EthicsNumber = _unitOfWork.Animals.GetAnimalsEthicsNumberDescription(id.Value);
             ViewBag.OffspringKept = _keptOffspring.Count();
             ViewBag.PlugDate = _plugDate.ToString();
-            ViewBag.GDDescription = await _animals.GetAnimalsGDDescription(id.Value);
+            ViewBag.GDDescription = await _unitOfWork.Animals.GetAnimalsGDDescription(id.Value);
             ViewBag.GDDate = _gDDate.ToString();
             ViewBag.InjectionDate = _injectionDate.ToString();
-            ViewBag.InjectionBy = await _animals.GetAnimalsInjectionSurgeon(id.Value);
+            ViewBag.InjectionBy = await _unitOfWork.Animals.GetAnimalsInjectionSurgeon(id.Value);
             ViewBag.SurgeryDate = _surgeryDate.ToString();
-            ViewBag.Surgeon = await _animals.GetAnimalsSurgeon(id.Value);
-            ViewBag.SurgeryType = await _animals.GetAnimalsListOfSurgeries(id.Value);
+            ViewBag.Surgeon = await _unitOfWork.Animals.GetAnimalsSurgeon(id.Value);
+            ViewBag.SurgeryType = await _unitOfWork.Animals.GetAnimalsListOfSurgeries(id.Value);
 
             return View(animal);
         }
@@ -109,7 +69,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
@@ -141,14 +101,14 @@ namespace AnimalDB.Controllers
                 return false;
             }
             
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
                 return false;
             }
 
-            await _animals.AddPhotoToAnimal(animal.Id);
+            await _unitOfWork.Animals.AddPhotoToAnimal(animal.Id);
 
             if (file.ContentLength > 0)
             {
@@ -173,14 +133,14 @@ namespace AnimalDB.Controllers
                 return false;
             }
             
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
                 return false;
             }
 
-            await _animals.RemovePhotoFromAnimal(id.Value);
+            await _unitOfWork.Animals.RemovePhotoFromAnimal(id.Value);
 
             var path = Path.Combine(Server.MapPath("~/Content/AnimalImages"), id.ToString() + ".jpg");
             if (System.IO.File.Exists(path))
@@ -194,18 +154,17 @@ namespace AnimalDB.Controllers
         [Authorize(Roles = "Administrator, Technician")]
         public async Task<ActionResult> Create()
         {
-            ViewBag.ArrivalStatus_Id = new SelectList(await _arrivalStatus.GetArrivalStatus(), "Id", "Description");
-            ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description");
-            ViewBag.Source_Id = new SelectList(await _sources.GetSources(), "Id", "Description");
-            ViewBag.Strain_Id = new SelectList(await _strains.GetStrains(), "Id", "Description");
-            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName");
-            ViewBag.Researcher_Id = new SelectList(await _students.GetStudentsAndInvestigators(), "Id", "FullName");
-            //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text");
-            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description");
-            ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description");
-            ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text");
-            ViewBag.Transgene_Id = new SelectList(await _transgenes.GetTransgenes(), "Id", "Description");
-            ViewBag.GDTimeline_Id = new SelectList(await _gDTimelines.GetGDTimelines(), "Id", "Description");
+            ViewBag.ArrivalStatus_Id = new SelectList(await _unitOfWork.ArrivalStatus.Get(), "Id", "Description");
+            ViewBag.Colour_Id = new SelectList(await _unitOfWork.Colours.Get(), "Id", "Description");
+            ViewBag.Source_Id = new SelectList(await _unitOfWork.Sources.Get(), "Id", "Description");
+            ViewBag.Strain_Id = new SelectList(await _unitOfWork.Strains.Get(), "Id", "Description");
+            ViewBag.Investigator_Id = new SelectList(await _unitOfWork.Investigators.Get(), "Id", "FullName");
+            ViewBag.Researcher_Id = new SelectList(_unitOfWork.Students.GetStudentsAndInvestigators(), "Id", "FullName");
+            ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description");
+            ViewBag.ApprovalNumber_Id = new SelectList(await _unitOfWork.ApprovalNumbers.Get(), "Id", "Description");
+            ViewBag.Ethics_Id = new SelectList(await _unitOfWork.EthicsNumbers.Get(), "Id", "Text");
+            ViewBag.Transgene_Id = new SelectList(await _unitOfWork.Transgenes.Get(), "Id", "Description");
+            ViewBag.GDTimeline_Id = new SelectList(await _unitOfWork.GDTimelines.Get(), "Id", "Description");
 
             var model = new Animal()
             {
@@ -222,7 +181,7 @@ namespace AnimalDB.Controllers
         [Authorize(Roles = "Administrator, Technician")]
         public async Task<ActionResult> Create(Animal animal, int? Ethics_Id, string next)
         {
-            if (await _animals.GetAnimalByUniqueId(animal.UniqueAnimalId) != null)
+            if (await _unitOfWork.Animals.GetAnimalByUniqueId(animal.UniqueAnimalId) != null)
             {
                 ModelState.AddModelError("UniqueAnimalId", "Unique Animal Id is already in use.");
             }
@@ -245,18 +204,20 @@ namespace AnimalDB.Controllers
             if (ModelState.IsValid)
             {
                 animal.LastChecked = DateTime.Now;
-                await _animals.CreateAnimal(animal);
+                _unitOfWork.Animals.Insert(animal);
 
                 if (Ethics_Id.HasValue)
                 {
-                    await _ethicsNumberHistories
-                        .CreateEthicsNumberHistory(new EthicsNumberHistory()
+                    _unitOfWork.EthicsNumberHistories
+                        .Insert(new EthicsNumberHistory()
                     {
                         Animal_Id = animal.Id,
                         Ethics_Id = Ethics_Id.Value,
                         Timestamp = DateTime.Now
                     });
                 }
+
+                await _unitOfWork.Complete();
                 if (next == "finish")
                 {
                     if (animal.DeathDate.HasValue)
@@ -275,17 +236,17 @@ namespace AnimalDB.Controllers
                 }
             }
 
-            ViewBag.ArrivalStatus_Id = new SelectList(await _arrivalStatus.GetArrivalStatus(), "Id", "Description", animal.ArrivalStatus_Id);
-            ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description", animal.Colour_Id);
-            ViewBag.Source_Id = new SelectList(await _sources.GetSources(), "Id", "Description", animal.Source_Id);
-            ViewBag.Strain_Id = new SelectList(await _strains.GetStrains(), "Id", "Description", animal.Strain_Id);
-            ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
-            ViewBag.Researcher_Id = new SelectList(await _students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
+            ViewBag.ArrivalStatus_Id = new SelectList(await _unitOfWork.ArrivalStatus.Get(), "Id", "Description", animal.ArrivalStatus_Id);
+            ViewBag.Colour_Id = new SelectList(await _unitOfWork.Colours.Get(), "Id", "Description", animal.Colour_Id);
+            ViewBag.Source_Id = new SelectList(await _unitOfWork.Sources.Get(), "Id", "Description", animal.Source_Id);
+            ViewBag.Strain_Id = new SelectList(await _unitOfWork.Strains.Get(), "Id", "Description", animal.Strain_Id);
+            ViewBag.Investigator_Id = new SelectList(await _unitOfWork.Investigators.Get(), "Id", "FullName", animal.Investigator_Id);
+            ViewBag.Researcher_Id = new SelectList(await _unitOfWork.Students.Get(), "Id", "FullName", animal.Researcher_Id);
             //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text", animal.ChargeCode_Id);
-            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", animal.Room_Id);
-            ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
-            ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text", Ethics_Id);
-            ViewBag.Transgene_Id = new SelectList(await _transgenes.GetTransgenes(), "Id", "Description", animal.Transgene_Id);
+            ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description", animal.Room_Id);
+            ViewBag.ApprovalNumber_Id = new SelectList(await _unitOfWork.ApprovalNumbers.Get(), "Id", "Description", animal.ApprovalNumber_Id);
+            ViewBag.Ethics_Id = new SelectList(await _unitOfWork.EthicsNumbers.Get(), "Id", "Text", Ethics_Id);
+            ViewBag.Transgene_Id = new SelectList(await _unitOfWork.Transgenes.Get(), "Id", "Description", animal.Transgene_Id);
             return View(animal);
         }
 
@@ -297,7 +258,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
@@ -305,25 +266,25 @@ namespace AnimalDB.Controllers
 
             if (User.IsInRole("Student"))
             {
-                ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", animal.Room_Id);
-                ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
-                ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description", animal.Colour_Id);
+                ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description", animal.Room_Id);
+                ViewBag.ApprovalNumber_Id = new SelectList(await _unitOfWork.ApprovalNumbers.Get(), "Id", "Description", animal.ApprovalNumber_Id);
+                ViewBag.Colour_Id = new SelectList(await _unitOfWork.Colours.Get(), "Id", "Description", animal.Colour_Id);
                 return View("StudentEdit", animal);
             }
             else 
             {
-                ViewBag.ArrivalStatus_Id = new SelectList(await _arrivalStatus.GetArrivalStatus(), "Id", "Description", animal.ArrivalStatus_Id);
-                ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description", animal.Colour_Id);
-                ViewBag.Source_Id = new SelectList(await _sources.GetSources(), "Id", "Description", animal.Source_Id);
-                ViewBag.Strain_Id = new SelectList(await _strains.GetStrains(), "Id", "Description", animal.Strain_Id);
-                ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
-                ViewBag.Researcher_Id = new SelectList(await _students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
+                ViewBag.ArrivalStatus_Id = new SelectList(await _unitOfWork.ArrivalStatus.Get(), "Id", "Description", animal.ArrivalStatus_Id);
+                ViewBag.Colour_Id = new SelectList(await _unitOfWork.Colours.Get(), "Id", "Description", animal.Colour_Id);
+                ViewBag.Source_Id = new SelectList(await _unitOfWork.Sources.Get(), "Id", "Description", animal.Source_Id);
+                ViewBag.Strain_Id = new SelectList(await _unitOfWork.Strains.Get(), "Id", "Description", animal.Strain_Id);
+                ViewBag.Investigator_Id = new SelectList(await _unitOfWork.Investigators.Get(), "Id", "FullName", animal.Investigator_Id);
+                ViewBag.Researcher_Id = new SelectList(_unitOfWork.Students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
                 //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text", animal.ChargeCode_Id);
-                ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", animal.Room_Id);
-                ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
-                ViewBag.Transgene_Id = new SelectList(await _transgenes.GetTransgenes(), "Id", "Description", animal.Transgene_Id);
-                var ethics = await _animals.GetAnimalsEthicsNumber(animal.Id);
-                ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text", ethics?.Ethics_Id);
+                ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description", animal.Room_Id);
+                ViewBag.ApprovalNumber_Id = new SelectList(await _unitOfWork.ApprovalNumbers.Get(), "Id", "Description", animal.ApprovalNumber_Id);
+                ViewBag.Transgene_Id = new SelectList(await _unitOfWork.Transgenes.Get(), "Id", "Description", animal.Transgene_Id);
+                var ethics = _unitOfWork.Animals.GetAnimalsEthicsNumber(animal.Id);
+                ViewBag.Ethics_Id = new SelectList(await _unitOfWork.EthicsNumbers.Get(), "Id", "Text", ethics?.Ethics_Id);
                 return View(animal);
             }
         }
@@ -334,7 +295,7 @@ namespace AnimalDB.Controllers
         [Authorize(Roles = "Student, Administrator, Technician, Investigator")]
         public async Task<ActionResult> Edit(Animal animal, int? Ethics_Id)
         {
-            var a = await _animals.GetAnimalByUniqueId(animal.UniqueAnimalId);
+            var a = await _unitOfWork.Animals.GetAnimalByUniqueId(animal.UniqueAnimalId);
             if  (a != null && a.Id != animal.Id)
             {
                 ModelState.AddModelError("UniqueAnimalId", "Unique Animal Id is already in use.");
@@ -362,12 +323,14 @@ namespace AnimalDB.Controllers
                     animal.FeedingGroup_Id = null;
                     animal.Group_Id = null;
                 }
-                await _animals.UpdateAnimal(animal);
+                _unitOfWork.Animals.Update(animal);
 
                 if (Ethics_Id.HasValue)
                 {
-                    await _animals.AddAnimalToEthicsNumber(animal.Id, Ethics_Id.Value);
+                    await _unitOfWork.Animals.AddAnimalToEthicsNumber(animal.Id, Ethics_Id.Value);
                 }
+
+                await _unitOfWork.Complete();
 
                 if (animal.DeathDate.HasValue)
                 {
@@ -381,25 +344,25 @@ namespace AnimalDB.Controllers
 
             if (User.IsInRole("Student"))
             {
-                ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", animal.Room_Id);
-                ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
-                ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description", animal.Colour_Id);
+                ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description", animal.Room_Id);
+                ViewBag.ApprovalNumber_Id = new SelectList(await _unitOfWork.ApprovalNumbers.Get(), "Id", "Description", animal.ApprovalNumber_Id);
+                ViewBag.Colour_Id = new SelectList(await _unitOfWork.Colours.Get(), "Id", "Description", animal.Colour_Id);
                 return View("StudentEdit", animal);
             }
             else
             {
-                ViewBag.ArrivalStatus_Id = new SelectList(await _arrivalStatus.GetArrivalStatus(), "Id", "Description", animal.ArrivalStatus_Id);
-                ViewBag.Colour_Id = new SelectList(await _colours.GetColours(), "Id", "Description", animal.Colour_Id);
-                ViewBag.Source_Id = new SelectList(await _sources.GetSources(), "Id", "Description", animal.Source_Id);
-                ViewBag.Strain_Id = new SelectList(await _strains.GetStrains(), "Id", "Description", animal.Strain_Id);
-                ViewBag.Investigator_Id = new SelectList(await _investigators.GetInvestigators(), "Id", "FullName", animal.Investigator_Id);
-                ViewBag.Researcher_Id = new SelectList(await _students.GetStudentsAndInvestigators(), "Id", "FullName", animal.Researcher_Id);
+                ViewBag.ArrivalStatus_Id = new SelectList(await _unitOfWork.ArrivalStatus.Get(), "Id", "Description", animal.ArrivalStatus_Id);
+                ViewBag.Colour_Id = new SelectList(await _unitOfWork.Colours.Get(), "Id", "Description", animal.Colour_Id);
+                ViewBag.Source_Id = new SelectList(await _unitOfWork.Sources.Get(), "Id", "Description", animal.Source_Id);
+                ViewBag.Strain_Id = new SelectList(await _unitOfWork.Strains.Get(), "Id", "Description", animal.Strain_Id);
+                ViewBag.Investigator_Id = new SelectList(await _unitOfWork.Investigators.Get(), "Id", "FullName", animal.Investigator_Id);
+                ViewBag.Researcher_Id = new SelectList(await _unitOfWork.Students.Get(), "Id", "FullName", animal.Researcher_Id);
                 //ViewBag.ChargeCode_Id = new SelectList(_chargeCodes.GetChargeCodes(), "Id", "Text", animal.ChargeCode_Id);
-                ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", animal.Room_Id);
-                ViewBag.ApprovalNumber_Id = new SelectList(await _approvalNumbers.GetApprovalNumbers(), "Id", "Description", animal.ApprovalNumber_Id);
-                ViewBag.Transgene_Id = new SelectList(await _transgenes.GetTransgenes(), "Id", "Description", animal.Transgene_Id);
-                var ethics = await _animals.GetAnimalsEthicsNumber(animal.Id);
-                ViewBag.Ethics_Id = new SelectList(await _ethicsNumbers.GetEthicsNumbers(), "Id", "Text", ethics?.Ethics_Id);
+                ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description", animal.Room_Id);
+                ViewBag.ApprovalNumber_Id = new SelectList(await _unitOfWork.ApprovalNumbers.Get(), "Id", "Description", animal.ApprovalNumber_Id);
+                ViewBag.Transgene_Id = new SelectList(await _unitOfWork.Transgenes.Get(), "Id", "Description", animal.Transgene_Id);
+                var ethics = _unitOfWork.Animals.GetAnimalsEthicsNumber(animal.Id);
+                ViewBag.Ethics_Id = new SelectList(await _unitOfWork.EthicsNumbers.Get(), "Id", "Text", ethics?.Ethics_Id);
                 return View(animal);
             }
         }
@@ -412,7 +375,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
@@ -427,8 +390,9 @@ namespace AnimalDB.Controllers
         [Authorize(Roles = "Administrator, Technician")]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Animal animal = await _animals.GetAnimalById(id);
-            await _animals.DeleteAnimal(animal);
+            Animal animal = await _unitOfWork.Animals.GetById(id);
+            _unitOfWork.Animals.Delete(animal);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", "Home");
         }
 
@@ -440,7 +404,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
@@ -454,7 +418,7 @@ namespace AnimalDB.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Resurrect(int id)
         {
-            await _animals.Resurrect(id);
+            await _unitOfWork.Animals.Resurrect(id);
             return RedirectToAction("Details", "Animals", new { id });
         }
     }

@@ -143,8 +143,8 @@ namespace AnimalDB.Repo.Contexts
             return new AnimalDBContext();
         }
 
-        public System.Data.Entity.DbSet<AnimalDB.Repo.Entities.Document> Documents { get; set; }
+        public System.Data.Entity.DbSet<Document> Documents { get; set; }
 
-        public System.Data.Entity.DbSet<AnimalDB.Repo.Entities.DocumentCategory> DocumentCategories { get; set; }
+        public System.Data.Entity.DbSet<DocumentCategory> DocumentCategories { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AnimalDB.Models;
+using AnimalDB.Repo.Contexts;
 using AnimalDB.Repo.Interfaces;
 using System.Linq;
 using System.Threading;
@@ -10,13 +11,13 @@ namespace AnimalDB.Web.Controllers
 {
     public class NavController : Controller
     {
-        private readonly INotificationService _notifications;
-        private readonly IUserManagementService _users;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserManagementService _userManagementService;
 
-        public NavController(INotificationService notifications, IUserManagementService users)
+        public NavController(IUnitOfWork unitOfWork, IUserManagementService userManagementService)
         {
-            _notifications = notifications;
-            _users = users;
+            _unitOfWork = unitOfWork;
+            _userManagementService = userManagementService;
         }
 
         [ChildActionOnly]
@@ -26,11 +27,11 @@ namespace AnimalDB.Web.Controllers
             var syncContext = SynchronizationContext.Current;
             SynchronizationContext.SetSynchronizationContext(null);
 
-            var notifications = _notifications.GetPastNotifications().Result;
+            var notifications = _unitOfWork.Notifications.GetPast();
 
             var model = new MenuViewModel
             {
-                UserRole = _users.GetUserType(User.Identity.Name).Result,
+                UserRole = _userManagementService.GetUserType(User.Identity.Name).Result,
                 NotificationAmount = notifications.Count()
             };
 

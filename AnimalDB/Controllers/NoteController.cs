@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Configuration;
@@ -16,17 +17,11 @@ namespace AnimalDB.Controllers
     {
         //private AnimalDBContext db = new AnimalDBContext();
 
-        private readonly IAnimalService _animals;
-        private readonly INoteService _notes;
-        private readonly ITechnicianService _technicians;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public NoteController(IAnimalService animals, 
-                              INoteService notes,
-                              ITechnicianService technicians)
+        public NoteController(IUnitOfWork unitOfWork)
         {
-            this._animals = animals;
-            this._notes = notes;
-            this._technicians = technicians;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /Note/
@@ -37,7 +32,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -46,7 +41,7 @@ namespace AnimalDB.Controllers
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
 
-            return View(await _notes.GetNotesByAnimalId(id.Value));
+            return View(_unitOfWork.Notes.GetByAnimalId(id.Value));
         }
 
         // GET: /Note/Create
@@ -57,7 +52,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -65,7 +60,7 @@ namespace AnimalDB.Controllers
             }
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
-            ViewBag.TechnicianNotified_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName");
+            ViewBag.TechnicianNotified_Id = new SelectList(await _unitOfWork.Technicians.Get(), "Id", "FullName");
             return View();
         }
 
@@ -79,7 +74,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var animal = await _animals.GetAnimalById(id.Value);
+            var animal = await _unitOfWork.Animals.GetById(id.Value);
 
             if (animal == null)
             {
@@ -91,14 +86,15 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await AlertTechnicians(await _technicians.GetTechnicianById(note.TechnicianNotified_Id), note);
-                await _notes.CreateNote(note);
+                await AlertTechnicians(await _unitOfWork.Technicians.GetById(note.TechnicianNotified_Id), note);
+                _unitOfWork.Notes.Insert(note);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id });
             }
 
             ViewBag.AnimalName = animal.UniqueAnimalId;
             ViewBag.AnimalId = animal.Id;
-            ViewBag.TechnicianNotified_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", note.TechnicianNotified_Id);
+            ViewBag.TechnicianNotified_Id = new SelectList(await _unitOfWork.Technicians.Get(), "Id", "FullName", note.TechnicianNotified_Id);
             note.Type = null;
             return View(note);
         }
@@ -110,12 +106,12 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Note note = await _notes.GetNoteById(id.Value);
+            Note note = await _unitOfWork.Notes.GetById(id.Value);
             if (note == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.TechnicianNotified_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", note.TechnicianNotified_Id);
+            ViewBag.TechnicianNotified_Id = new SelectList(await _unitOfWork.Technicians.Get(), "Id", "FullName", note.TechnicianNotified_Id);
             return View(note);
         }
 
@@ -128,11 +124,12 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await AlertTechnicians(await _technicians.GetTechnicianById(note.TechnicianNotified_Id), note, true);
-                await _notes.UpdateNote(note);
+                await AlertTechnicians(await _unitOfWork.Technicians.GetById(note.TechnicianNotified_Id), note, true);
+                _unitOfWork.Notes.Update(note);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = note.Animal_Id });
             }
-            ViewBag.TechnicianNotified_Id = new SelectList(await _technicians.GetTechnicians(), "Id", "FullName", note.TechnicianNotified_Id);
+            ViewBag.TechnicianNotified_Id = new SelectList(await _unitOfWork.Technicians.Get(), "Id", "FullName", note.TechnicianNotified_Id);
             return View(note);
         }
 
@@ -143,7 +140,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Note note = await _notes.GetNoteById(id.Value);
+            Note note = await _unitOfWork.Notes.GetById(id.Value);
             if (note == null)
             {
                 return HttpNotFound();
@@ -156,8 +153,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Note note = await _notes.GetNoteById(id);
-            await _notes.DeleteNote(note);
+            Note note = await _unitOfWork.Notes.GetById(id);
+            _unitOfWork.Notes.Delete(note);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id = note.Animal_Id });
         }
 
@@ -165,7 +163,7 @@ namespace AnimalDB.Controllers
         {
             if (tech == null) return;
 
-            note.Animal = await _animals.GetAnimalById(note.Animal_Id);
+            note.Animal = await _unitOfWork.Animals.GetById(note.Animal_Id);
             MailMessage msg = new MailMessage
             {
                 From = new MailAddress(ConfigurationManager.AppSettings["SystemEmail"])

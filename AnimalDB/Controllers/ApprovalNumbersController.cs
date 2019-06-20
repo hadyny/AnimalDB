@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,17 +10,17 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class ApprovalNumbersController : Controller
     {
-        private IApprovalNumberService _approvalNumbers;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ApprovalNumbersController(IApprovalNumberService approvalNumbers)
+        public ApprovalNumbersController(IUnitOfWork unitOfWork)
         {
-            this._approvalNumbers = approvalNumbers;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: ApprovalNumbers
         public async Task<ActionResult> Index()
         {
-            return View(await _approvalNumbers.GetApprovalNumbers());
+            return View(await _unitOfWork.ApprovalNumbers.Get());
         }
 
         // GET: ApprovalNumbers/Create
@@ -35,7 +36,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _approvalNumbers.CreateApprovalNumber(approvalNumber);
+                _unitOfWork.ApprovalNumbers.Insert(approvalNumber);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -49,7 +51,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ApprovalNumber approvalNumber = await _approvalNumbers.GetApprovalNumberById(id.Value);
+            ApprovalNumber approvalNumber = await _unitOfWork.ApprovalNumbers.GetById(id.Value);
             if (approvalNumber == null)
             {
                 return HttpNotFound();
@@ -64,7 +66,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _approvalNumbers.UpdateApprovalNumber(approvalNumber);
+                _unitOfWork.ApprovalNumbers.Update(approvalNumber);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(approvalNumber);
@@ -77,7 +80,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ApprovalNumber approvalNumber = await _approvalNumbers.GetApprovalNumberById(id.Value);
+            ApprovalNumber approvalNumber = await _unitOfWork.ApprovalNumbers.GetById(id.Value);
             if (approvalNumber == null)
             {
                 return HttpNotFound();
@@ -90,8 +93,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            ApprovalNumber approvalNumber = await _approvalNumbers.GetApprovalNumberById(id);
-            await _approvalNumbers.DeleteApprovalNumber(approvalNumber);
+            ApprovalNumber approvalNumber = await _unitOfWork.ApprovalNumbers.GetById(id);
+            _unitOfWork.ApprovalNumbers.Delete(approvalNumber);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
 

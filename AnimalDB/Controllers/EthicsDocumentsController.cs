@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.Net;
@@ -11,21 +12,18 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Administrator,Technician")]
     public class EthicsDocumentsController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private IInvestigatorService _investigators;
-        private IEthicsDocumentService _ethicsDocuments;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public EthicsDocumentsController(IInvestigatorService investigators, IEthicsDocumentService ethicsDocuments)
+        public EthicsDocumentsController(IUnitOfWork unitOfWork)
         {
-            this._investigators = investigators;
-            this._ethicsDocuments = ethicsDocuments;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: EthicsDocuments/Investigators
 
         public async Task<ActionResult> Investigators()
         {
-            return View(await _investigators.GetInvestigators());
+            return View(await _unitOfWork.Investigators.Get());
         }
 
         // GET: EthicsDocuments
@@ -36,7 +34,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Investigator inv = await _investigators.GetInvestigatorById(id);
+            Investigator inv = await _unitOfWork.Investigators.GetById(id);
 
             if (inv == null)
             {
@@ -45,7 +43,7 @@ namespace AnimalDB.Controllers
             ViewBag.Investigator = inv.FullName;
             ViewBag.Investigator_Id = inv.Id;
 
-            return View(await _ethicsDocuments.GetEthicsDocumentsByInvestigatorId(id));
+            return View(_unitOfWork.EthicsDocuments.GetByInvestigatorId(id));
         }
 
         // GET: EthicsDocuments/Upload
@@ -56,7 +54,7 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Investigator inv = await _investigators.GetInvestigatorById(id);
+            Investigator inv = await _unitOfWork.Investigators.GetById(id);
 
             if (inv == null)
             {
@@ -85,7 +83,7 @@ namespace AnimalDB.Controllers
                 ModelState.AddModelError("file", "A pdf file is required");
             }
 
-            if (await _ethicsDocuments.CheckIfDocumentExists(upload.FileName))
+            if (_unitOfWork.EthicsDocuments.Exists(upload.FileName))
             {
                 ModelState.AddModelError("file", "\"" + upload.FileName + "\" already exists in the database. If you want to update the file, locate the entry and click \"Edit\".");
             }
@@ -100,10 +98,11 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _ethicsDocuments.CreateEthicsDocument(ethicsDocument);
+                _unitOfWork.EthicsDocuments.Insert(ethicsDocument);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = ethicsDocument.Investigator_Id });
             }
-            Investigator inv = await _investigators.GetInvestigatorById(ethicsDocument.Investigator_Id);
+            Investigator inv = await _unitOfWork.Investigators.GetById(ethicsDocument.Investigator_Id);
 
             ViewBag.Investigator_Id = inv.Id;
             ViewBag.Investigator = inv.FullName;
@@ -118,7 +117,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            EthicsDocument ethicsDocument = await _ethicsDocuments.GetEthicsDocumentById(id.Value);
+            EthicsDocument ethicsDocument = await _unitOfWork.EthicsDocuments.GetById(id.Value);
             if (ethicsDocument == null)
             {
                 return HttpNotFound();
@@ -141,7 +140,7 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                var olddoc = await _ethicsDocuments.GetEthicsDocumentById(ethicsDocument.Id);
+                var olddoc = await _unitOfWork.EthicsDocuments.GetById(ethicsDocument.Id);
                 if (upload != null && upload.ContentLength > 0)
                 {
                     olddoc.DateUploaded = DateTime.Now;
@@ -153,7 +152,8 @@ namespace AnimalDB.Controllers
                 }
                 olddoc.Description = ethicsDocument.Description;
 
-                await _ethicsDocuments.UpdateEthicsDocument(olddoc);
+                _unitOfWork.EthicsDocuments.Update(olddoc);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = ethicsDocument.Investigator_Id });
             }
             
@@ -167,7 +167,7 @@ namespace AnimalDB.Controllers
             {
                 return null;
             }
-            EthicsDocument doc = await _ethicsDocuments.GetEthicsDocumentById(id.Value);
+            EthicsDocument doc = await _unitOfWork.EthicsDocuments.GetById(id.Value);
             if (doc == null)
             {
                 return null;
@@ -190,7 +190,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            EthicsDocument doc = await _ethicsDocuments.GetEthicsDocumentById(id.Value);
+            EthicsDocument doc = await _unitOfWork.EthicsDocuments.GetById(id.Value);
             if (doc == null)
             {
                 return HttpNotFound();
@@ -206,7 +206,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            EthicsDocument ethicsDocument = await _ethicsDocuments.GetEthicsDocumentById(id.Value);
+            EthicsDocument ethicsDocument = await _unitOfWork.EthicsDocuments.GetById(id.Value);
             if (ethicsDocument == null)
             {
                 return HttpNotFound();
@@ -219,9 +219,10 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            EthicsDocument ethicsDocument = await _ethicsDocuments.GetEthicsDocumentById(id);
+            EthicsDocument ethicsDocument = await _unitOfWork.EthicsDocuments.GetById(id);
             string inv_id = ethicsDocument.Investigator_Id;
-            await _ethicsDocuments.DeleteEthicsDocument(ethicsDocument);
+            _unitOfWork.EthicsDocuments.Delete(ethicsDocument);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id = inv_id });
         }
 

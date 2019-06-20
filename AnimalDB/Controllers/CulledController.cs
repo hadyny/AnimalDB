@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,24 +12,21 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Investigator, Technician, Administrator")]
     public class CulledController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly IAnimalService _animals;
-        private readonly IInvestigatorService _investigators;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CulledController(IAnimalService animals, IInvestigatorService investigators)
+        public CulledController(IUnitOfWork unitOfWork)
         {
-            this._animals = animals;
-            this._investigators = investigators;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /Culled/
         public async Task<ActionResult> Index(int? id)
         {
-            var animals = await _animals.GetDeceasedAnimals();
+            var animals = _unitOfWork.Animals.GetDeceasedAnimals();
 
             if (User.IsInRole("Investigator"))
             {
-                var investigator = await _investigators.GetInvestigatorByUsername(User.Identity.Name);
+                var investigator = await _unitOfWork.Investigators.GetByUsername(User.Identity.Name);
                 animals.Where(m => m.Investigator_Id == investigator.Id);
             }
 
@@ -64,7 +62,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();

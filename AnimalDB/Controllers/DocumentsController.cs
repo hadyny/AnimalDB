@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System;
 using System.IO;
@@ -12,13 +13,11 @@ namespace AnimalDB.Web.Controllers
     [Authorize]
     public class DocumentsController : Controller
     {
-        private IDocumentService _docs;
-        private IDocumentCategoryService _categories;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DocumentsController(IDocumentService docs, IDocumentCategoryService categories)
+        public DocumentsController(IUnitOfWork unitOfWork)
         {
-            this._docs = docs;
-            this._categories = categories;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Documents
@@ -29,7 +28,7 @@ namespace AnimalDB.Web.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            DocumentCategory category = await _categories.GetDocumentCategoryById(id.Value);
+            DocumentCategory category = await _unitOfWork.DocumentCategories.GetById(id.Value);
             if (category == null)
             {
                 return HttpNotFound();
@@ -38,14 +37,14 @@ namespace AnimalDB.Web.Controllers
             ViewBag.Id = category.Id;
             ViewBag.Category = category.Description;
 
-            return View(await _docs.GetDocumentsByCategoryId(category.Id));
+            return View(_unitOfWork.Documents.GetByCategoryId(category.Id));
         }
 
 
         // GET: Documents/Create
         public async Task<ActionResult> Create()
         {
-            ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description");
+            ViewBag.Category_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description");
             return View();
         }
 
@@ -56,11 +55,12 @@ namespace AnimalDB.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _docs.CreateDocument(document);
+                _unitOfWork.Documents.Insert(document);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", "DocumentCategories", document.Category_Id);
             }
 
-            ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description", document.Category_Id);
             return View(document);
         }
 
@@ -71,12 +71,12 @@ namespace AnimalDB.Web.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Document document = await _docs.GetDocumentById(id.Value);
+            Document document = await _unitOfWork.Documents.GetById(id.Value);
             if (document == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description", document.Category_Id);
             return View(document);
         }
 
@@ -92,7 +92,7 @@ namespace AnimalDB.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var olddoc = await _docs.GetDocumentById(document.Id);
+                var olddoc = await _unitOfWork.Documents.GetById(document.Id);
                 if (upload != null && upload.ContentLength > 0)
                 {
                     var filename = Path.GetFileName(upload.FileName);
@@ -104,11 +104,12 @@ namespace AnimalDB.Web.Controllers
                 olddoc.Description = document.Description;
                 olddoc.Category_Id = document.Category_Id;
 
-                await _docs.UpdateDocument(olddoc);
+                _unitOfWork.Documents.Update(olddoc);
+                await _unitOfWork.Complete();
 
                 return RedirectToAction("Index", "DocumentCategories", new { id = document.Category_Id });
             }
-            ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description", document.Category_Id);
             return View(document);
         }
 
@@ -118,11 +119,11 @@ namespace AnimalDB.Web.Controllers
         {
             if (id.HasValue)
             {
-                ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", id.Value);
+                ViewBag.Category_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description", id.Value);
             }
             else
             {
-                ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description");
+                ViewBag.Category_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description");
             }
 
             ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "DocumentCategories", new { id });
@@ -140,7 +141,7 @@ namespace AnimalDB.Web.Controllers
                 ModelState.AddModelError("file", "A pdf file is required");
             }
 
-            if (await _docs.DoesDocumentFileNameExist(upload.FileName))
+            if (_unitOfWork.Documents.Exists(upload.FileName))
             {
                 ModelState.AddModelError("file", "\"" + upload.FileName + "\" already exists in the database. If you want to update the file, locate the entry and click \"Edit\".");
             }
@@ -152,12 +153,13 @@ namespace AnimalDB.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                await _docs.CreateDocument(document);
+                _unitOfWork.Documents.Insert(document);
+                await _unitOfWork.Complete();
                 upload.SaveAs(path);
                 return RedirectToAction("Index", "DocumentCategories", new { id = document.Category_Id });
             }
             ViewBag.returnUrl = Request["returnUrl"] ?? Url.Action("Index", "DocumentCategories", new { id = document.Category_Id });
-            ViewBag.Category_Id = new SelectList(await _categories.GetDocumentCategories(), "Id", "Description", document.Category_Id);
+            ViewBag.Category_Id = new SelectList(await _unitOfWork.DocumentCategories.Get(), "Id", "Description", document.Category_Id);
             return View(document);
         }
 
@@ -168,7 +170,7 @@ namespace AnimalDB.Web.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Document doc = await _docs.GetDocumentById(id.Value);
+            Document doc = await _unitOfWork.Documents.GetById(id.Value);
             if (doc == null)
             {
                 return HttpNotFound();
@@ -184,7 +186,7 @@ namespace AnimalDB.Web.Controllers
             {
                 return null;
             }
-            Document doc = await _docs.GetDocumentById(id.Value);
+            Document doc = await _unitOfWork.Documents.GetById(id.Value);
             var content = System.IO.File.ReadAllBytes(Path.Combine(Server.MapPath("~/Content/Documents"), doc.FileName));
             if (doc == null)
             {
@@ -208,7 +210,7 @@ namespace AnimalDB.Web.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Document document = await _docs.GetDocumentById(id.Value);
+            Document document = await _unitOfWork.Documents.GetById(id.Value);
             if (document == null)
             {
                 return HttpNotFound();
@@ -221,9 +223,10 @@ namespace AnimalDB.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Document document = await _docs.GetDocumentById(id);
+            Document document = await _unitOfWork.Documents.GetById(id);
             int catergory = document.Category_Id;
-            await _docs.DeleteDocument(document);
+            _unitOfWork.Documents.Delete(document);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", "DocumentCategories", new { id = catergory });
         }
     }

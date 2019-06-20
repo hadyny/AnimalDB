@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Linq;
 using System.Net;
@@ -10,17 +11,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Administrator")]
     public class ChargeCodesController : Controller
     {
-        IChargeCodeService _chargeCodes;
+        public readonly IUnitOfWork _unitOfWork;
 
-        public ChargeCodesController(IChargeCodeService chargeCodes)
+        public ChargeCodesController(IUnitOfWork unitOfWork)
         {
-            this._chargeCodes = chargeCodes;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: ChargeCodes
         public async Task<ActionResult> Index()
         {
-            return View(await _chargeCodes.GetChargeCodes());
+            return View(await _unitOfWork.ChargeCodes.Get());
         }
 
         // GET: ChargeCodes/Animals
@@ -30,7 +31,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ChargeCode chargeCode = await _chargeCodes.GetChargeCodeById(id.Value);
+            ChargeCode chargeCode = await _unitOfWork.ChargeCodes.GetById(id.Value);
             if (chargeCode == null)
             {
                 return HttpNotFound();
@@ -52,7 +53,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Id,Text")] ChargeCode chargeCode)
         {
-            var codes = await _chargeCodes.GetChargeCodes();
+            var codes = await _unitOfWork.ChargeCodes.Get();
             if (codes.Count(m => m.Text == chargeCode.Text) != 0)
             {
                 ModelState.AddModelError("", "Charge code already in use");
@@ -60,7 +61,8 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _chargeCodes.CreateChargeCode(chargeCode);
+                _unitOfWork.ChargeCodes.Insert(chargeCode);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -74,7 +76,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ChargeCode chargeCode = await _chargeCodes.GetChargeCodeById(id.Value);
+            ChargeCode chargeCode = await _unitOfWork.ChargeCodes.GetById(id.Value);
             if (chargeCode == null)
             {
                 return HttpNotFound();
@@ -87,7 +89,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Text")] ChargeCode chargeCode)
         {
-            var codes = await _chargeCodes.GetChargeCodes();
+            var codes = await _unitOfWork.ChargeCodes.Get();
             if (codes.Count(m => m.Text == chargeCode.Text) != 0)
             {
                 ModelState.AddModelError("", "Charge code already in use");
@@ -95,7 +97,8 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _chargeCodes.UpdateChargeCode(chargeCode);
+                _unitOfWork.ChargeCodes.Update(chargeCode);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(chargeCode);

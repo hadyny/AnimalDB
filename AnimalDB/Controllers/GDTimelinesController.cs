@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,19 +10,18 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class GDTimelinesController : Controller
     {
-        private readonly IGDTimelineService _gDTimelines;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GDTimelinesController(IGDTimelineService gDTimelines)
+        public GDTimelinesController(IUnitOfWork unitOfWork)
         {
-            this._gDTimelines = gDTimelines;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: GDTimelines
         public async Task<ActionResult> Index()
         {
-            ViewBag.unused = await _gDTimelines.GetUnusedTimelineList();
-            
-            return View(await _gDTimelines.GetGDTimelines());
+            ViewBag.unused = _unitOfWork.GDTimelines.GetUnused();
+            return View(await _unitOfWork.GDTimelines.Get());
         }
 
         // GET: GDTimelines/Details/5
@@ -31,7 +31,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            GDTimeline gDTimeline = await _gDTimelines.GetGDTimelineById(id.Value);
+            GDTimeline gDTimeline = await _unitOfWork.GDTimelines.GetById(id.Value);
             if (gDTimeline == null)
             {
                 return HttpNotFound();
@@ -46,20 +46,19 @@ namespace AnimalDB.Controllers
         }
 
         // POST: GDTimelines/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Id,Description,Offset")] GDTimeline gDTimeline)
         {
-            if (await _gDTimelines.CheckIfTimeLineExists(gDTimeline))
+            if (_unitOfWork.GDTimelines.Exists(gDTimeline))
             {
                 ModelState.AddModelError("Description", "GD Timeline already exists");
             }
 
             if (ModelState.IsValid)
             {
-                await _gDTimelines.CreateGDTimeline(gDTimeline);
+                _unitOfWork.GDTimelines.Insert(gDTimeline);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
@@ -73,7 +72,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            GDTimeline gDTimeline = await _gDTimelines.GetGDTimelineById(id.Value);
+            GDTimeline gDTimeline = await _unitOfWork.GDTimelines.GetById(id.Value);
             if (gDTimeline == null)
             {
                 return HttpNotFound();
@@ -82,19 +81,18 @@ namespace AnimalDB.Controllers
         }
 
         // POST: GDTimelines/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Description,Offset")] GDTimeline gDTimeline)
         {
-            if (await _gDTimelines.CheckIfTimeLineExists(gDTimeline))
+            if (_unitOfWork.GDTimelines.Exists(gDTimeline))
             {
                 ModelState.AddModelError("Description", "GD Timeline already exists");
             }
             if (ModelState.IsValid)
             {
-                await _gDTimelines.UpdateGDTimeline(gDTimeline);
+                _unitOfWork.GDTimelines.Update(gDTimeline);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             return View(gDTimeline);
@@ -107,7 +105,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            GDTimeline gDTimeline = await _gDTimelines.GetGDTimelineById(id.Value);
+            GDTimeline gDTimeline = await _unitOfWork.GDTimelines.GetById(id.Value);
             if (gDTimeline == null)
             {
                 return HttpNotFound();
@@ -120,8 +118,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            GDTimeline gDTimeline = await _gDTimelines.GetGDTimelineById(id);
-            await _gDTimelines.DeleteGDTimeline(gDTimeline);
+            GDTimeline gDTimeline = await _unitOfWork.GDTimelines.GetById(id);
+            _unitOfWork.GDTimelines.Delete(gDTimeline);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

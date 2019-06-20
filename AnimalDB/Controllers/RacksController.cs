@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Interfaces;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -10,21 +10,17 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class RacksController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
+        private readonly IUnitOfWork _unitOfWork;
 
-        private IRackService _racks;
-        private IRoomService _rooms;
-
-        public RacksController(IRackService racks, IRoomService rooms)
+        public RacksController(IUnitOfWork unitOfWork)
         {
-            this._racks = racks;
-            this._rooms = rooms;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Racks
         public async Task<ActionResult> Index()
         {
-            return View(await _racks.GetRacks());
+            return View(await _unitOfWork.Racks.Get());
         }
 
         // GET: Racks/Details/5
@@ -34,7 +30,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Rack rack = await _racks.GetRackById(id.Value);
+            Rack rack = await _unitOfWork.Racks.GetById(id.Value);
             if (rack == null)
             {
                 return HttpNotFound();
@@ -49,7 +45,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Rack rack = await _racks.GetRackById(id.Value);
+            Rack rack = await _unitOfWork.Racks.GetById(id.Value);
             if (rack == null)
             {
                 return HttpNotFound();
@@ -60,7 +56,7 @@ namespace AnimalDB.Controllers
         // GET: Racks/Create
         public async Task<ActionResult> Create()
         {
-            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description");
+            ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description");
             return View();
         }
 
@@ -71,11 +67,12 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _racks.CreateRack(rack);
+                _unitOfWork.Racks.Insert(rack);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", rack.Room_Id);
+            ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description", rack.Room_Id);
             return View(rack);
         }
 
@@ -86,12 +83,12 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Rack rack = await _racks.GetRackById(id.Value);
+            Rack rack = await _unitOfWork.Racks.GetById(id.Value);
             if (rack == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", rack.Room_Id);
+            ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description", rack.Room_Id);
             return View(rack);
         }
 
@@ -104,10 +101,11 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _racks.UpdateRack(rack);
+                _unitOfWork.Racks.Update(rack);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
-            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", rack.Room_Id);
+            ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description", rack.Room_Id);
             return View(rack);
         }
 
@@ -118,7 +116,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Rack rack = await _racks.GetRackById(id.Value);
+            Rack rack = await _unitOfWork.Racks.GetById(id.Value);
             if (rack == null)
             {
                 return HttpNotFound();
@@ -131,8 +129,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Rack rack = await _racks.GetRackById(id);
-            await _racks.DeleteRack(rack);
+            Rack rack = await _unitOfWork.Racks.GetById(id);
+            _unitOfWork.Racks.Delete(rack);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

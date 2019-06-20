@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Interfaces;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,24 +12,17 @@ namespace AnimalDB.Controllers
     [Authorize]
     public class RostersController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly IRosterService _rosters;
-        private readonly IRoomService _rooms;
-        private readonly IInvestigatorService _investigators;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public RostersController(IRosterService rosters,
-                                 IRoomService rooms,
-                                 IInvestigatorService investigators)
+        public RostersController(IUnitOfWork unitOfWork)
         {
-            this._rosters = rosters;
-            this._rooms = rooms;
-            this._investigators = investigators;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: RosterRooms
         public async Task<ActionResult> RosterRooms()
         {
-            return View(await _rooms.GetRooms());
+            return View(await _unitOfWork.Rooms.Get());
         }
 
         // GET: Rosters
@@ -39,14 +32,14 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Room room = await _rooms.GetRoomById(id.Value);
+            Room room = await _unitOfWork.Rooms.GetById(id.Value);
             if (room == null)
             {
                 return HttpNotFound();
             }
             ViewBag.Room = room.Description;
             ViewBag.Room_Id = room.Id;
-            return View(await _rosters.GetRostersByRoomId(room.Id));
+            return View(_unitOfWork.Rosters.GetByRoomId(room.Id));
         }
 
         // GET: Rosters/Create
@@ -56,7 +49,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Room room = await _rooms.GetRoomById(id.Value);
+            Room room = await _unitOfWork.Rooms.GetById(id.Value);
             if (room == null)
             {
                 return HttpNotFound();
@@ -69,7 +62,7 @@ namespace AnimalDB.Controllers
 
             ICollection<Student> students = new List<Student>();
 
-            foreach (var investigator in await _investigators.GetInvestigators())
+            foreach (var investigator in await _unitOfWork.Investigators.Get())
             {
                 if (investigator.Animals.Count(m => m.Room_Id == room.Id) != 0)
                 {
@@ -91,19 +84,20 @@ namespace AnimalDB.Controllers
                 roster.Date = roster.Date.AddDays(-1);
             }
 
-            if (await _rosters.CheckIfThereIsARosterThisWeekend(roster.Date))
+            if (_unitOfWork.Rosters.ThisWeekendsRosterExists(roster.Date))
             {
                 ModelState.AddModelError("Date", "There is already a roster for this weekend");
             }
 
             if (ModelState.IsValid)
             {
-                await _rosters.CreateRoster(roster);
+                _unitOfWork.Rosters.Insert(roster);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = roster.Room_Id });
             }
             ICollection<Student> students = new List<Student>();
 
-            foreach (var investigator in await _investigators.GetInvestigators())
+            foreach (var investigator in await _unitOfWork.Investigators.Get())
             {
                 if (investigator.Animals.Count(m => m.Room_Id == roster.Room_Id) != 0)
                 {
@@ -121,7 +115,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Roster roster = await _rosters.GetRosterById(id.Value);
+            Roster roster = await _unitOfWork.Rosters.GetById(id.Value);
             if (roster == null)
             {
                 return HttpNotFound();
@@ -129,7 +123,7 @@ namespace AnimalDB.Controllers
 
             ICollection<Student> students = new List<Student>();
 
-            foreach (var investigator in await _investigators.GetInvestigators())
+            foreach (var investigator in await _unitOfWork.Investigators.Get())
             {
                 if (investigator.Animals.Count(m => m.Room_Id == roster.Room_Id) != 0)
                 {
@@ -150,19 +144,20 @@ namespace AnimalDB.Controllers
                 roster.Date = roster.Date.AddDays(-1);
             }
 
-            if (await _rosters.CheckIfThereIsARosterThisWeekend(roster.Date, roster.Id))
+            if (_unitOfWork.Rosters.ThisWeekendsRosterExists(roster.Date, roster.Id))
             {
                 ModelState.AddModelError("Date", "There is already a roster for this weekend");
             }
 
             if (ModelState.IsValid)
             {
-                await _rosters.UpdateRoster(roster);
+                _unitOfWork.Rosters.Update(roster);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index", new { id = roster.Room_Id });
             }
             ICollection<Student> students = new List<Student>();
 
-            foreach (var investigator in await _investigators.GetInvestigators())
+            foreach (var investigator in await _unitOfWork.Investigators.Get())
             {
                 if (investigator.Animals.Count(m => m.Room_Id == roster.Room_Id) != 0)
                 {
@@ -180,7 +175,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Roster roster = await _rosters.GetRosterById(id.Value);
+            Roster roster = await _unitOfWork.Rosters.GetById(id.Value);
             if (roster == null)
             {
                 return HttpNotFound();
@@ -193,9 +188,10 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Roster roster = await _rosters.GetRosterById(id);
+            Roster roster = await _unitOfWork.Rosters.GetById(id);
             int room_Id = roster.Room_Id;
-            await _rosters.DeleteRoster(roster);
+            _unitOfWork.Rosters.Delete(roster);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index", new { id = room_Id });
         }
     }

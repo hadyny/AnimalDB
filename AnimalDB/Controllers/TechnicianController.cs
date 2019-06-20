@@ -1,5 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Services;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,20 +10,19 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Administrator")]
     public class TechnicianController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly ITechnicianService _technicians;
-        private readonly IUserManagementService _users;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserManagementService _userManagementService;
 
-        public TechnicianController(ITechnicianService technicians, IUserManagementService users)
+        public TechnicianController(IUnitOfWork unitOfWork, IUserManagementService userManagementService)
         {
-            this._technicians = technicians;
-            this._users = users;
+            _unitOfWork = unitOfWork;
+            _userManagementService = userManagementService;
         }
 
         // GET: /Technician/
         public async Task<ActionResult> Index()
         {
-            return View(await _technicians.GetTechnicians());
+            return View(await _unitOfWork.Technicians.Get());
         }
 
         // GET: /Technician/Create
@@ -36,7 +35,7 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include="UserName,Email,FirstName,LastName")] Technician technician)
         {
-            string error = await _users.CreateAnimalUser(technician, Repo.Enums.UserType.Technician);
+            string error = await _userManagementService.Register(technician, Repo.Enums.UserType.Technician);
 
             if (string.IsNullOrEmpty(error))
             {
@@ -57,7 +56,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Technician Technician = await _technicians.GetTechnicianById(id);
+            Technician Technician = await _unitOfWork.Technicians.GetById(id);
             if (Technician == null)
             {
                 return HttpNotFound();
@@ -70,8 +69,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
-            Technician technician = await _technicians.GetTechnicianById(id);
-            await _technicians.DeleteTechnician(technician);
+            Technician technician = await _unitOfWork.Technicians.GetById(id);
+            await _unitOfWork.Technicians.Delete(technician);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

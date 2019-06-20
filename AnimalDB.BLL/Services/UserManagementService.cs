@@ -3,6 +3,7 @@ using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Enums;
 using AnimalDB.Repo.Interfaces;
 using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security;
 using System;
 using System.Configuration;
 using System.DirectoryServices;
@@ -13,90 +14,11 @@ namespace AnimalDB.Repo.Services
 {
     public class UserManagementService : IUserManagementService
     {
-        private readonly IAdministratorService _administrators;
-        private readonly ITechnicianService _technicians;
-        private readonly IVeterinarianService _veterinarians;
-        private readonly IInvestigatorService _investigators;
-        private readonly IStudentService _students;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserManagementService(IAdministratorService administrators,
-                              ITechnicianService technicians,
-                              IVeterinarianService veterinarians,
-                              IInvestigatorService investogators,
-                              IStudentService students)
+        public UserManagementService(IUnitOfWork unitOfWork)
         {
-            _administrators = administrators;
-            _technicians = technicians;
-            _veterinarians = veterinarians;
-            _investigators = investogators;
-            _students = students;
-        }
-
-        public async Task<string> CreateAnimalUser(AnimalUser user, UserType newUserType)
-        {
-            var userType = await GetUserType(user.UserName);
-            
-            if (userType == UserType.Administrator && newUserType == UserType.Investigator)
-            {
-                user.UserName += "_Investigator";
-            }
-            else if (userType != null) // or is admin and investigator
-            {
-                return "User " + user.UserName + " is already a " + Enum.GetName(typeof(UserType), userType.Value);
-            }
-            
-            DirectoryEntry entry = new DirectoryEntry("LDAP://psy.local", ConfigurationManager.AppSettings["SystemUsername"], ConfigurationManager.AppSettings["SystemPassword"]);
-            SearchResult _result = null;
-            try
-            {
-                Object obj = entry.NativeObject;
-                DirectorySearcher search = new DirectorySearcher(entry)
-                {
-                    Filter = "(SAMAccountName=" + user.UserName.Replace("_Investigator", "") + ")"
-                };
-                search.PropertiesToLoad.Add("givenname");
-                search.PropertiesToLoad.Add("sn");
-                search.PropertiesToLoad.Add("mail");
-                _result = search.FindOne();
-            }
-            catch (Exception) { }
-
-            if (_result == null)
-            {
-                return "User " + user.UserName + " does not have an Active Directory account.";
-            }
-            if (!_result.Properties.Contains("mail"))
-            {
-                return "User " + user.UserName + " does not have an email address in their Active Directory account."; 
-            }
-            else
-            {
-                user.Email = _result.Properties["mail"][0].ToString();
-                user.FirstName = _result.Properties["givenname"][0].ToString();
-                user.LastName = _result.Properties["sn"][0].ToString();
-            }
-
-            switch (newUserType)
-            {
-                case UserType.Administrator:
-                    await _administrators.CreateAdministrator(user as Administrator);
-                    break;
-                case UserType.Investigator:
-                    await _investigators.CreateInvestigator(user as Investigator);
-                    break;
-                case UserType.Student:
-                    await _students.CreateStudent(user as Student);
-                    break;
-                case UserType.Technician:
-                    await _technicians.CreateTechnician(user as Technician);
-                    break;
-                case UserType.Veterinarian:
-                    await _veterinarians.CreateVeterinarian(user as Veterinarian);
-                    break;
-             
-            }
-
-            return null;
+            _unitOfWork = unitOfWork;
         }
 
         public SearchResult GetADUser(string username, string password)
@@ -128,49 +50,121 @@ namespace AnimalDB.Repo.Services
 
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
 
-            using (var db = new AnimalDBContext())
-            {
-                switch (userType)
-                {
-                    case UserType.Administrator:
-                        await _administrators.SetAuthCookie(userName);
-                        break;
-                    case UserType.Technician:
-                        await _technicians.SetAuthCookie(userName);
-                        break;
-                    case UserType.Veterinarian:
-                        await _veterinarians.SetAuthCookie(userName);
-                        break;
-                    case UserType.Investigator:
-                        await _investigators.SetAuthCookie(userName);
-                        break;
-                    case UserType.Student:
-                        await _students.SetAuthCookie(userName);
-                        break;
-                }
-            }
+            await SetAuthCookie(userName, userType);
+
             return true;
         }
 
-        public async Task<UserType?> GetUserType(string username)
+        public async Task SetAuthCookie(string userName, UserType userType)
         {
-            if (await _administrators.GetAdministratorByUsername(username) != null)
+            //using (var db = new AnimalDBContext())
+            //{
+            //    Administrator user = await GetAdministratorByUsername(userName);
+            //    var AdminManager = new UserManager<Administrator>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<Administrator>(db));
+            //    var adminIdentity = await AdminManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+            //    HttpContext.Current.GetOwinContext().Authentication.SignIn(new AuthenticationProperties() { IsPersistent = false }, adminIdentity);
+            //}
+
+            AnimalUser user = null;
+
+            switch (userType)
+            {
+                case UserType.Administrator:
+                    user = await _unitOfWork.Administrators.GetByUsername(userName);
+                    break;
+                case UserType.Investigator:
+                    user = await _unitOfWork.Investigators.GetByUsername(userName);
+                    break;
+                case UserType.Student:
+                    user = await _unitOfWork.Students.GetByUsername(userName);
+                    break;
+                case UserType.Technician:
+                    user = await _unitOfWork.Technicians.GetByUsername(userName);
+                    break;
+                case UserType.Veterinarian:
+                    user = await _unitOfWork.Veterinarians.GetByUsername(userName);
+                    break;
+            }
+
+            var manager = new UserManager<AnimalUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<AnimalUser>(_unitOfWork.Context));
+            var identity = await manager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+            HttpContext.Current.GetOwinContext().Authentication.SignIn(new AuthenticationProperties() { IsPersistent = false }, identity);
+        }
+
+        public async Task<string> Register(AnimalUser user, UserType newUserType)
+        {
+            var userType = await GetUserType(user.UserName);
+
+            if (userType == UserType.Administrator && newUserType == UserType.Investigator)
+            {
+                user.UserName += "_Investigator";
+            }
+            else if (userType != null) // or is admin and investigator
+            {
+                return "User " + user.UserName + " is already a " + Enum.GetName(typeof(UserType), userType.Value);
+            }
+
+            DirectoryEntry entry = new DirectoryEntry("LDAP://psy.local", ConfigurationManager.AppSettings["SystemUsername"], ConfigurationManager.AppSettings["SystemPassword"]);
+            SearchResult _result = null;
+            try
+            {
+                Object obj = entry.NativeObject;
+                DirectorySearcher search = new DirectorySearcher(entry)
+                {
+                    Filter = "(SAMAccountName=" + user.UserName.Replace("_Investigator", "") + ")"
+                };
+                search.PropertiesToLoad.Add("givenname");
+                search.PropertiesToLoad.Add("sn");
+                search.PropertiesToLoad.Add("mail");
+                _result = search.FindOne();
+            }
+            catch (Exception) { }
+
+            if (_result == null)
+            {
+                return "User " + user.UserName + " does not have an Active Directory account.";
+            }
+            if (!_result.Properties.Contains("mail"))
+            {
+                return "User " + user.UserName + " does not have an email address in their Active Directory account.";
+            }
+            else
+            {
+                user.Email = _result.Properties["mail"][0].ToString();
+                user.FirstName = _result.Properties["givenname"][0].ToString();
+                user.LastName = _result.Properties["sn"][0].ToString();
+            }
+
+
+            var usermanager = new UserManager<AnimalUser>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<AnimalUser>(_unitOfWork.Context));
+            var result = await usermanager.CreateAsync(user, "Password not required");
+            if (result.Succeeded)
+            {
+                usermanager.AddToRole(user.Id, newUserType.ToString());
+            }
+
+            return null;
+        }
+
+        public async Task <UserType?> GetUserType(string username)
+        {
+            if (await _unitOfWork.Administrators.GetByUsername(username) != null)
             {
                 return UserType.Administrator;
             }
-            else if (await _technicians.GetTechnicianByUsername(username) != null)
+            else if (await _unitOfWork.Technicians.GetByUsername(username) != null)
             {
                 return UserType.Technician;
             }
-            else if (await _veterinarians.GetVeterinarianByUsername(username) != null)
+            else if (await _unitOfWork.Veterinarians.GetByUsername(username) != null)
             {
                 return UserType.Veterinarian;
             }
-            else if (await _investigators.GetInvestigatorByUsername(username) != null)
+            else if (await _unitOfWork.Investigators.GetByUsername(username) != null)
             {
                 return UserType.Investigator;
             }
-            else if (await _students.GetStudentByUsername(username) != null)
+            else if (await _unitOfWork.Students.GetByUsername(username) != null)
             {
                 return UserType.Student;
             }

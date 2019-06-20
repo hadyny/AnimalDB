@@ -9,26 +9,24 @@ using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Enums;
 using AnimalDB.Repo.Interfaces;
 using AnimalDB.Models;
+using AnimalDB.Repo.Contexts;
 
 namespace AnimalDB.Controllers
 {
     [Authorize(Roles = "Investigator, Technician, Administrator")]
     public class CulledPupsController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private ICulledPupsService _culledPups;
-        private IAnimalService _animals;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CulledPupsController(ICulledPupsService culledPups, IAnimalService animals)
+        public CulledPupsController(IUnitOfWork unitOfWork)
         {
-            this._culledPups = culledPups;
-            this._animals = animals;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: CulledPups
         public async Task<ActionResult> Index()
         {
-            return View(await _culledPups.GetCulledPups());
+            return View(await _unitOfWork.CulledPups.Get());
         }
 
         // GET: CulledPups/Details/5
@@ -38,7 +36,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            CulledPups culledPups = await _culledPups.GetCulledPupsById(id.Value);
+            CulledPups culledPups = await _unitOfWork.CulledPups.GetById(id.Value);
             if (culledPups == null)
             {
                 return HttpNotFound();
@@ -47,9 +45,9 @@ namespace AnimalDB.Controllers
         }
 
         // GET: CulledPups/Create
-        public async Task<ActionResult> Create()
+        public ActionResult Create()
         {
-            var animals = await _animals.GetLivingAnimals();
+            var animals = _unitOfWork.Animals.GetLiving();
             ViewBag.AnimalId = new SelectList(animals
                                                 .Where(m => m.Sex == Sex.Female), 
                                             "Id", "UniqueAnimalId");
@@ -69,10 +67,11 @@ namespace AnimalDB.Controllers
 
             if (ModelState.IsValid)
             {
-                await _culledPups.CreateCulledPups(culledPups);
+                _unitOfWork.CulledPups.Insert(culledPups);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
-            var animals = await _animals.GetLivingAnimals();
+            var animals = _unitOfWork.Animals.GetLiving();
             ViewBag.AnimalId = new SelectList(animals
                                                 .Where(m => m.Sex == Sex.Female),
                                            "Id", "UniqueAnimalId", culledPups.AnimalId);
@@ -86,12 +85,12 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            CulledPups culledPups = await _culledPups.GetCulledPupsById(id.Value);
+            CulledPups culledPups = await _unitOfWork.CulledPups.GetById(id.Value);
             if (culledPups == null)
             {
                 return HttpNotFound();
             }
-            var animals = await _animals.GetLivingAnimals();
+            var animals = _unitOfWork.Animals.GetLiving();
             ViewBag.AnimalId = new SelectList(animals                                                
                                                 .Where(m => m.Sex == Sex.Female),
                                            "Id", "UniqueAnimalId", culledPups.AnimalId);
@@ -105,10 +104,11 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _culledPups.UpdateCulledPups(culledPups);
+                _unitOfWork.CulledPups.Update(culledPups);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
-            var animals = await _animals.GetLivingAnimals();
+            var animals = _unitOfWork.Animals.GetLiving();
             ViewBag.AnimalId = new SelectList(animals
                                                 .Where(m => m.Sex == Sex.Female),
                                            "Id", "UniqueAnimalId", culledPups.AnimalId);
@@ -122,7 +122,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            CulledPups culledPups = await _culledPups.GetCulledPupsById(id.Value);
+            CulledPups culledPups = await _unitOfWork.CulledPups.GetById(id.Value);
             if (culledPups == null)
             {
                 return HttpNotFound();
@@ -135,8 +135,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            CulledPups culledPups = await _culledPups.GetCulledPupsById(id);
-            await _culledPups.DeleteCulledPups(culledPups);
+            CulledPups culledPups = await _unitOfWork.CulledPups.GetById(id);
+            _unitOfWork.CulledPups.Delete(culledPups);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
 
@@ -147,7 +148,7 @@ namespace AnimalDB.Controllers
             var model = new List<PupsByEthicsViewModel>();
             EthicsNumberHistory entry;
 
-            foreach (var animal in await _culledPups.GetCulledPups())
+            foreach (var animal in await _unitOfWork.CulledPups.Get())
             {
                 entry = animal.Animal.EthicsNumbers.OrderByDescending(n => n.Timestamp).FirstOrDefault();
 

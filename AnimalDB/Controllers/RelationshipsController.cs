@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Linq;
 using System.Net;
@@ -10,15 +11,11 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Student, Investigator, Veterinarian, Technician, Administrator")]
     public class RelationshipsController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
+        private readonly IUnitOfWork _unitOfWork;
 
-        private readonly IAnimalService _animals;
-        private readonly ICulledPupsService _culledPups;
-
-        public RelationshipsController(IAnimalService animals, ICulledPupsService culledPups)
+        public RelationshipsController(IUnitOfWork unitOfWork)
         {
-            this._animals = animals;
-            this._culledPups = culledPups;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /Relationships/
@@ -29,7 +26,7 @@ namespace AnimalDB.Controllers
                 return View();
             }
 
-            var model = await _animals.GetAnimalByUniqueId(id);
+            var model = await _unitOfWork.Animals.GetAnimalByUniqueId(id);
 
             if (model == null)
             {
@@ -48,7 +45,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
@@ -59,7 +56,7 @@ namespace AnimalDB.Controllers
             int NumMale = 0;
             int NumFemale = 0;
 
-            foreach (var culledPups in await _culledPups.GetCulledPupsByAnimalId(animal.Id))
+            foreach (var culledPups in _unitOfWork.CulledPups.GetByAnimalId(animal.Id))
             {
                 AmountCulled += culledPups.AmountCulled;
                 NumMale += culledPups.NumMale ?? 0;
@@ -81,13 +78,13 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
             }
 
-            var animals = await _animals.GetLivingAnimals();
+            var animals = _unitOfWork.Animals.GetLiving();
 
             ViewBag.Parent_Id = new SelectList(animals.Where(m => m.Id != id.Value), "Id", "UniqueAnimalId");
             ViewBag.Child_Id = new SelectList(animals.Where(m => m.Id != id.Value), "Id", "UniqueAnimalId");
@@ -108,14 +105,14 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             
-            Animal animal = await _animals.GetAnimalById(id.Value);
+            Animal animal = await _unitOfWork.Animals.GetById(id.Value);
             if (animal == null)
             {
                 return HttpNotFound();
             }
 
-            var child = await _animals.GetAnimalById(relationship.Child_Id.Value);
-            var parent = await _animals.GetAnimalById(relationship.Parent_Id.Value);
+            var child = await _unitOfWork.Animals.GetById(relationship.Child_Id);
+            var parent = await _unitOfWork.Animals.GetById(relationship.Parent_Id);
 
             if ((relationship.Child_Id != null && relationship.Parent_Id != null) || 
                 (relationship.Child_Id == null && relationship.Parent_Id == null))
@@ -143,12 +140,13 @@ namespace AnimalDB.Controllers
                     animal.Parents.Add(parent);
                 }
 
-                await _animals.UpdateAnimal(animal);
+                _unitOfWork.Animals.Update(animal);
+                await _unitOfWork.Complete();
 
                 return RedirectToAction("Details", new { id = animal.Id });
             }
 
-            var animals = await _animals.GetLivingAnimals();
+            var animals = _unitOfWork.Animals.GetLiving();
             var parentList = animals.Where(m => m.Id != id.Value);
             var childList = parentList;
             ViewBag.Parent_Id = new SelectList(parentList, "Id", "UniqueAnimalId", relationship.Parent_Id);
@@ -166,8 +164,8 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Animal parent = await _animals.GetAnimalById(id.Value);
-            Animal child = await _animals.GetAnimalById(subject.Value);
+            Animal parent = await _unitOfWork.Animals.GetById(id.Value);
+            Animal child = await _unitOfWork.Animals.GetById(subject.Value);
 
             if (parent == null || child == null)
             {
@@ -190,10 +188,11 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteParentConfirmed(int id, int subject)
         {
-            Animal parent = await _animals.GetAnimalById(id);
-            Animal child = await _animals.GetAnimalById(subject);
+            Animal parent = await _unitOfWork.Animals.GetById(id);
+            Animal child = await _unitOfWork.Animals.GetById(subject);
             child.Parents.Remove(parent);
-            await _animals.UpdateAnimal(child);
+            _unitOfWork.Animals.Update(child);
+            await _unitOfWork.Complete();
             return RedirectToAction("Details", new { id = child.Id });
         }
 
@@ -205,8 +204,8 @@ namespace AnimalDB.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Animal parent = await _animals.GetAnimalById(subject.Value);
-            Animal child = await _animals.GetAnimalById(id.Value);
+            Animal parent = await _unitOfWork.Animals.GetById(subject.Value);
+            Animal child = await _unitOfWork.Animals.GetById(id.Value);
 
             if (parent == null || child == null)
             {
@@ -229,10 +228,11 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteChildConfirmed(int id, int subject)
         {
-            Animal parent = await _animals.GetAnimalById(subject);
-            Animal child = await _animals.GetAnimalById(id);
+            Animal parent = await _unitOfWork.Animals.GetById(subject);
+            Animal child = await _unitOfWork.Animals.GetById(id);
             parent.Offspring.Remove(child);
-            await _animals.UpdateAnimal(parent);
+            _unitOfWork.Animals.Update(parent);
+            await _unitOfWork.Complete();
             return RedirectToAction("Details", new { id = parent.Id });
         }
     }

@@ -3,7 +3,7 @@
 
 <h3>
     @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-    <a class="btn btn-primary noprint" onclick="javscript: printreport()">Print</a>
+    <a class="btn btn-primary noprint" href="#" onclick="javscript: printreport()">Print</a>
 </h3>
 
 <div class="printmanipulationreport">
@@ -41,7 +41,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <div class="form-group">
                         <div>
                             @Html.LabelFor(model => model.ProtocolNumber, "Protocol #:", htmlAttributes: new { @class = "control-label" })

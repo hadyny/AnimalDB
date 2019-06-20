@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,17 +10,17 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Technician, Administrator")]
     public class MedicationTypeController : Controller
     {
-        private IMedicationTypeService _medicationTypes;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public MedicationTypeController(IMedicationTypeService medicationTypes)
+        public MedicationTypeController(IUnitOfWork unitOfWork)
         {
-            this._medicationTypes = medicationTypes;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /MedicationType/
         public async Task<ActionResult> Index()
         {
-            return View(await _medicationTypes.GetMedicationTypes());
+            return View(await _unitOfWork.MedicationTypes.Get());
         }
 
         // GET: /MedicationType/Create
@@ -35,7 +36,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _medicationTypes.CreateMedicationType(medicationtype);
+                _unitOfWork.MedicationTypes.Insert(medicationtype);
+                await _unitOfWork.Complete();
                 if (this.Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                         && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
                 {
@@ -54,7 +56,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            MedicationType medicationtype = await _medicationTypes.GetMedicationTypeById(id.Value);
+            MedicationType medicationtype = await _unitOfWork.MedicationTypes.GetById(id.Value);
             if (medicationtype == null)
             {
                 return HttpNotFound();
@@ -71,7 +73,9 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _medicationTypes.UpdateMedicationType(medicationtype);
+                _unitOfWork.MedicationTypes.Update(medicationtype);
+                await _unitOfWork.Complete();
+
                 return RedirectToAction("Index");
             }
             return View(medicationtype);
@@ -84,7 +88,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            MedicationType medicationtype = await _medicationTypes.GetMedicationTypeById(id.Value);
+            MedicationType medicationtype = await _unitOfWork.MedicationTypes.GetById(id.Value);
             if (medicationtype == null)
             {
                 return HttpNotFound();
@@ -102,7 +106,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            MedicationType medicationtype = await _medicationTypes.GetMedicationTypeById(id.Value);
+            MedicationType medicationtype = await _unitOfWork.MedicationTypes.GetById(id.Value);
             if (medicationtype == null)
             {
                 return HttpNotFound();
@@ -115,8 +119,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            MedicationType medicationtype = await _medicationTypes.GetMedicationTypeById(id);
-            await _medicationTypes.DeleteMedicationType(medicationtype);
+            MedicationType medicationtype = await _unitOfWork.MedicationTypes.GetById(id);
+            _unitOfWork.MedicationTypes.Delete(medicationtype);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }

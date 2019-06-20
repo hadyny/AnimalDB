@@ -28,13 +28,13 @@
             <div class="col-md-10">
                 <select id="Type" name="Type" class="form-control col-md-2">
                     <option></option>
-                    <option value="@AnimalDB.Models.ArrivalStatusType.Normal_Conventional">Normal/conventional</option>
-                    <option value="@AnimalDB.Models.ArrivalStatusType.SPF_GermFree">SPF/Germ free</option>
-                    <option value="@AnimalDB.Models.ArrivalStatusType.Diseased">Diseased</option>
-                    <option value="@AnimalDB.Models.ArrivalStatusType.Transgenic_Chimera">Transgenic/chimera</option>
-                    <option value="@AnimalDB.Models.ArrivalStatusType.ProtectedSpecies">Protected species</option>
-                    <option value="@AnimalDB.Models.ArrivalStatusType.Unborn_Prehatched">Unborn/pre-hatched</option>
-                    <option value="@AnimalDB.Models.ArrivalStatusType.Other">Other</option>
+                    <option value="@AnimalDB.Repo.Enums.ArrivalStatusType.Normal_Conventional">Normal/conventional</option>
+                    <option value="@AnimalDB.Repo.Enums.ArrivalStatusType.SPF_GermFree">SPF/Germ free</option>
+                    <option value="@AnimalDB.Repo.Enums.ArrivalStatusType.Diseased">Diseased</option>
+                    <option value="@AnimalDB.Repo.Enums.ArrivalStatusType.Transgenic_Chimera">Transgenic/chimera</option>
+                    <option value="@AnimalDB.Repo.Enums.ArrivalStatusType.ProtectedSpecies">Protected species</option>
+                    <option value="@AnimalDB.Repo.Enums.ArrivalStatusType.Unborn_Prehatched">Unborn/pre-hatched</option>
+                    <option value="@AnimalDB.Repo.Enums.ArrivalStatusType.Other">Other</option>
                 </select>
                 @Html.ValidationMessageFor(model => model.Type)
             </div>

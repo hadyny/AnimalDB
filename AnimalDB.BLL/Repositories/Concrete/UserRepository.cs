@@ -1,5 +1,6 @@
 ﻿using AnimalDB.Repo.Contexts;
 using AnimalDB.Repo.Entities;
+using AnimalDB.Repo.Enums;
 using AnimalDB.Repo.Repositories.Abstract;
 using Microsoft.AspNet.Identity;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace AnimalDB.Repositories.Concrete
 {
     public class UserRepository<T> : IUserRepository<T> where T : AnimalUser
     {
-        private readonly AnimalDBContext db;
+        protected readonly AnimalDBContext db;
         private readonly DbSet<T> table = null;
 
         public UserRepository()
@@ -26,7 +27,7 @@ namespace AnimalDB.Repositories.Concrete
             table = db.Set<T>();
         }
 
-        public async Task Delete(T obj)
+        public virtual async Task Delete(T obj)
         {
             var usermanager = new UserManager<T>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<T>(db));
             var roles = await usermanager.GetRolesAsync(obj.Id);
@@ -34,7 +35,7 @@ namespace AnimalDB.Repositories.Concrete
             await usermanager.DeleteAsync(obj);
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public async Task<IEnumerable<T>> Get()
         {
             return await table.ToListAsync();
         }
@@ -49,7 +50,7 @@ namespace AnimalDB.Repositories.Concrete
             return await table.SingleOrDefaultAsync(m => m.UserName.Equals(name, System.StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task Insert(T obj, Repo.Enums.UserType userType)
+        public async Task Insert(T obj, UserType userType)
         {
             var usermanager = new UserManager<T>(new Microsoft.AspNet.Identity.EntityFramework.UserStore<T>(db));
             var result = await usermanager.CreateAsync(obj, "Password not required");

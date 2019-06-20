@@ -1,4 +1,5 @@
-﻿using AnimalDB.Repo.Entities;
+﻿using AnimalDB.Repo.Contexts;
+using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,26 +10,23 @@ namespace AnimalDB.Controllers
     [Authorize(Roles = "Student, Investigator, Veterinarian, Technician, Administrator")]
     public class CageLocationController : Controller
     {
-        //private AnimalDBContext db = new AnimalDBContext();
-        private readonly IRoomService _rooms;
-        private readonly ICageLocationService _cageLocations;
+        private IUnitOfWork _unitOfWork;
 
-        public CageLocationController(IRoomService rooms, ICageLocationService cageLocations)
+        public CageLocationController(IUnitOfWork unitOfWork)
         {
-            this._rooms = rooms;
-            this._cageLocations = cageLocations;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: /CageLocation/
         public async Task<ActionResult> Index()
         {
-            return View(await _cageLocations.GetCageLocations());
+            return View(await _unitOfWork.CageLocations.Get());
         }
 
         // GET: /CageLocation/Create
         public async Task<ActionResult> Create()
         {
-            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description");
+            ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description");
             return View();
         }
 
@@ -39,7 +37,8 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _cageLocations.CreateCageLocation(cagelocation);
+                _unitOfWork.CageLocations.Insert(cagelocation);
+                await _unitOfWork.Complete();
                 if (this.Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                         && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
                     {
@@ -47,7 +46,7 @@ namespace AnimalDB.Controllers
                     }
                 return RedirectToAction("Index");
             }
-            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description");
+            ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description");
             return View(cagelocation);
         }
 
@@ -58,12 +57,12 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            CageLocation cagelocation = await _cageLocations.GetCageLocationById(id.Value);
+            CageLocation cagelocation = await _unitOfWork.CageLocations.GetById(id.Value);
             if (cagelocation == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", cagelocation.Room_Id);
+            ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description", cagelocation.Room_Id);
             return View(cagelocation);
         }
 
@@ -74,10 +73,11 @@ namespace AnimalDB.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _cageLocations.UpdateCageLocation(cagelocation);
+                _unitOfWork.CageLocations.Update(cagelocation);
+                await _unitOfWork.Complete();
                 return RedirectToAction("Index");
             }
-            ViewBag.Room_Id = new SelectList(await _rooms.GetRooms(), "Id", "Description", cagelocation.Room_Id);
+            ViewBag.Room_Id = new SelectList(await _unitOfWork.Rooms.Get(), "Id", "Description", cagelocation.Room_Id);
             return View(cagelocation);
         }
 
@@ -88,7 +88,7 @@ namespace AnimalDB.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            CageLocation cagelocation = await _cageLocations.GetCageLocationById(id.Value);
+            CageLocation cagelocation = await _unitOfWork.CageLocations.GetById(id.Value);
             if (cagelocation == null)
             {
                 return HttpNotFound();
@@ -101,8 +101,9 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            CageLocation cagelocation = await _cageLocations.GetCageLocationById(id);
-            await _cageLocations.DeleteCageLocation(cagelocation);
+            CageLocation cagelocation = await _unitOfWork.CageLocations.GetById(id);
+            _unitOfWork.CageLocations.Delete(cagelocation);
+            await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
     }
