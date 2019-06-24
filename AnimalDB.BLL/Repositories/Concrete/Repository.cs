@@ -77,11 +77,6 @@ namespace AnimalDB.Repositories.Concrete
             table.Add(obj);
         }
 
-        public virtual async Task Save()
-        {
-            await db.SaveChangesAsync();
-        }
-
         public virtual void Update(T obj)
         {
             table.AddOrUpdate(obj);

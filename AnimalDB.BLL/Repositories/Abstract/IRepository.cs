@@ -14,6 +14,5 @@ namespace AnimalDB.Repo.Repositories.Abstract
         void Update(T obj);
         Task Delete(object id);
         void Delete(T EntityToDelete);
-        Task Save();
     }
 }

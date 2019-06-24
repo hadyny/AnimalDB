@@ -13,6 +13,5 @@ namespace AnimalDB.Repo.Repositories.Abstract
         Task Insert(T obj, Repo.Enums.UserType userType);
         void Update(T obj);
         Task Delete(T obj);
-        Task Save();
     }
 }

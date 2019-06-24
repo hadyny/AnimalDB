@@ -60,11 +60,6 @@ namespace AnimalDB.Repositories.Concrete
             }
         }
 
-        public async Task Save()
-        {
-            await db.SaveChangesAsync();
-        }
-
         public void Update(T obj)
         {
             table.Attach(obj);
