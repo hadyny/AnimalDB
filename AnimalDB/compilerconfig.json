@@ -10,5 +10,9 @@
   {
     "outputFile": "Content/Site.css",
     "inputFile": "Content/Site.less"
+  },
+  {
+    "outputFile": "Content/SitePrint.css",
+    "inputFile": "Content/SitePrint.less"
   }
 ]

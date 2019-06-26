@@ -410,7 +410,7 @@ td a.btn {
     table:not(.footer) {
         margin-bottom: 20px;
 
-        td:not(:nth-of-type(1)) {
+        td:not(:nth-of-type(1)), .total {
             width: 140px;
         }
     }
@@ -435,6 +435,13 @@ td a.btn {
             padding: 10px;
         }
     }
+
+    h4 {
+        border: 1px solid var(--dark);
+        padding: 10px;
+        font-size: 1.2rem;
+    }
+
 }
 
 hr.large {

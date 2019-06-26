@@ -25,7 +25,7 @@ namespace AnimalDB.Repo.Entities
         [Display(Name = "Animal Type")]
         public int Species_Id { get; set; }
         [ForeignKey("Species_Id")]
-        public Species Species { get; set; }
+        public virtual Species Species { get; set; }
 
         /* Source of Animals */
 
@@ -156,6 +156,9 @@ namespace AnimalDB.Repo.Entities
         [DefaultValue(0)]
         [Display(Name = "Disposed of [to others e.g. works]")]
         public int DisposedOf { get; set; }
+        [DefaultValue(0)]
+        [Display(Name = "Rehomed [to others]")]
+        public int RehomedToOthers { get; set; }
         [Display(Name = "Total Alive")]
         public int TotalAlive { get; set; }
 
@@ -164,6 +167,15 @@ namespace AnimalDB.Repo.Entities
         [DefaultValue(0)]
         [Display(Name = "Total Dead ")]
         public int TotalDead { get; set; }
+        [DefaultValue(0)]
+        [Display(Name = "Killed to use body or tissues")]
+        public int KilledToUse { get; set; }
+        [DefaultValue(0)]
+        [Display(Name = "Other dead")]
+        public int OtherDead { get; set; }
+        [DefaultValue(0)]
+        [Display(Name = "Total killed that were bred for research, testing, and teaching but not used")]
+        public int KilledBredNotUsed { get; set; }
         [Display(Name = "Total Used")]
         public int TotalUsed { get; set; }
         [DefaultValue(0)]

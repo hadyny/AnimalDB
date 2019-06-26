@@ -323,6 +323,7 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\fa-svg-with-js.css" />
+    <Content Include="Content\mpi.jpg" />
     <Content Include="Content\select2.css" />
     <Content Include="Content\select2.min.css" />
     <Content Include="Content\reset.css" />

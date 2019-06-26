@@ -16,5 +16,7 @@ namespace AnimalDB.Repo.Enums
         [Display(Name = "Euthanased for slice research")]
         Euthanased_for_Slice_Research,
         Histology,
+        [Display(Name = "Killed to use body or tissues")]
+        Killed_to_use_body_or_tissues
     }
 }

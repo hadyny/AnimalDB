@@ -5,48 +5,35 @@
     @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
 </h3>
 
-<h2>Animal Manipulation Figures <span class="small">Period: January @Model.PeriodFrom.Year to December @Model.PeriodTo.Year</span></h2>
-
-
 @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "manipulationreport" }))
 {
     @Html.AntiForgeryToken()
 
-    <div class="form-horizontal">
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(m => m.PeriodFrom)
-        @Html.HiddenFor(m => m.PeriodTo)
-        @Html.HiddenFor(m => m.Investigator_Id)
-        @Html.HiddenFor(m => m.Species_Id)
-        @Html.HiddenFor(m => m.ProtocolNumber)
-        <div class="row">
-            <div class="col-md-5 offset-md-1">
-                <div class="form-group">
-                    <div>
-                        @Html.LabelFor(model => model.Investigator_Id, "Name/Institution:", htmlAttributes: new { @class = "control-label" })
-                    </div>
-                    <div>
-                        @Html.DisplayFor(model => model.Investigator.FullName) / Psychology, University of Otago
-                    </div>
+<div class="form-horizontal">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(m => m.PeriodFrom)
+    @Html.HiddenFor(m => m.PeriodTo)
+    @Html.HiddenFor(m => m.Investigator_Id)
+    @Html.HiddenFor(m => m.Species_Id)
+    @Html.HiddenFor(m => m.ProtocolNumber)
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="text-uppercase">Animal Manipulation Figures:</h3>
+                    <h3>For @Model.PeriodTo.Year</h3>
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Species, "Animal Type:", htmlAttributes: new { @class = "control-label" })
-                    <div>
-                        @Html.DisplayFor(model => model.Species.Description)
-                    </div>
+                <div class="col-md-6 float-right text-right">
+                    <img src="~/Content/mpi.jpg" alt="Ministry of Primary Industries Logo" width="198" height="42" />
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <div>
-                        @Html.LabelFor(model => model.ProtocolNumber, "Protocol #:", htmlAttributes: new { @class = "control-label" })
-                        @Html.DisplayFor(model => model.ProtocolNumber)
-                    </div>
-                </div>
-            </div>
+            <h4>Name of Institution: @Html.DisplayFor(model => model.Investigator.FullName) / Psychology, University of Otago</h4>
+            <h5>One species per sheet please</h5>
+            <h4>1. Animal Type: @Html.DisplayFor(model => model.Species.Description)</h4>
         </div>
     </div>
+</div>
     <hr />
     <div class="row">
         <div class="col-md-6">
@@ -54,8 +41,8 @@
                 <table class="table-bordered offset-md-2 col-md-8">
                     <thead>
                         <tr>
-                            <th>Source of Animals</th>
-                            <th>No. Used</th>
+                            <th>2. Source of Animals:</th>
+                            <th>Number</th>
                         </tr>
                     </thead>
                     <tr>
@@ -133,10 +120,10 @@
                     <thead>
                         <tr>
                             <th>
-                                Status of Animals
+                                3. Status of Animals:
                             </th>
                             <th>
-                                No. Used
+                                Number
                             </th>
                         </tr>
                     </thead>
@@ -215,8 +202,8 @@
                 <table class="table-bordered offset-md-2 col-md-8">
                     <thead>
                         <tr>
-                            <th>Purpose</th>
-                            <th>No. Used</th>
+                            <th>4. Purpose:</th>
+                            <th>Number</th>
                         </tr>
                     </thead>
                     <tr>
@@ -338,14 +325,12 @@
                     </tr>
                 </table>
             </div>
-        </div>
-        <div class="col-md-6">
             <div>
                 <table class="table-bordered offset-md-2 col-md-8">
                     <thead>
                         <tr>
-                            <th>Re-use</th>
-                            <th>No. Used</th>
+                            <th>5. Re-use:</th>
+                            <th>Number</th>
                         </tr>
                     </thead>
                     <tr>
@@ -370,13 +355,15 @@
                     </tr>
                 </table>
             </div>
+        </div>
+        <div class="col-md-6">
             <div>
                 <table class="table-bordered offset-md-2 col-md-8">
                     <thead>
                         <tr>
-                            <th>Grading</th>
-                            <th>No. Approved</th>
-                            <th>No. Used</th>
+                            <th>6. Grading:</th>
+                            <th class="col-sm-1"></th>
+                            <th>Number</th>
                         </tr>
                     </thead>
                     <tr>
@@ -384,8 +371,7 @@
                             @Html.ActionLink("No Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.NoSuffering.ToString() })
                         </td>
                         <td>
-                            @Html.EditorFor(model => model.NoSufferingApproved, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.NoSufferingApproved, "", new { @class = "text-danger" })
+                            A
                         </td>
                         <td>
                             @Html.EditorFor(model => model.NoSuffering, new { htmlAttributes = new { @class = "form-control" } })
@@ -399,8 +385,7 @@
 
                         </td>
                         <td>
-                            @Html.EditorFor(model => model.LittleSufferingApproved, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.LittleSufferingApproved, "", new { @class = "text-danger" })
+                            B
                         </td>
                         <td>
                             @Html.EditorFor(model => model.LittleSuffering, new { htmlAttributes = new { @class = "form-control" } })
@@ -414,8 +399,7 @@
 
                         </td>
                         <td>
-                            @Html.EditorFor(model => model.ModerateSufferingApproved, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.ModerateSufferingApproved, "", new { @class = "text-danger" })
+                            C
                         </td>
                         <td>
                             @Html.EditorFor(model => model.ModerateSuffering, new { htmlAttributes = new { @class = "form-control" } })
@@ -428,8 +412,7 @@
                             @Html.ActionLink("High Impact", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "grading", identifier = Grading.SevereSuffering.ToString() })
                         </td>
                         <td>
-                            @Html.EditorFor(model => model.SevereSufferingApproved, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.SevereSufferingApproved, "", new { @class = "text-danger" })
+                            D
                         </td>
                         <td>
                             @Html.EditorFor(model => model.SevereSuffering, new { htmlAttributes = new { @class = "form-control" } })
@@ -443,8 +426,7 @@
 
                         </td>
                         <td>
-                            @Html.EditorFor(model => model.VerySevereSufferingApproved, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.VerySevereSufferingApproved, "", new { @class = "text-danger" })
+                            E
                         </td>
                         <td>
                             @Html.EditorFor(model => model.VerySevereSuffering, new { htmlAttributes = new { @class = "form-control" } })
@@ -457,8 +439,8 @@
                 <table class="table-bordered offset-md-2 col-md-8">
                     <thead>
                         <tr>
-                            <th>Alive</th>
-                            <th>No. Used</th>
+                            <th>7. Alive:</th>
+                            <th>Number</th>
                         </tr>
                     </thead>
                     <tr>
@@ -500,7 +482,15 @@
                             @Html.ValidationMessageFor(model => model.DisposedOf, "", new { @class = "text-danger" })
                         </td>
                     </tr>
-
+                    <tr>
+                        <td>
+                            @Html.ActionLink("Rehomed [to others]", "ViewAnimals", new { ethics_Id = Request["Ethics_Id"], category = "aliveStatus", identifier = AliveStatus.RehomedToOthers.ToString() })
+                        </td>
+                        <td>
+                            @Html.EditorFor(model => model.RehomedToOthers, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.RehomedToOthers, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
                     <tr>
                         <th>
                             <label for="totalalive" class="control-label">Total Alive</label>
@@ -515,14 +505,32 @@
                 <table class="table-bordered offset-md-2 col-md-8">
                     <thead>
                         <tr>
-                            <th>Dead</th>
-                            <th>No. Used</th>
+                            <th>8. Dead:</th>
+                            <th>Number</th>
                         </tr>
                     </thead>
                     <tr>
                         <td>
-                            @Html.LabelFor(model => model.TotalDead, htmlAttributes: new { @class = "control-label" })
+                            @Html.LabelFor(model => model.KilledToUse, htmlAttributes: new { @class = "control-label" })
                         </td>
+                        <td>
+                            @Html.EditorFor(model => model.KilledToUse, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.KilledToUse, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.LabelFor(model => model.OtherDead, htmlAttributes: new { @class = "control-label" })
+                        </td>
+                        <td>
+                            @Html.EditorFor(model => model.OtherDead, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.OtherDead, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            @Html.LabelFor(model => model.TotalDead, htmlAttributes: new { @class = "control-label" })
+                        </th>
                         <td>
                             @Html.EditorFor(model => model.TotalDead, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.TotalDead, "", new { @class = "text-danger" })
@@ -533,11 +541,23 @@
             <div>
                 <table class="table-bordered offset-md-2 col-md-8 table-bold">
                     <tr>
-                        <td>
-                            <label for="total" class="control-label">Total Manipulated / Used</label>
-                        </td>
-                        <td>
+                        <th>
+                            <label for="totalUsed" class="control-label">9. Total Manipulated / Used</label>
+                        </th>
+                        <td class="total">
                             @Html.EditorFor(model => model.TotalUsed, new { htmlAttributes = new { @class = "form-control" } })
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table class="table-bordered offset-md-2 col-md-8 table-bold">
+                    <tr>
+                        <th>
+                            <label for="totalKilled" class="control-label">10. Total killed that were bred for research, testing, and teaching but not used</label>
+                        </th>
+                        <td class="total">
+                            @Html.EditorFor(model => model.KilledBredNotUsed, new { htmlAttributes = new { @class = "form-control" } })
                         </td>
                     </tr>
                 </table>

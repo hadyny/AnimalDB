@@ -27,7 +27,7 @@ table > tbody > tr:nth-child(odd) > th {
   background-color: #f9f9f9;
 }
 .printmanipulationreport table {
-  font-size: 85%;
+  font-size: 80%;
 }
 .printmanipulationreport td:first-child {
   width: 200px;
@@ -70,15 +70,23 @@ table > tbody > tr:nth-child(odd) > th {
 .printmanipulationreport td {
   padding: 1px;
 }
-.printmanipulationreport h2 {
-  margin-bottom: 0;
-  font-size: 100%;
-  text-transform: uppercase;
-}
-.printmanipulationreport h2 span {
-  padding-left: 40px;
-  font-size: 12px;
+.printmanipulationreport h3 {
+  margin: 0;
+  font-size: 14px;
   text-transform: none;
+}
+.printmanipulationreport h4 {
+  border: 1px solid black;
+  padding: 5px;
+  clear: both;
+  margin: 0;
+}
+.printmanipulationreport h5 {
+  padding: 5px;
+  margin: 0;
+}
+.printmanipulationreport .img-container {
+  text-align: right;
 }
 .printmanipulationreport .form-group div {
   display: inline-block;

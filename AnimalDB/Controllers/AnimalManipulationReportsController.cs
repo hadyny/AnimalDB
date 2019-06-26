@@ -102,8 +102,11 @@ namespace AnimalDB.Controllers
                 ReleasedToTheWild = ethicsNumberHistories.Count(m => m.AliveStatus == AliveStatus.Released_ToTheWild),
                 RetainedByInstitution = ethicsNumberHistories.Count(m => m.AliveStatus == AliveStatus.Retained_ByYourInstitution),
                 ReturnedToOwner = ethicsNumberHistories.Count(m => m.AliveStatus == AliveStatus.Returned_ToOwner),
+                RehomedToOthers = ethicsNumberHistories.Count(m => m.AliveStatus == AliveStatus.RehomedToOthers),
 
                 TotalDead = ethicsNumberHistories.Count(m => m.Animal.DeathDate.HasValue),
+
+                KilledToUse = ethicsNumberHistories.Count(m => m.Animal.CauseOfDeath == CauseOfDeathEnum.Killed_to_use_body_or_tissues),
 
                 TotalSource = ethicsNumberHistories.Count(),
 
@@ -112,6 +115,10 @@ namespace AnimalDB.Controllers
                 TotalAlive = ethicsNumberHistories.Count(m => !m.Animal.DeathDate.HasValue)
             };
 
+            // TODO:
+            model.KilledBredNotUsed = 0;
+
+            model.OtherDead = model.TotalDead - model.KilledToUse;
 
             model.BornDuringProject += ethicsNumberHistories.Count(m => m.Animal.BornHere);
 
@@ -193,7 +200,8 @@ namespace AnimalDB.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            await _unitOfWork.AnimalManipulationReports.Delete(id);
+            var animalManipulationReport = await _unitOfWork.AnimalManipulationReports.GetById(id);
+            _unitOfWork.AnimalManipulationReports.Delete(animalManipulationReport);
             await _unitOfWork.Complete();
             return RedirectToAction("Index");
         }
