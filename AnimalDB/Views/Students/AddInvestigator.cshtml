@@ -1,9 +1,8 @@
 ﻿@model AnimalDB.Models.AddInvestigatorVM
 
-
-<h3>
-    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back</a>
+}
 
 <h2>Assign @ViewBag.StudentName to Investigators</h2>
 
@@ -38,10 +37,10 @@
             <tbody>
                 @foreach (var investigator in Model.Investigators)
                 {
-                <tr>
-                    <td>@investigator.FullName</td>
-                    <td>@Html.ActionLink("Remove", "RemoveInvestigator", new { Id = Model.StudentId, inv = investigator.Id }, new { @class = "btn  btn-danger" })  </td>
-                </tr>
+                    <tr>
+                        <td>@investigator.FullName</td>
+                        <td>@Html.ActionLink("Remove", "RemoveInvestigator", new { Id = Model.StudentId, inv = investigator.Id }, new { @class = "btn  btn-outline-danger" })  </td>
+                    </tr>
                 }
             </tbody>
         </table>

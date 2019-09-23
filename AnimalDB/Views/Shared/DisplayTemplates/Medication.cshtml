@@ -8,6 +8,6 @@
     <td>Every: @Html.DisplayFor(model => model.Frequency) @Html.DisplayFor(model => model.FrequencyValue)</td>
     <td>For: @Html.DisplayFor(model => model.Duration) @Html.DisplayFor(model => model.DurationValue)</td>
     <td>@Html.DisplayFor(m => m.Comments)</td>
-    <td>@Html.ActionLink("X", "Delete", "Medication", new { id = Model.Id, returnUrl = this.Request.RawUrl }, new { @class = "btn  btn-danger" })</td>
+    <td>@Html.ActionLink("X", "Delete", "Medication", new { id = Model.Id, returnUrl = this.Request.RawUrl }, new { @class = "btn  btn-outline-danger" })</td>
 </tr>
 

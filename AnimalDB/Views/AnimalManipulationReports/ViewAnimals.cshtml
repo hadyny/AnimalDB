@@ -1,98 +1,50 @@
 ﻿@model IEnumerable<AnimalDB.Models.ViewAnimalManipulationReportViewModel>
 
-<h3>
-    @Html.ActionLink("Back to report", "Create", new { Ethics_Id = Request["Ethics_Id"] }, new { @class = "btn btn-primary" })
-</h3>
 
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Create", new { Ethics_Id = Request["Ethics_Id"] })"><i class="fas fa-arrow-left"></i> Back to Report</a>
+}
 
-<table class="table table-striped">
+<table class="table table-hover">
     @if (User.IsInRole("Administrator"))
     {
-    <thead>
-        <tr>
-            <th colspan="2" class="">
-                <button id="toggleAll" class="btn btn-default">Toggle All</button>
-                <button id="selectAll" class="btn btn-default">Select All</button>
-                <button id="selectNone" class="btn btn-default">Select None</button>
-                <button id="recategorizeSeleceted" class="btn btn-default">Recategorize Selected</button>
-            </th>
-            <th></th>
-        </tr>
-    </thead>
+        <thead class="thead-dark">
+            <tr>
+                <th colspan="2" class="">
+                    <form id="recategorizeForm" method="get" action="@Url.Action("BulkChange")">
+                        <input type="hidden" name="returnUrl" value="@Url.Action()" />
+                        <input type="hidden" name="Ethics_Id" value="@Request["ethics_Id"]" />
+                        <button id="toggleAll" class="btn btn-outline-light">Toggle All</button>
+                        <button id="selectAll" class="btn btn-outline-light">Select All</button>
+                        <button id="selectNone" class="btn btn-outline-light">Select None</button>
+                        <button id="recategorizeSeleceted" class="btn btn-outline-light">Recategorize Selected</button>
+                    </form>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
     }
     <tbody>
         @foreach (var item in Model.OrderBy(m => m.Animal.UniqueAnimalId))
         {
-        <tr>
-            @if (User.IsInRole("Administrator"))
-            {
-            <td class="col-md-1">
-                @Html.CheckBoxFor(modelItem => item.Change, new { data_id = item.Animal.Id })
-            </td>
-            }
-            <td>
-                @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
-            </td>
-            <td>
-                @Html.ActionLink("View", "Details", "Animals", new { id = item.Animal.Id }, null)
-            </td>
-        </tr>
+            <tr>
+                @if (User.IsInRole("Administrator"))
+                {
+                    <td class="col-md-1">
+                        @Html.CheckBoxFor(modelItem => item.Change, new { data_id = item.Animal.Id })
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
+                </td>
+                <td>
+                    @Html.ActionLink("View", "Details", "Animals", new { id = item.Animal.Id }, null)
+                </td>
+            </tr>
         }
     <tbody>
-
 </table>
 
 @section Scripts {
-    <script>
-        $('#toggleAll').click(function () {
-            $('input[type="checkbox"]').each(function (i, el) {
-                el.checked = !el.checked    ;
-            });
-        });
-        $('#selectAll').click(function () {
-            $('input[type="checkbox"]').each(function (i, el) {
-                el.checked = true;
-            });
-        });
-        $('#selectNone').click(function () {
-            $('input[type="checkbox"]').each(function (i, el) {
-                el.checked = false;
-            });
-        });
-        $('#recategorizeSeleceted').click(function () {
-            var selected = $('input[type="checkbox"]:checked');
-            if (selected.length == 0) {
-                return;
-            }
-
-            var form = document.createElement("form");
-            form.setAttribute('method', 'get');
-            form.setAttribute('action', '@Url.Action("BulkChange")');
-            var hiddenField, animalId, returnUrl, ethicsId;
-
-            returnUrl = document.createElement('input');
-            returnUrl.setAttribute('type', 'hidden');
-            returnUrl.setAttribute('name', 'returnUrl');
-            returnUrl.setAttribute('value', '@Url.Action()');
-            form.appendChild(returnUrl);
-
-            ethicsId = document.createElement('input');
-            ethicsId.setAttribute('type', 'hidden');
-            ethicsId.setAttribute('name', 'Ethics_Id');
-            ethicsId.setAttribute('value', '@Request["ethics_Id"]');
-            form.appendChild(ethicsId);
-
-            selected.each(function (i, el) {
-                animalId = el.getAttribute('data-id');
-                hiddenField = document.createElement('input');
-                hiddenField.setAttribute('type', 'hidden');
-                hiddenField.setAttribute('name', 'animalIds[' + i + ']');
-                hiddenField.setAttribute('value', animalId);
-                form.appendChild(hiddenField);
-            });
-
-            document.body.appendChild(form);
-            form.submit();
-        });
-    </script>
+    @Scripts.Render("~/Scripts/editManipulationReportAnimals.js")
 }

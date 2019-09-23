@@ -1,6 +1,8 @@
 ﻿using AnimalDB.Repo.Contexts;
 using AnimalDB.Repo.Entities;
 using AnimalDB.Repo.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -14,6 +16,28 @@ namespace AnimalDB.Controllers
         public HomeController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+        }
+
+        public JsonResult Animals()
+        {
+            IEnumerable<Animal> animals = null;
+
+            if (User.IsInRole("Investigator"))
+            {
+                animals = _unitOfWork.Animals.GetInvestigatorsAnimals(User.Identity.Name);
+            }
+            else if (User.IsInRole("Student"))
+            {
+                animals = _unitOfWork.Animals.GetStudentsAnimals(User.Identity.Name);
+            }
+            else if (User.IsInRole("Administrator") ||
+                     User.IsInRole("Veterinarian") ||
+                     User.IsInRole("Technician"))
+            {
+                animals = _unitOfWork.Animals.GetLiving();
+            }
+
+            return Json(animals.Select(m => new { m.Id, m.UniqueAnimalId, m.HasPicture }), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /Home/
@@ -33,6 +57,7 @@ namespace AnimalDB.Controllers
             {
                 ViewBag.animalid = new SelectList(_unitOfWork.Animals.GetLiving(), "Id", "UniqueAnimalId");
             }
+
             return View();
         }
 

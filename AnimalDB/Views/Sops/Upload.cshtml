@@ -1,6 +1,8 @@
 ﻿@model AnimalDB.Repo.Entities.Sop
 
-<h3><a href="@ViewBag.returnUrl" class="btn btn-primary">Back</a></h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@ViewBag.returnUrl"><i class="fas fa-arrow-left"></i> Back to S.O.P.</a>
+}
 
 <h2>Upload PDF</h2>
 
@@ -8,9 +10,8 @@
 @using (Html.BeginForm("Upload", "SOPs", new { returnUrl = Request["returnUrl"] }, FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
-        <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })

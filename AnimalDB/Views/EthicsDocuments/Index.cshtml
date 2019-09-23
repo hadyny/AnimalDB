@@ -9,8 +9,8 @@
 <p>
     @Html.ActionLink("Upload New Document", "Upload", new { id = ViewBag.Investigator_Id }, new { @class = "btn  btn-outline-dark" })
 </p>
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr>
             <th class="col-md-6">
 
@@ -35,7 +35,7 @@
                 <td>
                     @Html.ActionLink("View", "View", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
                     @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-outline-danger" })
                 </td>
             </tr>
         }

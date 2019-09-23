@@ -1,7 +1,6 @@
 ﻿body {
   padding-top: 50px;
   padding-bottom: 20px;
-  /*font-size: 180%;*/
 }
 /* Set padding to keep content from hitting the edges */
 .body-content {
@@ -16,6 +15,10 @@ select.form-control,
 textarea {
   max-width: 280px;
 }
+h1 {
+  text-align: center;
+  margin-top: 50px;
+}
 footer {
   position: fixed;
   width: 100%;
@@ -28,12 +31,14 @@ footer {
   padding: 10px;
 }
 #loginForm {
-  margin-top: 100px;
+  margin-top: 50px;
+  padding-top: 50px;
   min-width: 280px;
+  border-top: 1px solid #ddd;
 }
 #loginForm input {
   max-width: none;
-  width: 80%;
+  width: 60%;
   margin: auto;
 }
 /* styles for validation helpers */
@@ -84,6 +89,10 @@ td a.btn {
   display: table;
   content: "";
   clear: both;
+}
+.nav-tabs {
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 .feeding {
   min-width: 1200px;
@@ -214,6 +223,18 @@ td a.btn {
 .feedingdetail .lowweight input {
   background-color: #f2dede;
 }
+.feeding-room {
+  margin-top: 40px;
+  border-top: 1px solid #ddd;
+  padding-top: 40px;
+}
+.feeding-room h2 {
+  min-height: 35px;
+  font-size: 1.5rem;
+}
+.feeding-room tr {
+  height: 49px;
+}
 .select2-container {
   border: none;
   box-shadow: none;
@@ -226,23 +247,51 @@ td a.btn {
 .select2-selection__rendered {
   line-height: inherit !important;
 }
-.findanimal .select2-selection {
-  height: 150px !important;
-  line-height: 150px;
+.findanimal {
+  width: 400px;
+  margin: 50px auto;
 }
-.findanimal .select2-selection__placeholder,
-.findanimal .select2-selection__rendered {
-  font-size: 85px;
-  line-height: 150px;
-  text-align: center;
+.findanimal #results {
+  max-height: 300px;
+  overflow: auto;
+  box-shadow: 5px 25px 25px #bbb;
+  margin-top: 2px;
 }
-.findanimal div {
-  width: 600px;
-  margin: 150px auto;
-}
-.findanimal #animalid {
+.findanimal #animalname {
   width: 100%;
   max-width: none;
+  margin-top: 30px;
+}
+.findanimal .animals {
+  padding: 0;
+  list-style-type: none;
+  margin-bottom: 0;
+}
+.findanimal .animal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0 10px;
+  height: 50px;
+  border-bottom: 1px solid #ddd;
+}
+.findanimal .animal-item.selected {
+  border: 1px solid var(--dark);
+}
+.findanimal .animal-item:hover {
+  border: 1px solid var(--dark);
+  cursor: pointer;
+}
+.findanimal .animal-picture {
+  width: 40px;
+}
+.findanimal .animal-name {
+  flex: 2;
+  font-weight: normal;
+  letter-spacing: 0.5px;
+  margin: 0 5px;
+  text-align: left;
 }
 .leftanimaldetails,
 .rightanimaldetails {
@@ -267,22 +316,24 @@ td a.btn {
 .offspring-details dt {
   text-align: left;
 }
+.admin {
+  padding-top: 20px;
+  margin-top: 20px;
+  border-top: 1px solid #ddd;
+}
 .admin a {
   width: 200px;
   margin: 5px;
 }
+.admin ul {
+  padding: 0;
+}
 .admin li {
   list-style: none;
+  text-align: center;
 }
-.admin h3 {
-  padding-left: 50px;
-}
-.admin div {
-  height: 420px;
-}
-.admin div.col-md-3:nth-child(2),
-.admin div.col-md-3:nth-child(3) {
-  border-right: 1px solid #ddd;
+.admin h2 {
+  text-align: center;
 }
 .reports a {
   width: 280px;
@@ -424,6 +475,9 @@ hr.large {
 .clinicalIncidentReport textarea {
   width: 100%;
   height: 150px;
+}
+.select-room {
+  margin-top: 30px;
 }
 .select-room .btn {
   min-width: 200px;

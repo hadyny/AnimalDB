@@ -1,32 +1,48 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.Sop>
 
-<h3>@Html.ActionLink("Back", "Index", "SopCategories", null, new { @class = "btn btn-primary" })</h3>
-
-<h2>@ViewBag.Category</h2>
+<h1>S.O.P. Documents</h1>
+<h2 class="text-center">@ViewBag.Category</h2>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">@Html.ActionLink("S.O.P. Categories", "Index", "SOPCategories", null, null)</li>
+        <li class="breadcrumb-item active" aria-current="page">@ViewBag.Category</li>
+    </ol>
+</nav>
 @if (User.IsInRole("Administrator") || User.IsInRole("Technician"))
 {
-<h3>
-    @Html.ActionLink("Upload New Document", "Upload", "SOPs", new { id = ViewBag.Id, returnUrl = Request.Path }, new { @class = "btn btn-primary" })
-</h3>
+<p>
+    @Html.ActionLink("Upload New Document", "Upload", "SOPs", new { id = ViewBag.Id, returnUrl = Request.Path }, new { @class = "btn btn-sm btn-primary" })
+</p>
 }
-<hr/>
-
-<table class="table table-striped">
-@foreach (var item in Model.OrderByDescending(m => m.DateUploaded)) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Description)
-            <div class="small text-muted">@Html.DisplayFor(m => item.FileName)</div>
-        </td>
-        <td>
-            @Html.ActionLink("View", "View", new { id=item.Id }, new { @class = "btn btn-outline-dark " })
-            @if (User.IsInRole("Administrator") || User.IsInRole("Technician"))
-            {
-            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
-            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-danger " })
-            }
-        </td>
-    </tr>
-}
-
+<table class="table table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>
+                Documents
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderByDescending(m => m.DateUploaded))
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                    <div class="small text-muted">@Html.DisplayFor(m => item.FileName)</div>
+                </td>
+                <td>
+                    @Html.ActionLink("View Document", "View", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+                </td>
+                <td>
+                    @if (User.IsInRole("Administrator") || User.IsInRole("Technician"))
+                    {
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+                        @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-outline-danger " })
+                    }
+                </td>
+            </tr>
+        }
+    <tbody>
 </table>

@@ -1,14 +1,17 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.SurgicalNote>
 
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Home")"><i class="fas fa-arrow-left"></i> Animals</a>
+}
 
-<h2>Surgical Notes for @ViewBag.AnimalName</h2>
+<h1>Surgical Notes for @ViewBag.AnimalName</h1>
 
 @Html.Partial("_AnimalHeaderPartial")
 <p>
-    @Html.ActionLink("Create New Surgical Note", "Create", new { id=ViewBag.AnimalId }, new { @class = "btn  btn-outline-dark" })
+    @Html.ActionLink("Create New Surgical Note", "Create", new { id = ViewBag.AnimalId }, new { @class = "btn  btn-outline-dark" })
 </p>
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr>
             <th>
                 Date
@@ -22,25 +25,28 @@
             <th></th>
         </tr>
     </thead>
-@foreach (var item in Model.OrderByDescending(m => m.Timestamp)) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Timestamp)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Surgeon)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.SurgeryType.Description) @if (item.VirusType != null) { <text>(</text>@item.VirusType.Description<text>)</text> }
-        </td>
-        <td>
-            @Html.ActionLink("Follow up", "FollowUps", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-            @if (!User.IsInRole("Student")) {
-            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
-            }
-        </td>
-    </tr>
-}
+    @foreach (var item in Model.OrderByDescending(m => m.Timestamp))
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Timestamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Surgeon)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SurgeryType.Description) @if (item.VirusType != null)
+                {<text>(</text>@item.VirusType.Description<text>)</text>}
+            </td>
+            <td>
+                @Html.ActionLink("Follow up", "FollowUps", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                @if (!User.IsInRole("Student"))
+                {
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-outline-danger" })
+                }
+            </td>
+        </tr>
+    }
 
 </table>

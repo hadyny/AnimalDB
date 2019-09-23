@@ -1,6 +1,5 @@
 ﻿using AnimalDB.Repo.Contexts;
 using AnimalDB.Repo.Entities;
-using AnimalDB.Repo.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -42,7 +41,7 @@ namespace AnimalDB.Controllers
                     }
                 }
 
-                years.Sort();
+                years.Sort((a, b) => -1* a.CompareTo(b));
 
                 ViewBag.Years = years;
 

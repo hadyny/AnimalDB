@@ -1,14 +1,14 @@
-﻿<h3>
-    @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })
-</h3>
+﻿@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Admin")"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+}
 
 <h2>Deceased Animals</h2>
 
 <h3>Select the year that the animal died:</h3>
 
 <ul class="culledanimals">
-@foreach (int year in ViewBag.Years)
-{
-    <li>@Html.ActionLink(year.ToString(), "Index", new { id = year }, new { @class = "btn  btn-primary" })</li>
-}
+    @foreach (int year in ViewBag.Years)
+    {
+        <li>@Html.ActionLink(year.ToString(), "Index", new { id = year }, new { @class = "btn  btn-primary" })</li>
+    }
 </ul>

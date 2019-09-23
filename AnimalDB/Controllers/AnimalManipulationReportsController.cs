@@ -57,6 +57,7 @@ namespace AnimalDB.Controllers
                 Investigator = ethics.Investigator,
                 Investigator_Id = ethics.Investigator.Id,
                 ProtocolNumber = ethics.Text,
+                Ethics_Id = ethics.Id,
                 Species = ethics.Species,
                 Species_Id = ethics.Species_Id.Value,
 

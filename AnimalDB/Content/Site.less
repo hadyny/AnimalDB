@@ -1,7 +1,6 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
-    /*font-size: 180%;*/
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -20,6 +19,11 @@ textarea {
     max-width: 280px;
 }
 
+h1 {
+    text-align: center;
+    margin-top: 50px;
+}
+
 footer {
     position: fixed;
     width: 100%;
@@ -33,15 +37,18 @@ footer {
 }
 
 #loginForm {
-    margin-top: 100px;
+    margin-top: 50px;
+    padding-top: 50px;
     min-width: 280px;
+    border-top: 1px solid #ddd;
+
+    input {
+        max-width: none;
+        width: 60%;
+        margin: auto;
+    }
 }
 
-#loginForm input {
-    max-width: none;
-    width: 80%;
-    margin: auto;
-}
 
 /* styles for validation helpers */
 .field-validation-error {
@@ -103,6 +110,11 @@ td a.btn {
     display: table;
     content: "";
     clear: both;
+}
+
+.nav-tabs {
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .feeding {
@@ -262,6 +274,21 @@ td a.btn {
     }
 }
 
+.feeding-room {
+    margin-top: 40px;
+    border-top: 1px solid #ddd;
+    padding-top: 40px;
+
+    h2 {
+        min-height: 35px;
+        font-size: 1.5rem;
+    }
+
+    tr {
+        height: 49px;
+    }
+}
+
 .select2-container {
     border: none;
     box-shadow: none;
@@ -278,26 +305,57 @@ td a.btn {
 }
 
 .findanimal {
+    width: 400px;
+    margin: 50px auto;
 
-    .select2-selection {
-        height: 150px !important;
-        line-height: 150px;
+    #results {
+        max-height: 300px;
+        overflow: auto;
+        box-shadow: 5px 25px 25px #bbb;
+        margin-top: 2px;
     }
 
-    .select2-selection__placeholder, .select2-selection__rendered {
-        font-size: 85px;
-        line-height: 150px;
-        text-align: center;
-    }
-
-    div {
-        width: 600px;
-        margin: 150px auto;
-    }
-
-    #animalid {
+    #animalname {
         width: 100%;
         max-width: none;
+        margin-top: 30px;
+    }
+
+    .animals {
+        padding: 0;
+        list-style-type: none;
+        margin-bottom: 0;
+    }
+
+    .animal-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0;
+        padding: 0 10px;
+        height: 50px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .animal-item.selected {
+        border: 1px solid var(--dark);
+    }
+
+    .animal-item:hover {
+        border: 1px solid var(--dark);
+        cursor: pointer;
+    }
+
+    .animal-picture {
+        width: 40px;
+    }
+
+    .animal-name {
+        flex: 2;
+        font-weight: normal;
+        letter-spacing: 0.5px;
+        margin: 0 5px;
+        text-align: left;
     }
 }
 
@@ -329,26 +387,26 @@ td a.btn {
 }
 
 .admin {
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+
     a {
         width: 200px;
         margin: 5px;
     }
 
+    ul {
+        padding: 0;
+    }
+
     li {
         list-style: none;
+        text-align:center;
     }
 
-    h3 {
-        padding-left: 50px;
-    }
-
-    div {
-        height: 420px;
-    }
-
-    div.col-md-3:nth-child(2),
-    div.col-md-3:nth-child(3) {
-        border-right: 1px solid #ddd;
+    h2 {
+        text-align: center;
     }
 }
 
@@ -539,6 +597,8 @@ hr.large {
 }
 
 .select-room {
+    margin-top: 30px;
+
     .btn {
         min-width: 200px;
     }
@@ -587,7 +647,7 @@ li .btn {
 .multi-wrapper {
     border: 1px solid #ccc;
     border-radius: 3px;
-    width: 100%
+    width: 100%;
 }
 
 .multi-wrapper .non-selected-wrapper, .multi-wrapper .selected-wrapper {
@@ -597,7 +657,7 @@ li .btn {
     overflow-y: scroll;
     padding: 10px;
     vertical-align: top;
-    width: 50%
+    width: 50%;
 }
 
 .multi-wrapper .non-selected-wrapper {

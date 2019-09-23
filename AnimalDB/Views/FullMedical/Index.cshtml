@@ -9,7 +9,7 @@
 
 @Html.Partial("_AnimalHeaderPartial")
 
-<h3>@Html.ActionLink("Back", "Index", "Medication", new { id=Model.Animal.Id }, new { @class = "btn btn-primary" })</h3>
+<h3>@Html.ActionLink("Back", "Index", "Medication", new { id = Model.Animal.Id }, new { @class = "btn btn-primary" })</h3>
 
 <h4>Include:</h4>
 <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -26,76 +26,49 @@
 <button class="btn  btn-outline-dark" onclick="javascript: printreport()">Print Page</button>
 <hr />
 <div class="row">
-<div class="offset-md-2 col-md-8">
-    <table class="table table-striped">
-        <thead>
-            <tr class="row">
-                <th class="col-md-2">
-                    Type
-                </th>
-                <th class="col-md-2">
-                    Date
-                </th>
-                <th class="col-md-2">
-                    Details
-                </th>
-                <th class="col-md-6">
-                    Description
-                </th>
-            </tr>
-        </thead>
-        
-        @foreach (var item in Model.MedicalItems.OrderByDescending(m => m.Timestamp))
-        {
-            <tr class="@item.Css">
-                <td>
-                    @Html.DisplayFor(modelItem => item.Type)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Timestamp)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Details)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-            </tr>
-        }
+    <div class="offset-md-2 col-md-8">
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr class="row">
+                    <th class="col-md-2">
+                        Type
+                    </th>
+                    <th class="col-md-2">
+                        Date
+                    </th>
+                    <th class="col-md-2">
+                        Details
+                    </th>
+                    <th class="col-md-6">
+                        Description
+                    </th>
+                </tr>
+            </thead>
 
-    </table>
-</div>
+            @foreach (var item in Model.MedicalItems.OrderByDescending(m => m.Timestamp))
+            {
+                <tr class="@item.Css">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Timestamp)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Details)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                </tr>
+            }
+
+        </table>
     </div>
+</div>
 @section scripts {
+    @Scripts.Render("~/Scripts/fullMedical.js")
     <script>
-        $('#btnnotes').click(function () {
-            if ($(this).attr('class') == 'btn  btn-primary active') {
-                $('.note td').hide();
-            } else {
-                $('.note td').show();
-            }
-        });
-
-        $('#btnmeds').click(function () {
-            if ($(this).attr('class') == 'btn  btn-primary active') {
-                $('.med td').hide();
-            } else {
-                $('.med td').show();
-            }
-        });
-
-        $('#btnsurg').click(function () {
-            if ($(this).attr('class') == 'btn  btn-primary active') {
-                $('.surg td').hide();
-            } else {
-                $('.surg td').show();
-            }
-        });
-
-        $('#btnnotes').button('toggle');
-        $('#btnmeds').button('toggle');
-        $('#btnsurg').button('toggle');
-
         function printreport() {
             print_window = window.open("", "printwindow", "status=1,width=595,height=842");
             print_window.document.write('<html><head>');
@@ -113,5 +86,4 @@
             print_window.focus();
         }
     </script>
-
 }

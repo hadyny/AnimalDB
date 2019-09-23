@@ -1,20 +1,25 @@
 ﻿@model AnimalDB.Repo.Entities.Animal
 
-<h2>Feeds and Weights for @Model.UniqueAnimalId</h2>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Home")"><i class="fas fa-arrow-left"></i> Animals</a>
+}
+
+<h1>Feeds and Weights for @Model.UniqueAnimalId</h1>
 
 @Html.Partial("_AnimalHeaderPartial")
 
 <h4>Base Weight: @(Html.DisplayTextFor(m => m.BaseWeight))g</h4>
-<h4>85% Base Weight: @if (Model.BaseWeight.HasValue)
-{
-    @Convert.ToInt32(Model.BaseWeight * .85);<text>g</text>
-}
+<h4>
+    85% Base Weight: @if (Model.BaseWeight.HasValue)
+    {
+        @Convert.ToInt32(Model.BaseWeight * .85);<text>g</text>
+    }
 </h4>
 <h4>Current Weight: @(ViewBag.CurrentWeight)g</h4>
-@if (Model.FeedingGroup != null) {
-<h4>Feeding Group: @Model.FeedingGroup.Description</h4>
+@if (Model.FeedingGroup != null)
+{
+    <h4>Feeding Group: @Model.FeedingGroup.Description</h4>
 }
-<hr />
 
 <div class="feedingdetailcontainer">
     <div class="feedingdetail">
@@ -52,33 +57,32 @@
                 </div>
             </div>
             <div class="col-md-8">
-                
-                    <div class="feedingtable">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Weight</th>
-                                    <th>Feed</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (var date = startDate.Date; date > DateTime.Now.AddDays(-75); date = date.AddDays(-1))
-                                {
-                                    var feed = Model.Feeds.FirstOrDefault(m => m.Date == date);
-                                    string classes = "";
-                                    
-                                    if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
-                                    {
-                                        classes += "weekend ";
-                                    }
+                <div class="feedingtable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Weight</th>
+                                <th>Feed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var date = startDate.Date; date > DateTime.Now.AddDays(-75); date = date.AddDays(-1))
+                            {
+                                var feed = Model.Feeds.FirstOrDefault(m => m.Date == date);
+                                string classes = "";
 
-                                    if (feed != null)
+                                if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
+                                {
+                                    classes += "weekend ";
+                                }
+
+                                if (feed != null)
+                                {
+
+                                    if (feed.Weight < (feed.Animal.BaseWeight * .85))
                                     {
-                                        
-                                        if (feed.Weight < (feed.Animal.BaseWeight * .85))
-                                        {
-                                            classes += "lowweight ";
-                                        }
+                                        classes += "lowweight ";
+                                    }
 
                                     <tr class="@classes">
                                         <td>
@@ -87,35 +91,35 @@
                                             </span>
                                         </td>
                                         @{
-                                        string feedValue = feed.FeedAmount == -1 ? "Free Feeding" : feed.FeedAmount.ToString();
-                                        if (!feed.CombinedFeed)
-                                        {
-                                            <td>
-                                                <span>
-                                                    @feedValue
-                                                </span>
-                                            </td>
-                                        }
-                                        else
-                                        {
-                                            <td class="combinedfeed">
-                                                <span class="combinedfeedmsg" style="display:inline;">
-                                                    Combined feed: @feedValue
-                                                </span>
-                                            </td>
-                                        }
-                                        
+                                            string feedValue = feed.FeedAmount == -1 ? "Free Feeding" : feed.FeedAmount.ToString();
+                                            if (!feed.CombinedFeed)
+                                            {
+                                                <td>
+                                                    <span>
+                                                        @feedValue
+                                                    </span>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td class="combinedfeed">
+                                                    <span class="combinedfeedmsg" style="display:inline;">
+                                                        Combined feed: @feedValue
+                                                    </span>
+                                                </td>
+                                            }
+
                                         }
                                     </tr>
-                                    }
-                                    else
-                                    {
-                                        <tr class="@classes">
-                                            <td><span></span></td>
-                                            <td><span></span></td>
-                                        </tr>
-                                    }
                                 }
+                                else
+                                {
+                                    <tr class="@classes">
+                                        <td><span></span></td>
+                                        <td><span></span></td>
+                                    </tr>
+                                }
+                            }
                         </tbody>
                     </table>
                 </div>

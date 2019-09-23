@@ -1,16 +1,19 @@
 ﻿@model AnimalDB.Repo.Entities.Animal
 
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Request["returnUrl"]"><i class="fas fa-arrow-left"></i> Back</a>
+}
+
 <h3>
-    <a href="@Request["returnUrl"]" class="btn btn-primary">Back</a>
-    <a href="@Url.Action("Details", "Animals", new { id = Model.Id })" class="btn btn-primary">View History</a>
+    <a href="@Url.Action("Details", "Animals", new { id = Model.Id })" class="btn btn-sm btn-primary">View History</a>
 </h3>
 
 <h2>Details for @Model.UniqueAnimalId</h2>
 
 <div>
-	<hr />
+    <hr />
     <dl class="dl-horizontal">
-        
+
         <dt>
             @Html.DisplayNameFor(model => model.UniqueAnimalId)
         </dt>
@@ -19,15 +22,15 @@
             @Html.DisplayFor(model => model.UniqueAnimalId)
         </dd>
         @*
-        <dt>
-            @Html.DisplayNameFor(model => model.ChargeCode)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.ChargeCode)
+            </dt>
 
-        <dd>
-            @if (Model.ChargeCode != null) {
-                @Html.DisplayFor(model => model.ChargeCode.Text)
-            }
-        </dd>
+            <dd>
+                @if (Model.ChargeCode != null) {
+                    @Html.DisplayFor(model => model.ChargeCode.Text)
+                }
+            </dd>
         *@
         <dt>
             @Html.DisplayNameFor(model => model.ArrivalDate)

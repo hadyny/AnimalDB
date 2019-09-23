@@ -137,7 +137,7 @@ table > tbody > tr:nth-child(odd) > th {
   float: left;
 }
 .clinicalIncidentReport button[type=submit],
-.clinicalIncidentReport a.btn-danger,
+.clinicalIncidentReport a.btn-outline-danger,
 .clinicalIncidentReport input[type=submit] {
   display: none;
 }

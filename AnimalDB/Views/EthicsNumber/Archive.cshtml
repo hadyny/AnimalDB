@@ -1,6 +1,8 @@
 ﻿@model AnimalDB.Repo.Entities.EthicsNumber
 
-<h2>@Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })</h2>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back</a>
+}
 
 <h3>Are you sure you want to archive this AUP Number?</h3>
 <div>
@@ -49,7 +51,7 @@
 
 
         <div class="form-actions no-color">
-            <input type="submit" value="Archive" class="btn btn-danger" />
+            <input type="submit" value="Archive" class="btn btn-outline-danger" />
         </div>
     }
 </div>

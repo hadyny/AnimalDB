@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.Animal>
 
-<h3>
-    @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Admin")"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+}
 
 <h2>Select animals to print identity cards</h2>
 <div class="alert alert-info col-sm-5">
@@ -34,7 +34,7 @@
                                 }
                             </select>
                         </td>
-                        <td><a href="#" class="btn  btn-danger" data-bind="click: $root.removeAnimal">X</a></td>
+                        <td><a href="#" class="btn  btn-outline-danger" data-bind="click: $root.removeAnimal">X</a></td>
                     </tr>
                 </tbody>
             </table>

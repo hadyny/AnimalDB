@@ -10,8 +10,8 @@
     @Html.ActionLink("Create a roster entry", "Create", new { id = ViewBag.Room_Id }, new { @class = "btn btn-outline-dark " })
     @Html.ActionLink("View Vet Schedule", "Index", "VetSchedules", new { returnUrl = Request.RawUrl }, new { @class = "btn btn-outline-dark " })
 </p>
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr class="row">
             <th class="col-md-5">
                 @Html.DisplayNameFor(model => model.Date)
@@ -46,7 +46,7 @@
                 <td>
                     @Html.ActionLink("Notes", "Index", "RosterNotes", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
                     @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
-                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-danger " })
+                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-outline-danger " })
                 </td>
             </tr>
         }

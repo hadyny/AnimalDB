@@ -29,7 +29,7 @@
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-danger" />
+            <input type="submit" value="Delete" class="btn btn-outline-danger" />
             @Html.ActionLink("Cancel", "Index", new { id = Model.Room_Id }, new { @class = "btn btn-outline-dark " })
         </div>
     }

@@ -1,8 +1,14 @@
 ﻿@model AnimalDB.Repo.Entities.Animal
 
-<h2>Details for @Model.UniqueAnimalId</h2>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Home")"><i class="fas fa-arrow-left"></i> Animals</a>
+}
+
+<h1>Details for @Model.UniqueAnimalId</h1>
 
 @Html.Partial("_AnimalHeaderPartial")
+@Html.HiddenFor(model => model.Id)
+
 <div class="row">
     <div class="col-md-4">
         <dl class="row leftanimaldetails">
@@ -178,13 +184,13 @@
             </dd>
             @if (Model.Strain_Id != null)
             {
-            <dt class="col-md-5">
-                @Html.DisplayNameFor(model => model.Strain_Id)
-            </dt>
+                <dt class="col-md-5">
+                    @Html.DisplayNameFor(model => model.Strain_Id)
+                </dt>
 
-            <dd class="col-md-7">
-                @Html.DisplayFor(model => model.Strain.Description)
-            </dd>
+                <dd class="col-md-7">
+                    @Html.DisplayFor(model => model.Strain.Description)
+                </dd>
             }
             @if (Model.Transgene_Id != null)
             {
@@ -207,7 +213,7 @@
                     @ViewBag.SurgeryDate.Remove(ViewBag.SurgeryDate.IndexOf(' '))
                 </dd>
             }
-            @if (!string.IsNullOrEmpty(ViewBag.Surgeon)) 
+            @if (!string.IsNullOrEmpty(ViewBag.Surgeon))
             {
                 <dt class="col-md-5">
                     Surgeon
@@ -239,12 +245,12 @@
             }
             @if (!string.IsNullOrEmpty(ViewBag.EthicsNumber))
             {
-            <dt class="col-md-5">
-                AUP Number
-            </dt>
-            <dd class="col-md-7">
-                @ViewBag.EthicsNumber
-            </dd>
+                <dt class="col-md-5">
+                    AUP Number
+                </dt>
+                <dd class="col-md-7">
+                    @ViewBag.EthicsNumber
+                </dd>
             }
             @if (Model.Sex == AnimalDB.Repo.Enums.Sex.Female)
             {
@@ -298,42 +304,13 @@
 
 @if (!User.IsInRole("Veterinarian"))
 {
-<p>
-    @Html.ActionLink("Edit Animal", "Edit", "Animals", new { id = Model.Id }, new { @class = "btn btn-outline-dark" })
-    <a href="@Url.Action("Single", "IdentityCard", new { id = Model.Id })" class="btn btn-outline-dark" target="_blank">Print Identity Card</a>
-</p>
+    <p>
+        @Html.ActionLink("Edit Animal", "Edit", "Animals", new { id = Model.Id }, new { @class = "btn btn-outline-dark" })
+        <a href="@Url.Action("Single", "IdentityCard", new { id = Model.Id })" class="btn btn-outline-dark" target="_blank">Print Identity Card</a>
+    </p>
 }
 
 @section scripts {
     @Scripts.Render("~/Scripts/jquery.uploadfile.js")
-<script>
-    $(document).ready(function()
-    {
-        $("#fileuploader").uploadFile({
-            url:"@Url.Action("UploadPhoto", new { id = Model.Id })",
-            fileName: "file",
-            allowedTypes: "jpg",
-            dragdropWidth: "170px",
-            onSuccess: function (files, data, xhr) {
-                $('.animalImg').css('display', 'block');
-                $('.animalImg').attr('src', '@Url.Content("~/Content/AnimalImages/" + Model.Id + ".jpg")');
-                $('.ajax-file-upload-statusbar').css('display', 'none');
-                $('#RemovePhoto').css('display', 'block');
-                $('#fileuploaderdiv').css('display', 'none');
-            }
-        });
-
-        $('#RemovePhoto').click(function () {
-            $.post("@Url.Action("RemovePhoto", new { id = Model.Id})")
-                .done(function (result) {
-                    if (result === "True") {
-                        $('.animalImg').css('display', 'none');
-                        $('#RemovePhoto').css('display', 'none');
-                        $('#fileuploaderdiv').css('display', 'inline-block');
-                    }
-                });
-            
-        });
-    });
-    </script>
+    @Scripts.Render("~/Scripts/uploadAnimalPhoto.js")
 }

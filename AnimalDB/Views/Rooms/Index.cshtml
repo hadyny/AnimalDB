@@ -1,16 +1,16 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.Room>
 
-<h3>
-    @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Admin")"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+}
 
 <h2>Rooms</h2>
 
 <p>
     @Html.ActionLink("Create New Room", "Create", null, new { @class = "btn  btn-outline-dark" })
 </p>
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Technician)

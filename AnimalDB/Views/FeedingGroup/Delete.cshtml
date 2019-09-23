@@ -1,15 +1,13 @@
 ﻿@model AnimalDB.Repo.Entities.FeedingGroup
 
-<h3>
-    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-</h3>
-
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back to Feeding Groups</a>
+}
 
 <h2>Delete</h2>
 
 <h3>Are you sure you want to delete this Feeding Group?</h3>
 <div>
-    <hr />
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Description)
@@ -21,11 +19,12 @@
 
     </dl>
 
-    @using (Html.BeginForm()) {
+    @using (Html.BeginForm())
+    {
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn  btn-danger" />
+            <input type="submit" value="Delete" class="btn  btn-outline-danger" />
         </div>
     }
 </div>

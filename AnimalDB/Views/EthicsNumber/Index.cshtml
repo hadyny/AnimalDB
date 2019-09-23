@@ -1,9 +1,11 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.EthicsNumber>
-@{ 
+@{
     int total = 0, totalAlive = 0, tmpTotal = 0, tmpTotalAlive = 0;
 }
 
-<h3>@Html.ActionLink("Back to Admin", "Index", "Admin", null, new { @class = "btn btn-primary" })</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Admin")"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+}
 
 <h2>AUP Numbers</h2>
 
@@ -11,8 +13,8 @@
     @Html.ActionLink("Create New AUP Number", "Create", new { returnUrl = Url.Action() }, new { @class = "btn  btn-outline-dark" })
     @Html.ActionLink("Archived AUP Numbers", "Archived", new { returnUrl = Url.Action() }, new { @class = "btn  btn-outline-dark" })
 </p>
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Text)
@@ -43,11 +45,11 @@
                     @{
                         tmpTotal = item.EthicsNumberHistory.Where(m => m.EthicsNumber.Id == item.Id && m.Animal.EthicsNumbers.OrderByDescending(n => n.Timestamp).FirstOrDefault().Id == m.Id).Count();
                         <text>@tmpTotal</text>
-                        total+= tmpTotal;
+                        total += tmpTotal;
                     }
                 </td>
                 <td>
-                    @{ 
+                    @{
                         tmpTotalAlive = item.EthicsNumberHistory.Where(m => m.EthicsNumber.Id == item.Id && !m.Animal.DeathDate.HasValue && m.Animal.EthicsNumbers.OrderByDescending(n => n.Timestamp).FirstOrDefault().Id == m.Id).Count();
                         <text>@tmpTotalAlive</text>
                         totalAlive += tmpTotalAlive;
@@ -66,13 +68,13 @@
                 </td>
             </tr>
         }
-            <tr>
-                <th>Total:</th>
-                <th>@total</th>
-                <th>@totalAlive</th>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
+        <tr>
+            <th>Total:</th>
+            <th>@total</th>
+            <th>@totalAlive</th>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
     </tbody>
 </table>

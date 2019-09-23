@@ -1,14 +1,16 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.Transgene>
 
-<h3>@Html.ActionLink("Back to Admin", "Index", "Admin", null, new { @class = "btn btn-primary" })</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Admin")"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+}
 
 <h2>Transgene IDs</h2>
 
 <p>
     @Html.ActionLink("Create New Transgene ID", "Create", null, new { @class = "btn  btn-outline-dark" })
 </p>
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
@@ -25,8 +27,9 @@
                 </td>
                 <td>
                     @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-                    @if (item.Animals.Count() == 0) {
-                        @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+                    @if (item.Animals.Count() == 0)
+                    {
+                        @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-outline-danger" })
                     }
                 </td>
             </tr>

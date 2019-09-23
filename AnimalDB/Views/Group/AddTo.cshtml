@@ -40,7 +40,7 @@
             <ul>
                 @foreach (AnimalDB.Repo.Entities.Animal animal in ViewBag.AnimalList)
                 {
-                    <li>@Html.ActionLink("X", "RemoveFrom", new { Id = animal.Id, groupid = Model.GroupId }, new { @class = "btn  btn-danger" }) @animal.UniqueAnimalId </li>
+                    <li>@Html.ActionLink("X", "RemoveFrom", new { Id = animal.Id, groupid = Model.GroupId }, new { @class = "btn  btn-outline-danger" }) @animal.UniqueAnimalId </li>
                 }
             </ul>
         </div>

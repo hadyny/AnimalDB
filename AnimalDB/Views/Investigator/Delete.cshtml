@@ -1,8 +1,8 @@
 ﻿@model AnimalDB.Repo.Entities.Investigator
 
-<h3>
-    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back</a>
+}
 
 <h2>Delete</h2>
 
@@ -44,11 +44,12 @@
 
     </dl>
 
-    @using (Html.BeginForm()) {
+    @using (Html.BeginForm())
+    {
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn  btn-danger" /> 
+            <input type="submit" value="Delete" class="btn  btn-outline-danger" />
         </div>
     }
 </div>

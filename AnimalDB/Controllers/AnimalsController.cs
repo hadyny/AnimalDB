@@ -122,6 +122,8 @@ namespace AnimalDB.Controllers
                 img.Save(path);
             }
 
+            await _unitOfWork.Complete();
+
             return true;
         }
 
@@ -141,7 +143,7 @@ namespace AnimalDB.Controllers
             }
 
             await _unitOfWork.Animals.RemovePhotoFromAnimal(id.Value);
-
+            await _unitOfWork.Complete();
             var path = Path.Combine(Server.MapPath("~/Content/AnimalImages"), id.ToString() + ".jpg");
             if (System.IO.File.Exists(path))
             {
@@ -419,6 +421,7 @@ namespace AnimalDB.Controllers
         public async Task<ActionResult> Resurrect(int id)
         {
             await _unitOfWork.Animals.Resurrect(id);
+            await _unitOfWork.Complete();
             return RedirectToAction("Details", "Animals", new { id });
         }
     }

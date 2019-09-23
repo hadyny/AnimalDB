@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.Animal>
 
-<h3>
-    @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Admin")"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+}
 
 <h2>Select animals to print identity cards</h2>
 <div class="alert alert-info col-sm-5">
@@ -36,34 +36,34 @@
 @section scripts {
 
     <script src="~/Scripts/multi.min.js"></script>
-    
+
     <script>
         multi(document.getElementById('animals'), {
             'non_selected_header': ' ',
             'selected_header': 'Animals currently selected:'
         });
-        //$("#filter").keyup(function () {
-        //    if ($("#filter").val() == "") {
-        //        $('#animals > option').hidden = false;
-        //    }
-        //    for (let i = 0; i < $('#animals > option').length; i++) {
-        //        if ($('#animals > option')[i].innerText.toLowerCase().indexOf($("#filter").val().toLowerCase()) == -1) {
-        //            $('#animals > option')[i].hidden = true;
-        //        } else {
-        //            $('#animals > option')[i].hidden = false;
-        //        }
-        //    }
-        //});
+            //$("#filter").keyup(function () {
+            //    if ($("#filter").val() == "") {
+            //        $('#animals > option').hidden = false;
+            //    }
+            //    for (let i = 0; i < $('#animals > option').length; i++) {
+            //        if ($('#animals > option')[i].innerText.toLowerCase().indexOf($("#filter").val().toLowerCase()) == -1) {
+            //            $('#animals > option')[i].hidden = true;
+            //        } else {
+            //            $('#animals > option')[i].hidden = false;
+            //        }
+            //    }
+            //});
 
-        //$('#animals').change(function () {
-        //    let selectedItems = $("#animals").val();
-        //    let selectedItemText = '', itemText = '';
-        //    $('#selectedlist')[0].innerHTML = '';
-        //    selectedItems.forEach(function (item) {
-        //        itemText = $(`#animals option[value=${item}]`)[0].innerText;
-        //        $('#selectedlist')[0].innerHTML += `<li>${itemText}</li>`;
-        //    });
-        //});
+            //$('#animals').change(function () {
+            //    let selectedItems = $("#animals").val();
+            //    let selectedItemText = '', itemText = '';
+            //    $('#selectedlist')[0].innerHTML = '';
+            //    selectedItems.forEach(function (item) {
+            //        itemText = $(`#animals option[value=${item}]`)[0].innerText;
+            //        $('#selectedlist')[0].innerHTML += `<li>${itemText}</li>`;
+            //    });
+            //});
     </script>
 
 }

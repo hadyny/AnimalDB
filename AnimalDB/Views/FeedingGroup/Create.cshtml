@@ -1,15 +1,15 @@
 ﻿@model AnimalDB.Repo.Entities.FeedingGroup
 
-<h3>
-    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back to Feeding Groups</a>
+}
 
 <h2>Create New Feeding Group</h2>
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <hr />
         @Html.ValidationSummary(true)

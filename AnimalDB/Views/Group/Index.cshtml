@@ -1,15 +1,16 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.Group>
 
-
-<h3>@Html.ActionLink("Back", "Group", "FeedingGroup", new { id = ViewBag.FeedingGroupId }, new { @class = "btn btn-primary" })</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Group", "FeedingGroup", new { id = ViewBag.FeedingGroupId })"><i class="fas fa-arrow-left"></i> Back</a>
+}
 
 <h2>Sub-Groups for @ViewBag.FeedingGroupName</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create", new { id = ViewBag.FeedingGroupId }, new { @class = "btn  btn-outline-dark" })
 </p>
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
@@ -17,23 +18,27 @@
             <th></th>
         </tr>
     </thead>
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Description)
-            @if (item.Animals.Count() == 1) {
-                <text>(</text>@item.Animals.Count() <text>animal)</text>
-            } else {
-                <text>(</text>@item.Animals.Count() <text>animals)</text>
-            }
-        </td>
-        <td>
-            @*
-            @Html.ActionLink("View / Edit Animals", "AddTo", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })*@
-            @Html.ActionLink("Edit Sub-Group Name", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+                @if (item.Animals.Count() == 1)
+                {
+                    <text>(</text>@item.Animals.Count() <text>animal)</text>
+                }
+                else
+                {
+                    <text>(</text>@item.Animals.Count() <text>animals)</text>
+                }
+            </td>
+            <td>
+                @*
+                @Html.ActionLink("View / Edit Animals", "AddTo", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })*@
+                @Html.ActionLink("Edit Sub-Group Name", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-outline-danger" })
+            </td>
+        </tr>
+    }
 
 </table>

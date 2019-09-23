@@ -2,20 +2,21 @@
 
 @if (string.IsNullOrEmpty(ViewBag.BackToGroups))
 {
-<h3>
-    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-</h3>
+    @section BackNav {
+        <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back to Rooms</a>
+    }
 }
 else
 {
-    <h3>
-        @Html.ActionLink("Back", "Groups", "Feed", new { id = ViewBag.RoomId }, new { @class = "btn btn-primary" })
-    </h3>
+    @section BackNav {
+        <a class="btn btn-sm btn-secondary" href="@Url.Action("Groups", "Feed", new { id = ViewBag.FeedingGroup })"><i class="fas fa-arrow-left"></i> Back to Groups</a>
+    }
+
 }
 <h2>Animals in @ViewBag.RoomName</h2>
 
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.UniqueAnimalId)
@@ -29,17 +30,17 @@ else
     <tbody>
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.UniqueAnimalId)
-            </td>
-            <td>
-                @(item.EthicsNumbers.OrderByDescending(m => m.Timestamp).FirstOrDefault()?.EthicsNumber.Text)
-            </td>
-            <td>
-                @Html.ActionLink("View", "Details", "Animals", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UniqueAnimalId)
+                </td>
+                <td>
+                    @(item.EthicsNumbers.OrderByDescending(m => m.Timestamp).FirstOrDefault()?.EthicsNumber.Text)
+                </td>
+                <td>
+                    @Html.ActionLink("View", "Details", "Animals", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
+                </td>
+            </tr>
         }
     </tbody>
 </table>

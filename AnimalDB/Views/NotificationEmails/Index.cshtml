@@ -1,11 +1,11 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.NotificationEmail>
 
-<h3>
-    @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Admin")"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+}
 
 <h2>Notification Emails</h2>
-<h4>Notifications for injections and medication will be sent to these addresses</h4>
+<h3>Notifications for injections and medication will be sent to these addresses</h3>
 
 <p>
     @Html.ActionLink("Add New Email Address", "Create", null, new { @class = "btn  btn-outline-dark" })
@@ -17,7 +17,6 @@
         </th>
         <th></th>
     </tr>
-
 @foreach (var item in Model) {
     <tr>
         <td>
@@ -25,9 +24,8 @@
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
+            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-outline-danger" })
         </td>
     </tr>
 }
-
 </table>

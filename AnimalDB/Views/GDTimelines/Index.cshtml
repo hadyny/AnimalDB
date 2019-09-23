@@ -1,16 +1,16 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.GDTimeline>
 
-<h3>
-    @Html.ActionLink("Back to Admin", "Index", "Admin", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Admin")"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+}
 
 <h2>GD Timelines</h2>
 
 <p>
     @Html.ActionLink("Create New GD Timeline", "Create", null, new { @class = "btn btn-outline-dark " })
 </p>
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
@@ -37,7 +37,7 @@
                         var unused = ViewBag.unused as List<string>;
                         if (unused.Contains(item.Description))
                         {
-                        @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-danger " })
+                            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-outline-danger " })
                         }
                     }
                 </td>

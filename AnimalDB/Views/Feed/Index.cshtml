@@ -1,14 +1,12 @@
 ﻿@model AnimalDB.Web.Models.FeedViewModel
+<h1>Feeding Rooms</h1>
 
-<h3>
-    KEY: <span class="btn btn-navy ">All animals checked today</span>&nbsp;<span class="btn btn-info ">Some animals checked today</span>&nbsp;<span class="btn btn-warning ">No animals checked today</span>
-</h3>
-<hr />
-<h2>Select Room:</h2>
+<div class="col-md-8 offset-md-2 text-center">
+    <span class="btn btn-navy">All animals checked today</span>&nbsp;<span class="btn btn-info ">Some animals checked today</span>&nbsp;<span class="btn btn-warning ">No animals checked today</span>
+</div>
 
-<table class="table table-striped table-hover select-room">
-
-    <thead>
+<table class="table table-hover select-room">
+    <thead class="thead-dark">
         <tr>
             <th>
                 Room
@@ -24,38 +22,40 @@
             </th>
         </tr>
     </thead>
+    <tbody>
+        @foreach (var item in Model.Rooms)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(item.RoomName, "Groups", new { id = item.RoomId }, new { @class = "btn  " + item.ClassList })
+                </td>
+                <td>
+                    @item.TotalAnimals Animals
+                </td>
+                <td>
+                    @if (item.StockAnimals == 1)
+                    {
+                        @item.StockAnimals <text>Stock Animal</text>
+                    }
+                    else if (item.StockAnimals != 0)
+                    {
+                        @item.StockAnimals <text>Stock Animals</text>
+                    }
+                </td>
+                <td>
+                    @if (item.GMOAnimals == 1)
+                    {
+                        @item.GMOAnimals <text>GMO Animal</text>
+                    }
+                    else if (item.GMOAnimals != 0)
+                    {
+                        @item.GMOAnimals <text>GMO Animals</text>
+                    }
+                </td>
 
-    @foreach (var item in Model.Rooms)
-    {
-    <tr>
-        <td>
-            @Html.ActionLink(item.RoomName, "Groups", new { id = item.RoomId }, new { @class = "btn  " + item.ClassList })
-        </td>
-        <td>
-            @item.TotalAnimals Animals
-        </td>
-        <td>
-            @if (item.StockAnimals == 1)
-            {
-                @item.StockAnimals <text>Stock Animal</text>
-            }
-            else if (item.StockAnimals != 0)
-            {
-                @item.StockAnimals <text>Stock Animals</text>
-            }
-        </td>
-        <td>
-            @if (item.GMOAnimals == 1)
-            {
-                @item.GMOAnimals <text>GMO Animal</text>
-            } else if (item.GMOAnimals != 0)
-            { 
-                @item.GMOAnimals <text>GMO Animals</text>
-            }
-        </td>
-
-    </tr>
-    }
+            </tr>
+        }
+    </tbody>
 </table>
-<hr />
-<h4>Total Animals: @Model.TotalAnimals</h4>
+
+<h4 class="text-center">Total Animals: @Model.TotalAnimals</h4>

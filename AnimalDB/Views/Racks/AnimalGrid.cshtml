@@ -1,6 +1,8 @@
 ﻿@model AnimalDB.Repo.Entities.Rack
 
-<h3>@Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back</a>
+}
 
 <h2>Animals in @Model.Reference_Id</h2>
 @{ char c = 'A'; }
@@ -13,7 +15,8 @@
                 {
                     <th>@c@j</th>
                 }
-                </tr><tr>
+            </tr>
+            <tr>
                 @for (int j = 1; j <= Model.Width; j++)
                 {
                     <td>

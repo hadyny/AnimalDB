@@ -4,11 +4,15 @@
     ViewBag.Title = "Index";
 }
 
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Home")"><i class="fas fa-arrow-left"></i> Animals</a>
+}
+
 <h2>Relationships</h2>
 
 
 <form method="get" class="form-horizontal">
-    
+
     <div class="form-group row">
         @Html.Label("id", "Scan or enter Animal Id", new { @class = "control-label col-md-2" })
         <div class="col-md-10">

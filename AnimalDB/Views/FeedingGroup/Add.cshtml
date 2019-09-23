@@ -1,8 +1,8 @@
 ﻿@model AnimalDB.Models.AddToFeedingGroupViewModel
 
-<h3>
-    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-</h3> 
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back to Feeding Groups</a>
+}
 
 <h2>Add Animals to Feeding Group</h2>
 
@@ -24,7 +24,7 @@
             </div>
 
             <div class="form-group">
-                <div class="offset-md-2 col-md-8">
+                <div class="col-md-8">
                     <button type="submit" class="btn  btn-outline-dark">Add Animal</button>
                 </div>
             </div>
@@ -36,10 +36,10 @@
             <tbody>
                 @foreach (var animal in Model.ExistingAnimals)
                 {
-                <tr>
-                    <td>@animal.UniqueAnimalId</td>
-                    <td>@Html.ActionLink("Remove", "RemoveFrom", new { Id = animal.Id }, new { @class = "btn  btn-danger" })</td>
-                </tr>
+                    <tr>
+                        <td>@animal.UniqueAnimalId</td>
+                        <td>@Html.ActionLink("Remove", "RemoveFrom", new { Id = animal.Id }, new { @class = "btn  btn-outline-danger" })</td>
+                    </tr>
                 }
             </tbody>
         </table>
@@ -51,11 +51,11 @@
 @section scripts {
     @Scripts.Render("~/bundles/jqueryval")
     <script type="text/javascript">
-          $(document).ready(function(){
-              $('select').select2({
-                  allowClear: true,
-                  matcher: matchCustom
-              });
-          });
+        $(document).ready(function () {
+            $('select').select2({
+                allowClear: true,
+                matcher: matchCustom
+            });
+        });
     </script>
 }

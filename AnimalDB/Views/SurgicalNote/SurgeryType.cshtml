@@ -35,7 +35,7 @@
         <ul>
             @foreach (var surgery in Model.SurgeryTypes)
             {
-                <li>@Html.ActionLink("X", "RemoveFrom", new { id = Model.Id, surgeryType = surgery.Id }, new { @class = "btn btn-danger " }) @surgery.Description</li>
+                <li>@Html.ActionLink("X", "RemoveFrom", new { id = Model.Id, surgeryType = surgery.Id }, new { @class = "btn btn-outline-danger " }) @surgery.Description</li>
             }
         </ul>
     </div>

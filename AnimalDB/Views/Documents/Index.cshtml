@@ -24,7 +24,7 @@
                 @if (User.IsInRole("Administrator") || User.IsInRole("Technician"))
                 {
                     @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark " })
-                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-danger " })
+                    @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-outline-danger " })
                 }
             </td>
         </tr>

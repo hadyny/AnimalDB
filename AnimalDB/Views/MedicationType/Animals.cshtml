@@ -1,13 +1,13 @@
 ﻿@model AnimalDB.Repo.Entities.MedicationType
 
-<h3>
-    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back</a>
+}
 
 <h2>Animals that have used @Model.Description</h2>
 
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr>
             <th>
                 Unique Animal Id
@@ -30,27 +30,28 @@
         </tr>
     </thead>
 
-@foreach (var item in Model.Medication) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Dosage)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Rate)
-        </td>
-        <td>
-            Every: @Html.DisplayFor(modelItem => item.Frequency) @Html.DisplayFor(modelItem => item.FrequencyValue)
-        </td>
-        <td>
-            For: @Html.DisplayFor(modelItem => item.Duration) @Html.DisplayFor(modelItem => item.DurationValue)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Timestamp)
-        </td>
-    </tr>
-}
+    @foreach (var item in Model.Medication)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dosage)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rate)
+            </td>
+            <td>
+                Every: @Html.DisplayFor(modelItem => item.Frequency) @Html.DisplayFor(modelItem => item.FrequencyValue)
+            </td>
+            <td>
+                For: @Html.DisplayFor(modelItem => item.Duration) @Html.DisplayFor(modelItem => item.DurationValue)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Timestamp)
+            </td>
+        </tr>
+    }
 
 </table>

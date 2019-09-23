@@ -5,7 +5,7 @@
     @if (User.IsInRole("Administrator") || User.IsInRole("Technician"))
     {
         @Html.ActionLink("Upload new schedule", "Upload", null, new { @class = "btn btn-outline-dark " })
-        @Html.ActionLink("Delete schedule", "Delete", null, new { @class = "btn btn-danger " })
+        @Html.ActionLink("Delete schedule", "Delete", null, new { @class = "btn btn-outline-danger " })
     }
 </h3>
 

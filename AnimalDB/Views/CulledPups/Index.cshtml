@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.CulledPups>
 
-<h3>@Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-primary" })</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Admin")"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+}
 
 <h2>Culled Pups</h2>
 
@@ -21,22 +23,24 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model.OrderByDescending(m => m.DateCulled)) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AmountCulled) @if (item.NumFemale != null) { <text>(@item.NumFemale Female, @item.NumMale Male)</text> }
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DateCulled)
-        </td>
-        <td>
-            @Html.ActionLink("View/Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-            @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model.OrderByDescending(m => m.DateCulled))
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Animal.UniqueAnimalId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AmountCulled) @if (item.NumFemale != null)
+                {<text>(@item.NumFemale Female, @item.NumMale Male)</text>}
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateCulled)
+            </td>
+            <td>
+                @Html.ActionLink("View/Edit", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-outline-danger" })
+            </td>
+        </tr>
+    }
 
 </table>

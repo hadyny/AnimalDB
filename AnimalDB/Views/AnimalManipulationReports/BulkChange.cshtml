@@ -1,8 +1,9 @@
 ﻿@model AnimalDB.Web.Models.BulkChangeAnimalViewModel
 
-<h3>
-    <a href="@Html.Raw(ViewBag.returnUrl)" class="btn btn-primary">Back</a>
-</h3>
+
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Html.Raw(ViewBag.returnUrl)"><i class="fas fa-arrow-left"></i> Back</a>
+}
 
 <h2>Bulk Change Attributes</h2>
 
@@ -42,7 +43,7 @@
 
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Change" class="btn btn-danger" />
+                        <input type="submit" value="Change" class="btn btn-outline-danger" />
                     </div>
                 </div>
             </div>

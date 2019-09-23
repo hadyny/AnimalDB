@@ -1,15 +1,16 @@
 ﻿@model AnimalDB.Repo.Entities.Sop
 
-<h3>@Html.ActionLink("Back", "Index", new { id=Model.Category_Id }, new { @class = "btn btn-primary" })</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", new { id = Model.Category_Id })"><i class="fas fa-arrow-left"></i> Back to S.O.P. Category</a>
+}
 
 <h2>Edit S.O.P.</h2>
 
 @using (Html.BeginForm("Edit", "SOPs", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
-        <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
         @Html.HiddenFor(model => model.FileName)
@@ -31,7 +32,6 @@
                 @Html.ValidationMessageFor(model => model.Category_Id, "", new { @class = "text-danger" })
             </div>
         </div>
-        <hr />
         <div class="form-group">
             @Html.Label("Update PDF File", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
@@ -39,7 +39,6 @@
                 @Html.ValidationMessage("file", new { @class = "text-danger" })
             </div>
         </div>
-        <hr />
         <div class="form-group">
             <div>
                 <input type="submit" value="Save" class="btn btn-outline-dark " />

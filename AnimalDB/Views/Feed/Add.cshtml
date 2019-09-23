@@ -46,11 +46,11 @@
                                                 <button title="All animals checked" type="button" class="btn btn-sm btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     <span class="fas fa-check-circle"></span>
                                                 </button>
-                                                
+
                                             }
                                             else if (Model.Animals.Count(m => m.LastChecked.Date == DateTime.Today.Date) == 0)
                                             {
-                                                <button title="Animals not checked" type="button" class="btn btn-sm btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <button title="Animals not checked" type="button" class="btn btn-sm btn-outline-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     <span class="fas fa-times-circle"></span>
                                                 </button>
                                             }
@@ -69,7 +69,7 @@
                                         }
                                         else if (Model.Animals.Count(m => m.MissedChecks.Count(n => n.Timestamp.Date == start.Date) != 0) == Model.Animals.Count())
                                         {
-                                            <button title="Animals not checked" type="button" class="btn btn-sm btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <button title="Animals not checked" type="button" class="btn btn-sm btn-outline-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <span class="fas fa-times-circle"></span>
                                             </button>
                                         }
@@ -88,7 +88,7 @@
                                                 }
                                                 else
                                                 {
-                                                   <a class="dropdown-item" href="#"><span class="text-success fas fa-check-circle"></span> @animal.UniqueAnimalId</a>
+                                                    <a class="dropdown-item" href="#"><span class="text-success fas fa-check-circle"></span> @animal.UniqueAnimalId</a>
                                                 }
                                             }
                                         </span>
@@ -117,20 +117,20 @@
             </div>
         </div>
 
-        @Html.ActionLink("Cancel", "Groups", new { id = Model.Room_Id }, new { @class = "btn  btn-danger" })
-        
+        @Html.ActionLink("Cancel", "Groups", new { id = Model.Room_Id }, new { @class = "btn  btn-outline-danger" })
+
         <button type="button" data-toggle="modal" data-target="#removefeedgroupmodal" class="btn btn-outline-dark ">Remove a group feed</button>
-        
+
 
         <div class="btn-group btn-group-toggle" data-toggle="buttons">
             <label class="btn btn-primary">
                 <input id="visualCheck" type="checkbox" autocomplete="off" />All visually checked
             </label>
-            <button type="button" id="btnGroup" data-toggle="modal" data-target="#feedgroupmodal" class="btn btn-danger ">Feed group</button>
-            <button type="button" id="btnPrevious" data-bind="click:FeedPrevious" class="btn btn-danger ">Feed previous</button>
-            <button type="button" id="btnFinish" data-bind="click:SaveAndFinish" class="btn btn-danger ">Save and finish</button>
+            <button type="button" id="btnGroup" data-toggle="modal" data-target="#feedgroupmodal" class="btn btn-outline-danger ">Feed group</button>
+            <button type="button" id="btnPrevious" data-bind="click:FeedPrevious" class="btn btn-outline-danger ">Feed previous</button>
+            <button type="button" id="btnFinish" data-bind="click:SaveAndFinish" class="btn btn-outline-danger ">Save and finish</button>
         </div>
-        
+
     }
 </div>
 
@@ -155,11 +155,11 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary @if (string.IsNullOrEmpty(ViewBag.Groups)) { <text>disabled</text> } " data-bind="click:FeedGroup">Feed</button>
-</div>
+            </div>
 
-</div>
+        </div>
 
-</div>
+    </div>
 </div>
 
 
@@ -203,7 +203,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark " data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger " data-bind="click:Finish">Continue</button>
+                <button type="button" class="btn btn-outline-danger " data-bind="click:Finish">Continue</button>
             </div>
         </div>
     </div>
@@ -213,179 +213,17 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3 class="modal-title animal-photo-name"></h3>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="animal-picture-modal"></div>
+            <div class="modal-body animal-picture-modal text-center"></div>
         </div>
     </div>
 </div>
 
 @section scripts {
-    <script>
-        function loadModalImage(id, name) {
-            $('.animal-photo-name').text(name);
-            $('.animal-picture-modal').html('<img src="@Url.Content("~/Content/AnimalImages/")' + id + '.jpg" width="600" height="400" alt="Loading..." />');
-            $('#PhotoModal').modal();
-            return false;
-        }
-
-
-        $('#btnFinish,#btnPrevious,#btnGroup').attr('disabled', 'disabled');
-        $('#visualCheck').change(function() {
-            if ($('#visualCheck')[0].checked) {
-                $('#btnFinish,#btnPrevious,#btnGroup').removeAttr('disabled');
-                $('#btnFinish,#btnPrevious,#btnGroup').removeClass('btn-danger');
-                $('#btnFinish,#btnPrevious,#btnGroup').addClass('btn-success');
-
-            } else {
-                $('#btnFinish,#btnPrevious,#btnGroup').attr('disabled', 'disabled');
-                $('#btnFinish,#btnPrevious,#btnGroup').addClass('btn-danger');
-                $('#btnFinish,#btnPrevious,#btnGroup').removeClass('btn-success');
-            }
-        });
-
-
-
-    </script>
     @Scripts.Render("~/bundles/knockout")
-    <script>
-        function vm() {
-            var self = this;
-
-            self.FeedGroup = function () {
-                var feedvalue = $('#feedgroupvalue').val();
-                var groupname = $('#groupdropdown').val();
-                if (groupname !== '') {
-                    $('div.col-md-2').each(function (index, column) {
-                        if ($(column).find('.groupname td span').html().replace('&nbsp;', '').trim() == groupname) {
-                            $('input[id^="Animals_' + index + '__Feeds_' + $('#groupdatedropdown').val() + '__FeedAmount"]').val(feedvalue);
-                            $('input[id^="Animals_' + index + '__Feeds_' + $('#groupdatedropdown').val() + '__CombinedFeed"]').val('true');
-                        }
-                    });
-                    self.Finish();
-                } else {
-                    $('#feedgroupmodal').modal('hide');
-                }
-            };
-
-            self.RemoveFeedGroup = function () {
-                var groupname = $('#removegroupdropdown').val();
-                if (groupname != '') {
-                    $('div.col-md-2').each(function (index, column) {
-                        if ($(column).find('.groupname td span').html().replace('&nbsp;', '').trim() == groupname) {
-                            $('input[id^="Animals_' + index + '__Feeds_' + $('#removegroupdatedropdown').val() + '__FeedAmount"]').val('');
-                            $('input[id^="Animals_' + index + '__Feeds_' + $('#removegroupdatedropdown').val() + '__CombinedFeed"]').val('false');
-                        }
-                    });
-                    self.Finish();
-                } else {
-                    $('#removefeedgroupmodal').modal('hide');
-                }
-            };
-
-            self.FeedPrevious = function () {
-                var feedamount, feedtype = false, feedinput;
-
-                $.each($('.col-md-2 .feedingtable table'), function (i, el) {
-                    $.each($(el).find('input[id$=__FeedAmount]'), function (j, el2) {
-                        if ($(el2).val() !== '') {
-                            feedamount = $(el2).val();
-                            feedtype = $(el2).siblings('input').val();
-                        }
-                    });
-                    $(el).find('input[id$=__FeedAmount]').last().val(feedamount);
-                    $(el).find('input[id$=__CombinedFeed]').last().val(feedtype);
-                });
-                self.Finish();
-            };
-
-            self.LowWeightAnimals = ko.observableArray();
-
-            self.SaveAndFinish = function () {
-                self.LowWeightAnimals.removeAll();
-                $.each($('div.col-md-2'), function (index, column) {
-                    var animalid = $(column).find('.uniqueanimalid b').html().trim();
-                    var animalweight = $(column).find('.baseweight').html().replace('g', '').trim();
-                    var result = false;
-
-                    var lastWeight = $(column).find('input[id$=__Weight]').filter(function (i, el) { return $(el).val() !== "" }).last().val();
-                    if (lastWeight != "" && parseInt(animalweight, 10) * .85 > parseInt(lastWeight, 10)) {
-                        var animal = { name: animalid };
-                        if (self.LowWeightAnimals.indexOf(animal) < 0) {
-                            self.LowWeightAnimals.push(animal);
-                        }
-                    }
-                });
-                if (self.LowWeightAnimals().length == 0) {
-                    self.Finish();
-                } else {
-                    $('#lowweightalert').modal('show');
-                }
-            };
-
-            self.Finish = function () {
-                $('#state').val('finish');
-                // convert all ff's into -1's
-                $('input[name$="FeedAmount"]').each(function (i, j) {
-                    if ($(j).val() === 'ff') {
-                        $(j).val(-1);
-                    }
-                });
-                document.forms[1].submit();
-            };
-        }
-        ko.applyBindings(new vm());
-
-        $('.combinedfeed .feed').keyup(function (e) {
-            var newvalue = e.target.value;
-            var feedid = e.target.id;
-            feedid = feedid.slice(0, feedid.lastIndexOf("_") - 1);
-            feedid = feedid.slice(feedid.lastIndexOf("_") + 1);
-            var currentgroupname = $(e.target).parents('.col-md-2').find('.groupname td span').html().replace('&nbsp;', '').trim();
-            $.each($('.col-md-2'), function (i, j) {
-                if ($(j).find('.groupname td span').html().replace('&nbsp;', '').trim() === currentgroupname) {
-                    $(j).find($('input[id$="__Feeds_' + feedid + '__FeedAmount"]')).val(newvalue);
-                }
-            });
-        });
-
-        var currentGroup = '';
-        var previousGroup = '';
-        var previousElement = null;
-        $.each($('.groupname td'), function (i, j) {
-            currentGroup = $(j).find('span').html().replace('&nbsp;', '').trim();
-            if (currentGroup != '') {
-                if (currentGroup != previousGroup) {
-                    $(j).addClass('start');
-                } else if (currentGroup == previousGroup) {
-                    $(j).addClass('middle');
-                }
-            }
-            if (currentGroup != '' && currentGroup != previousGroup && previousGroup != '' && previousElement != null) {
-                $(previousElement).addClass('end');
-            }
-            previousElement = j;
-            previousGroup = currentGroup;
-        });
-        if (currentGroup != '' && previousElement != null) {
-            $(previousElement).addClass('end');
-        }
-
-        // convert all -1's into -ff's
-        $('input[name$="FeedAmount"]').each(function (i, j) {
-            if ($(j).val() === '-1') {
-                $(j).val('ff');
-            }
-        });
-
-        $('.col-md-2 .start').parents('.col-md-2').find('.feed').css('display', 'inline');
-        $('.col-md-2 .start').parents('.col-md-2').find('.combinedfeedmsg').css('display', 'none');
-        $('.col-md-2 .start').parents('.col-md-2').addClass('start-group-separator');
-        $('.col-md-2 .end').parents('.col-md-2').addClass('end-group-separator');
-
-        $('#groupdatedropdown option:last, #removegroupdatedropdown option:last').attr('selected', 'selected');
-
-        $("html, body").animate({ scrollTop: $(document).height() }, 1000);
-    </script>
+    @Scripts.Render("~/Scripts/addFeed.js")
 }

@@ -1,8 +1,8 @@
 ﻿@model AnimalDB.Repo.Entities.Sop
 
-<h3>
-    @Html.ActionLink("Back", "Index", new { id=Model.Category_Id }, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", new { id = Model.Category_Id })"><i class="fas fa-arrow-left"></i> Back to S.O.P. Category</a>
+}
 
 <h2>@Html.DisplayFor(model => model.Description) @Html.ActionLink("Download", "GetSop", new { id = Model.Id, download = 1 }, new { @class = "btn btn-outline-dark" })</h2>
 
@@ -31,7 +31,3 @@
 <div class="row">
     <embed src="@Url.Action("GetSop", "Sops", new { id=Model.Id })" class="offset-md-1 col-md-10" height="842" />
 </div>
-<hr />
-<h3>
-    @Html.ActionLink("Back", "Index", new { id = Model.Category_Id }, new { @class = "btn btn-primary" })
-</h3>

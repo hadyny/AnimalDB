@@ -1,15 +1,15 @@
 ﻿@model IEnumerable<AnimalDB.Repo.Entities.FeedingGroup>
 
-<h2>Feeding Groups</h2>
+<h1>Feeding Groups</h1>
 
 @if (!User.IsInRole("Student"))
 {
-<p>
+<p class="text-center">
     @Html.ActionLink("Create New Feeding Group", "Create", null, new { @class = "btn  btn-outline-dark" })
 </p>
 }
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover col-md-8 offset-md-2">
+    <thead class="thead-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
@@ -17,22 +17,23 @@
             <th></th>
         </tr>
     </thead>
-
-@foreach (var item in Model.OrderBy(m => m.Description)) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Description)
-        </td>
-        <td>
-            @Html.ActionLink("Add/View Animals", "Add", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-            @Html.ActionLink("Create Sub-Groups", "Group", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-            @if (!User.IsInRole("Student"))
-            {
-                @Html.ActionLink("Edit Group", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-                @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn  btn-danger" })
-            }
-        </td>
-    </tr>
-}
-
+    <tbody>
+        @foreach (var item in Model.OrderBy(m => m.Description))
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td class="text-right">
+                    @Html.ActionLink("Add/View Animals", "Add", new { id = item.Id }, new { @class = "btn btn-outline-dark" })
+                    @Html.ActionLink("Create Sub-Groups", "Group", new { id = item.Id }, new { @class = "btn btn-outline-dark" })
+                    @if (!User.IsInRole("Student"))
+                    {
+                        @Html.ActionLink("Edit Group", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-dark" })
+                        @Html.ActionLink("X", "Delete", new { id = item.Id }, new { @class = "btn btn-outline-danger" })
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>

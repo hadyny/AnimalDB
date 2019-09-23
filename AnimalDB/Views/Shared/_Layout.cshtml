@@ -4,15 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Psychology Animal Database</title>
-    <script type="text/javascript">
-    var appInsights=window.appInsights||function(config){
-            function s(config){t[config]=function(){var i=arguments;t.queue.push(function(){t[config].apply(t,i)})}}var t={config:config},r=document,f=window,e="script",o=r.createElement(e),i,u;for(o.src=config.url||"//az416426.vo.msecnd.net/scripts/a/ai.0.js",r.getElementsByTagName(e)[0].parentNode.appendChild(o),t.cookie=r.cookie,t.queue=[],i=["Event","Exception","Metric","PageView","Trace"];i.length;)s("track"+i.pop());return config.disableExceptionTracking||(i="onerror",s("_"+i),u=f[i],f[i]=function(config,r,f,e,o){var s=u&&u(config,r,f,e,o);return s!==!0&&t["_"+i](config,r,f,e,o),s}),t
-    }({
-        instrumentationKey:"f96cfe40-0911-4253-86dc-083d9eed26d8"
-    });
+    <script>
+        var appInsights = window.appInsights || function (config) {
+            function s(config) { t[config] = function () { var i = arguments; t.queue.push(function () { t[config].apply(t, i) }) } } var t = { config: config }, r = document, f = window, e = "script", o = r.createElement(e), i, u; for (o.src = config.url || "//az416426.vo.msecnd.net/scripts/a/ai.0.js", r.getElementsByTagName(e)[0].parentNode.appendChild(o), t.cookie = r.cookie, t.queue = [], i = ["Event", "Exception", "Metric", "PageView", "Trace"]; i.length;)s("track" + i.pop()); return config.disableExceptionTracking || (i = "onerror", s("_" + i), u = f[i], f[i] = function (config, r, f, e, o) { var s = u && u(config, r, f, e, o); return s !== !0 && t["_" + i](config, r, f, e, o), s }), t
+        }({
+            instrumentationKey: "f96cfe40-0911-4253-86dc-083d9eed26d8"
+        });
 
-    window.appInsights=appInsights;
-    appInsights.trackPageView();
+        window.appInsights = appInsights;
+        appInsights.trackPageView();
     </script>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
@@ -21,8 +21,16 @@
     <meta name="description" content="Animal Database" />
 </head>
 <body>
-
-    @{Html.RenderAction("Menu", "Nav");}
+    @if (Request.IsAuthenticated)
+    {
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        @RenderSection("BackNav", required: false)
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        @{Html.RenderAction("Menu", "Nav");}
+    </nav>
+    }
     <div class="container-fluid body-content">
         @RenderBody()
     </div>
@@ -30,6 +38,5 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
-    @*<script>$("dd").each(function () { this.innerHTML = this.innerHTML.replace(/_/g, " "); });</script>*@
 </body>
 </html>

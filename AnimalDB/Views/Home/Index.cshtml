@@ -1,9 +1,8 @@
-﻿<form method="post" class="findanimal">
+﻿<form method="post" class="findanimal" autocomplete="off">
     <div>
-        <hr />
-        @Html.DropDownList("animalid", "")
-        <h2 class="field-validation-error">@ViewBag.Errors</h2>
-        <hr />
+        <h1>Select an animal</h1>
+        <input id="animalname" class="form-control" placeholder="Start typing..." />
+        <div id="results"></div>
     </div>
 </form>
 
@@ -14,16 +13,11 @@
     </h4>
 </footer>
 
+
 @section scripts {
+    @Scripts.Render("~/Scripts/autocomplete.js")
     <script type="text/javascript">
-        $(document).ready(function () {
-            $('#animalid').select2({ allowClear: true, matcher: matchCustom, placeholder: "Select animal:" });
-            $('#animalid').select2('open');
-            $('#animalid').on("change", function (e) {
-                if (e.val !== '') {
-                    $('.findanimal').submit();
-                }
-            });
-        });
-</script>
+        autocomplete('@Url.Action("Animals")', document.getElementById('animalname'), document.getElementById('results'));
+        $("#animalname").focus();
+    </script>
 }

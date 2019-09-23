@@ -16,6 +16,7 @@ namespace AnimalDB.Repo.Entities
 
         [Display(Name = "Protocol #")]
         public string ProtocolNumber { get; set; }
+        public int Ethics_Id { get; set; }
 
         [Display(Name = "Beginning of Period")]
         public DateTime PeriodFrom { get; set; }

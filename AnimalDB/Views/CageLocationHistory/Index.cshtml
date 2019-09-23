@@ -4,7 +4,11 @@
     bool first = true;
 }
 
-<h2>Cage Location History for @ViewBag.AnimalName</h2>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index", "Home")"><i class="fas fa-arrow-left"></i> Animals</a>
+}
+
+<h1>Cage Location History for @ViewBag.AnimalName</h1>
 
 @Html.Partial("_AnimalHeaderPartial")
 
@@ -19,16 +23,16 @@
         else
         {
             <text>@Model.First().RackEntry.Rack.Reference_Id, @Model.First().RackEntry.Reference </text>
+        }
     }
-}
 </h3>
 
 
 <p>
     @Html.ActionLink("Move Animal", "Create", new { id = ViewBag.AnimalId }, new { @class = "btn  btn-outline-dark" })
 </p>
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover">
+    <thead class="thead-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Timestamp)
@@ -39,51 +43,55 @@
             <th></th>
         </tr>
     </thead>
-@foreach (var item in Model) {
-    if (first) {
-        first = false;
-        <tr class="success">
-            <td>
-                @Html.DisplayFor(modelItem => item.Timestamp)
-            </td>
-            <td>
-                @if (item.CageLocation_Id != null)
-                {
-                    @Html.DisplayFor(modelItem => item.CageLocation.Description)
-                }
-                else
-                {
-                    <text>@Html.DisplayFor(modelItem => item.RackEntry.Rack.Reference_Id), @Html.DisplayFor(modelItem => item.RackEntry.Reference)</text>
-}
-            </td>
-            <td>
-                @if (!User.IsInRole("Student") && !User.IsInRole("Veterinarian"))
-                {
-                    @Html.ActionLink("Change", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
-                }
-            </td>
-        </tr>
-    } else {
-        first = false;
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Timestamp)
-            </td>
-            <td>
-                @if (item.CageLocation_Id != null)
-                {
-                    @Html.DisplayFor(modelItem => item.CageLocation.Description)
-                }
-                else
-                {
-                    <text>@Html.DisplayFor(modelItem => item.RackEntry.Rack.Reference_Id), @Html.DisplayFor(modelItem => item.RackEntry.Reference)</text>
-}
-            </td>
-            <td>
-                
-            </td>
-        </tr>   
+    @foreach (var item in Model)
+    {
+        if (first)
+        {
+            first = false;
+            <tr class="success">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Timestamp)
+                </td>
+                <td>
+                    @if (item.CageLocation_Id != null)
+                    {
+                        @Html.DisplayFor(modelItem => item.CageLocation.Description)
+                    }
+                    else
+                    {
+                        <text>@Html.DisplayFor(modelItem => item.RackEntry.Rack.Reference_Id), @Html.DisplayFor(modelItem => item.RackEntry.Reference)</text>
+                    }
+                </td>
+                <td>
+                    @if (!User.IsInRole("Student") && !User.IsInRole("Veterinarian"))
+                    {
+                        @Html.ActionLink("Change", "Edit", new { id = item.Id }, new { @class = "btn  btn-outline-dark" })
+                    }
+                </td>
+            </tr>
+        }
+        else
+        {
+            first = false;
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Timestamp)
+                </td>
+                <td>
+                    @if (item.CageLocation_Id != null)
+                    {
+                        @Html.DisplayFor(modelItem => item.CageLocation.Description)
+                    }
+                    else
+                    {
+                        <text>@Html.DisplayFor(modelItem => item.RackEntry.Rack.Reference_Id), @Html.DisplayFor(modelItem => item.RackEntry.Reference)</text>
+                    }
+                </td>
+                <td>
+                </td>
+            </tr>
+
+        }
     }
-}
 
 </table>

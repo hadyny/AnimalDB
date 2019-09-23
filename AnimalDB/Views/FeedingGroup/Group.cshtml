@@ -1,8 +1,8 @@
 ﻿@model AnimalDB.Models.CreateGroupViewModel
 
-<h3>
-    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back to Feeding Groups</a>
+}
 
 <h2>Grouping for feeding group @Model.Description</h2>
 @Html.ActionLink("Edit Sub-Groups", "Index", "Group", new { id = Model.Id }, new { @class = "btn  btn-outline-dark" })

@@ -34,7 +34,7 @@
     }
 }
 
-<ul class="nav nav-pills nav-fill">
+<ul class="nav nav-tabs nav-fill">
     <li class="nav-item">@Html.ActionLink("Animal Details", "Details", "Animals", new { id = ViewBag.AnimalId }, new { @class = "nav-link " + a })</li>
     <li class="nav-item">@Html.ActionLink("Feeds/Weight", "Details", "Feed", new { id = ViewBag.AnimalId }, new { @class = "nav-link " + f})</li>
     <li class="nav-item">@Html.ActionLink("Notes", "Index", "Note", new { id = ViewBag.AnimalId }, new { @class = "nav-link " + n })</li>
@@ -45,5 +45,3 @@
     <li class="nav-item">@Html.ActionLink("Relationships", "Details", "Relationships", new { id = ViewBag.AnimalId }, new { @class = "nav-link " + o })</li>
     <li class="nav-item">@Html.ActionLink("Reports", "Index", "ClinicalIncidentReports", new { id = ViewBag.AnimalId }, new { @class = "nav-link " + r })</li>
 </ul>
-
-<hr />

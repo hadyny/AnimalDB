@@ -1,8 +1,8 @@
 ﻿@model AnimalDB.Repo.Entities.VirusType
 
-<h3>
-    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back</a>
+}
 
 <h2>Edit Virus Type</h2>
 
@@ -10,7 +10,7 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -25,7 +25,7 @@
         </div>
 
         <div class="form-group">
-            <div class="offset-md-2 col-md-10">
+            <div class="col-md-10">
                 <input type="submit" value="Save" class="btn btn-outline-dark " />
             </div>
         </div>

@@ -111,6 +111,7 @@ namespace AnimalDB.Controllers
             if (!string.IsNullOrEmpty(grps))
             {
                 ViewBag.BackToGroups = "1";
+                ViewBag.FeedingGroup = id ?? id.Value;
             }
             if (!string.IsNullOrEmpty(gmo))
             {

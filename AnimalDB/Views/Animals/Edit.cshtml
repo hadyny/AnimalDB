@@ -213,18 +213,5 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-
-    <script>
-        $('#BaseWeight').on("focusout", function () {
-            var base = this.value;
-            var upperLimit = '@Model.BaseWeight';
-            upperLimit = upperLimit * 1.1;
-            var lowerLimit = '@Model.BaseWeight';
-            lowerLimit = lowerLimit * .9;
-            if (('@Model.BaseWeight' !== '') && (base >= upperLimit || base <= lowerLimit)) {
-                alert("You have changed the base weight by more than 10%, please check that this value is correct.");
-            }
-        });
-
-    </script>
+    @Scripts.Render("~/Scripts/editAnimal.js")
 }

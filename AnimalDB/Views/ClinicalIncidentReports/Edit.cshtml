@@ -1,9 +1,10 @@
 ﻿@model AnimalDB.Repo.Entities.ClinicalIncidentReport
 
-<h3>
-    @Html.ActionLink("Back", "Index", "ClinicalIncidentReports", new { id = Model.Animal_Id }, new { @class = "btn btn-primary" })
-    <a class="btn btn-primary noprint" href="#" onclick="javscript: printreport()">Print</a>
-</h3>
+@section BackNav {
+    <a class="btn btn-sm btn-secondary" href="@Url.Action("Index",  new { id = Model.Animal_Id })"><i class="fas fa-arrow-left"></i> Back</a>
+}
+
+<a class="btn btn-primary noprint" href="#" onclick="javscript: printreport()">Print</a>
 
 <div class="clinicalIncidentReport">
     <h2>Clinical Incidence Report Form - SICK REPORT</h2>
@@ -251,23 +252,5 @@
 
 @section scripts {
     @Scripts.Render("~/bundles/jqueryval")
-    <script>
-        function printreport() {
-            print_window = window.open("", "printwindow", "status=1,width=700,height=842");
-            print_window.document.write('<html><head>');
-            print_window.document.write('<title>Clinical Incidence Report</title>');
-            print_window.document.write('<link href="@Styles.Url("~/Content/printcss")" rel="stylesheet" />');
-            print_window.document.write('<link href="@Styles.Url("~/Content/printcss2")" rel="stylesheet" media="print" />');
-            print_window.document.write('</head>');
-            print_window.document.write('<body onload="window.print()"><div class="noprint">');
-            print_window.document.write('<button onclick="window.close()">Close Preview</button>');
-            print_window.document.write('</div>');
-            print_window.document.write($('<div />').append($('.clinicalIncidentReport').clone()).html());
-            print_window.document.write('<script src="@Scripts.Url("~/bundles/jquery")"><' + '/script>');
-            print_window.document.write('<script>$("input, textarea").attr("readonly", "readonly");$("select").attr("disabled", true);<' + '/script>');
-            print_window.document.write('</body></html>');
-            print_window.document.close();
-            print_window.focus();
-        }
-    </script>
+    @Scripts.Render("~/Scripts/printClinicalIncidentReport.js")
 }

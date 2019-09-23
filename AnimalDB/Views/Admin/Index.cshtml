@@ -1,68 +1,68 @@
-﻿<h2>Administration</h2>
-<hr />
+﻿<h1>Administration</h1>
 <div class="row admin">
-    <div class="col-md-3">
-        <h3>Create</h3>
-        <ul>
+    <div class="col-md-6">
+        <h2>Create and Edit</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <ul>
+                    @if (User.IsInRole("Technician") || User.IsInRole("Administrator"))
+                    {
+                        <li>@Html.ActionLink("Rooms", "Index", "Rooms", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("New Animal", "Create", "Animals", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("Arrival Status", "Index", "ArrivalStatus", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("Colours", "Index", "Colour", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("Medication", "Index", "MedicationType", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("GD Timelines", "Index", "GDTimelines", null, new { @class = "btn  btn-outline-dark" })</li>
+                    }
+                    <li>@Html.ActionLink("Cage Locations", "Index", "CageLocation", null, new { @class = "btn  btn-outline-dark" })</li>
+                    <li>@Html.ActionLink("AUP Numbers", "Index", "EthicsNumber", null, new { @class = "btn  btn-outline-dark" })</li>
+                    <li>@Html.ActionLink("Approval Numbers", "Index", "ApprovalNumbers", null, new { @class = "btn  btn-outline-dark" })</li>
+                </ul>
+            </div>
             @if (User.IsInRole("Technician") || User.IsInRole("Administrator"))
             {
-            <li>@Html.ActionLink("Rooms", "Index", "Rooms", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("New Animal", "Create", "Animals", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Arrival Status", "Index", "ArrivalStatus", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Colours", "Index", "Colour", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Medication", "Index", "MedicationType", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("GD Timelines", "Index", "GDTimelines", null, new { @class = "btn  btn-outline-dark" })</li>
+                <div class="col-md-6">
+                    <ul>
+                        <li>@Html.ActionLink("Sources", "Index", "Source", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("Species", "Index", "Species", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("Strains", "Index", "Strain", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("Transgene IDs", "Index", "Transgenes", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("Surgery Types", "Index", "SurgeryType", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("Virus Types", "Index", "VirusTypes", null, new { @class = "btn  btn-outline-dark" })</li>
+                        <li>@Html.ActionLink("Racks", "Index", "Racks", null, new { @class = "btn  btn-outline-dark" })</li>
+                    </ul>
+                </div>
             }
-            <li>@Html.ActionLink("Cage Locations", "Index", "CageLocation", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("AUP Numbers", "Index", "EthicsNumber", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Approval Numbers", "Index", "ApprovalNumbers", null, new { @class = "btn  btn-outline-dark" })</li>
-        </ul>
-    </div>
-    @if (User.IsInRole("Technician") || User.IsInRole("Administrator")) {
-    <div class="col-md-3">
-        <h3>&nbsp;</h3>
-        <ul>
-            <li>@Html.ActionLink("Sources", "Index", "Source", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Species", "Index", "Species", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Strains", "Index", "Strain", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Transgene IDs", "Index", "Transgenes", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Surgery Types", "Index", "SurgeryType", null, new { @class = "btn  btn-outline-dark" })</li>
-            @*<li>@Html.ActionLink("Charge Codes", "Index", "ChargeCodes", null, new { @class = "btn  btn-outline-dark" })</li>*@
-            <li>@Html.ActionLink("Virus Types", "Index", "VirusTypes", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Racks", "Index", "Racks", null, new { @class = "btn  btn-outline-dark" })</li>
-        </ul>
+        </div>
     </div>
     <div class="col-md-3">
-        <h3>Tasks</h3>
+        <h2>Tasks</h2>
         <ul>
-            @*
-        <li>@Html.ActionLink("Cleaning", "Index", "CleaningTask", null, new { @class = "btn  btn-outline-dark" })</li>
-        <li>@Html.ActionLink("Rooms to clean", "Index", "CleaningRoomLocation", null, new { @class = "btn  btn-outline-dark" })</li>
-        <li>@Html.ActionLink("Areas to clean", "Index", "CleaningLocation", null, new { @class = "btn  btn-outline-dark" })</li>
-            *@
             <li>@Html.ActionLink("Print Identity Cards", "SelectMultiple", "IdentityCard", null, new { @class = "btn  btn-outline-dark" })</li>
             <li>@Html.ActionLink("Print Stock Cards", "SelectSmallCard", "IdentityCard", null, new { @class = "btn  btn-outline-dark" })</li>
             @if (User.IsInRole("Technician") || User.IsInRole("Administrator"))
-    {
-        <li>@Html.ActionLink("Manipulation Figures", "Index", "AnimalManipulationReports", null, new { @class = "btn  btn-outline-dark" })</li>
-        <li>@Html.ActionLink("Add Culled Pups", "Index", "CulledPups", null, new { @class = "btn  btn-outline-dark" })</li>
-        <li>@Html.ActionLink("Culled Pups by AUP", "PupsByEthics", "CulledPups", null, new { @class = "btn  btn-outline-dark" })</li>
-}
+            {
+                <li>@Html.ActionLink("Manipulation Figures", "Index", "AnimalManipulationReports", null, new { @class = "btn  btn-outline-dark" })</li>
+                <li>@Html.ActionLink("Add Culled Pups", "Index", "CulledPups", null, new { @class = "btn  btn-outline-dark" })</li>
+                <li>@Html.ActionLink("Culled Pups by AUP", "PupsByEthics", "CulledPups", null, new { @class = "btn  btn-outline-dark" })</li>
+            }
         </ul>
     </div>
-    }
+
     <div class="col-md-3">
-        <h3>Other</h3>
+        <h2>Other</h2>
         <ul>
-        @if(User.IsInRole("Administrator")) {
-            <li>@Html.ActionLink("Administrators", "Index", "Administrators", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Technicians", "Index", "Technician", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Veterinarians", "Index", "Veterinarian", null, new { @class = "btn  btn-outline-dark" })</li>
-        }
-        @if (User.IsInRole("Technician") || User.IsInRole("Administrator")) {
-            <li>@Html.ActionLink("Investigators", "Index", "Investigator", null, new { @class = "btn  btn-outline-dark" })</li>
-            <li>@Html.ActionLink("Researchers", "Index", "Students", null, new { @class = "btn  btn-outline-dark" })</li>
-        }
+            @if (User.IsInRole("Administrator"))
+            {
+                <li>@Html.ActionLink("Administrators", "Index", "Administrators", null, new { @class = "btn  btn-outline-dark" })</li>
+                <li>@Html.ActionLink("Technicians", "Index", "Technician", null, new { @class = "btn  btn-outline-dark" })</li>
+                <li>@Html.ActionLink("Veterinarians", "Index", "Veterinarian", null, new { @class = "btn  btn-outline-dark" })</li>
+            }
+            @if (User.IsInRole("Technician") || User.IsInRole("Administrator"))
+            {
+                <li>@Html.ActionLink("Investigators", "Index", "Investigator", null, new { @class = "btn  btn-outline-dark" })</li>
+                <li>@Html.ActionLink("Researchers", "Index", "Students", null, new { @class = "btn  btn-outline-dark" })</li>
+            }
             <li>@Html.ActionLink("Deceased Animals", "Index", "Culled", null, new { @class = "btn  btn-outline-dark" })</li>
             <li>@Html.ActionLink("Notification Emails", "Index", "NotificationEmails", null, new { @class = "btn  btn-outline-dark" })</li>
         </ul>

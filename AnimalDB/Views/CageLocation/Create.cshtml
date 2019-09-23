@@ -1,22 +1,25 @@
 ﻿@model AnimalDB.Repo.Entities.CageLocation
 
-<h3>
+
+@section BackNav {
     @if (string.IsNullOrEmpty(Request["returnUrl"]))
     {
-        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
-    } else {
-    <a href="@Request["returnUrl"]" class="btn btn-primary">Back</a>
+        <a class="btn btn-sm btn-secondary" href="@Url.Action("Index")"><i class="fas fa-arrow-left"></i> Back</a>
     }
-</h3>
+    else
+    {
+        <a class="btn btn-sm btn-secondary" href="@Request["returnUrl"]"><i class="fas fa-arrow-left"></i> Back</a>
+    }
+}
 
 <h2>Create New Cage Location</h2>
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
-        
+
         <hr />
         @Html.ValidationSummary(true)
 
@@ -37,7 +40,7 @@
         </div>
 
         <div class="form-group">
-            <div class="offset-md-2 col-md-10">
+            <div class="col-md-10">
                 <input type="submit" value="Create" class="btn  btn-outline-dark" />
             </div>
         </div>
